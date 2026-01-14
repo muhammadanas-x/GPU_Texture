@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seiler Curve - Three.js</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            overflow: hidden;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #111;
+        }
+        
+        #progress-display {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 14px;
+            z-index: 100;
+            border: 1px solid #333;
+        }
+        
+        #progress-display strong {
+            color: #4af;
+        }
+        
+        #info {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            color: white;
+            font-size: 12px;
+            opacity: 0.7;
+        }
+    </style>
+</head>
+<body>
+    <div id="progress-display">
+        <div>Progress: <strong id="progress-value">0.0%</strong></div>
+        <div style="margin-top: 5px; font-size: 12px; opacity: 0.8;">
+            Memory optimized: using DataTexture for curve
+        </div>
+    </div>
+    
+    <div id="info">Drag to rotate • Scroll to zoom</div>
+
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+                "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+            }
+        }
+    </script>
+
+    <script type="module">
+        import * as THREE from 'three';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+        import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x111111);
+
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.set(10, 10, 10);
+        camera.lookAt(0, 0, 0);
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        document.body.appendChild(renderer.domElement);
+
+        const controls = new OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.05;
+
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+        scene.add(ambientLight);
+
+        const pointLight = new THREE.PointLight(0xffffff, 1);
+        pointLight.position.set(10, 10, 10);
+        scene.add(pointLight);
+
+        // Add helpers
+        const axesHelper = new THREE.AxesHelper(10);
+        scene.add(axesHelper);
+
+        const gridHelper = new THREE.GridHelper(20, 20);
+        gridHelper.position.y = -0.01;
+        scene.add(gridHelper);
+
+        // Control points
+        const p0 = new THREE.Vector3(-5, 0, 0);
+        const p1 = new THREE.Vector3(-2, 5, 0);
+        const p2 = new THREE.Vector3(10, -5, 0);
+        const p3 = new THREE.Vector3(5, 0, 0);
+
+        // Create curve texture
+        const d1 = new THREE.Vector3().subVectors(p1, p0).multiplyScalar(3.0);
+        const d2 = new THREE.Vector3().subVectors(p2, p3).multiplyScalar(3.0);
+        const s1 = new THREE.Vector3().addVectors(p0, d1);
+        const s2 = new THREE.Vector3().addVectors(p3, d2);
+        
+        const textureData = new Float32Array([
+            p0.x, p0.y, p0.z, 0,   p3.x, p3.y, p3.z, 0, 
+            s1.x, s1.y, s1.z, 0,   s2.x, s2.y, s2.z, 0  
+        ]);
+
+        const curveTexture = new THREE.DataTexture(textureData, 2, 2, THREE.RGBAFormat, THREE.FloatType);
+        curveTexture.magFilter = THREE.LinearFilter;
+        curveTexture.minFilter = THREE.LinearFilter;
+        curveTexture.wrapS = THREE.ClampToEdgeWrapping;
+        curveTexture.wrapT = THREE.ClampToEdgeWrapping;
+        curveTexture.needsUpdate = true;
+
+        let progress = 0;
+        const clock = new THREE.Clock();
+
+        const pointMaterial = new THREE.ShaderMaterial({
+            uniforms: {
+                uCurveTex: { value: curveTexture },
+                uProgress: { value: progress }
+            },
+            vertexShader: `
+                uniform sampler2D uCurveTex;
+                uniform float uProgress;
+                varying vec3 vPosition;
+                
+                void main() {
+                    float u = uProgress * 0.5 + 0.25;
+                    float v = uProgress * (1.0 - uProgress) * 0.5 + 0.25;
+                    vec3 pos = texture2D(uCurveTex, vec2(u, v)).rgb;
+                    vec3 curvePosition = pos;
+                    vec4 worldPosition = modelViewMatrix * vec4(curvePosition, 1.0);
+                    vPosition = curvePosition;
+                    gl_Position = projectionMatrix * worldPosition;
+                    gl_PointSize = 30.0;
+                }
+            `,
+            fragmentShader: `
+                varying vec3 vPosition;
+                
+                void main() {
+                    gl_FragColor = vec4(vec3(1.0), 1.0);
+                }
+            `,
+            vertexColors: false
+        });
+
+        const pointGeometry = new THREE.BufferGeometry();
+        const positions = new Float32Array([0, 0, 0]);
+        pointGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+        
+        const movingPoint = new THREE.Points(pointGeometry, pointMaterial);
+        scene.add(movingPoint);
+
+        const createControlPoint = (position, color) => {
+            const geometry = new THREE.SphereGeometry(0.2, 16, 16);
+            const material = new THREE.MeshBasicMaterial({ color });
+            const sphere = new THREE.Mesh(geometry, material);
+            sphere.position.copy(position);
+            return sphere;
+        };
+
+        scene.add(createControlPoint(p0, 0xff0000)); // Red
+        scene.add(createControlPoint(p1, 0x00ff00)); // Green
+        scene.add(createControlPoint(p2, 0x0000ff)); // Blue
+        scene.add(createControlPoint(p3, 0xffff00)); // Yellow
+
+        const controlLineGeometry = new THREE.BufferGeometry();
+        const controlLineVertices = new Float32Array([
+            p0.x, p0.y, p0.z,
+            p1.x, p1.y, p1.z,
+            p2.x, p2.y, p2.z,
+            p3.x, p3.y, p3.z
+        ]);
+        controlLineGeometry.setAttribute('position', new THREE.BufferAttribute(controlLineVertices, 3));
+        
+        const controlLineMaterial = new THREE.LineBasicMaterial({ 
+            color: 0xffffff, 
+            transparent: true, 
+            opacity: 0.3 
+        });
+        
+        const controlLine = new THREE.Line(controlLineGeometry, controlLineMaterial);
+        scene.add(controlLine);
+
+        const gui = new GUI();
+        const params = {
+            progress: 0,
+            autoAnimate: true,
+            animationSpeed: 0.5
+        };
+        
+        gui.add(params, 'progress', 0, 1, 0.01).name('Progress').onChange((value) => {
+            progress = value;
+            pointMaterial.uniforms.uProgress.value = value;
+            updateProgressDisplay();
+        });
+        
+        gui.add(params, 'autoAnimate').name('Auto Animate');
+        gui.add(params, 'animationSpeed', 0.1, 2, 0.1).name('Speed');
+
+        // Update progress display
+        function updateProgressDisplay() {
+            document.getElementById('progress-value').textContent = 
+                (progress * 100).toFixed(1) + '%';
+        }
+
+        // Animation loop
+        function animate() {
+            requestAnimationFrame(animate);
+            
+            const deltaTime = clock.getDelta();
+            
+            if (params.autoAnimate) {
+                const time = clock.getElapsedTime();
+                progress = (Math.sin(time * params.animationSpeed) * 0.5 + 0.5);
+                params.progress = progress;
+                pointMaterial.uniforms.uProgress.value = progress;
+                updateProgressDisplay();
+            }
+            
+            controls.update();
+            renderer.render(scene, camera);
+        }
+
+        // Handle window resize
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+
+        window.addEventListener('resize', onWindowResize);
+
+        updateProgressDisplay();
+
+        animate();
+
+        window.addEventListener('keydown', (event) => {
+            const step = 0.05;
+            
+            switch(event.key) {
+                case 'ArrowUp':
+                case 'ArrowRight':
+                    progress = Math.min(1, progress + step);
+                    break;
+                case 'ArrowDown':
+                case 'ArrowLeft':
+                    progress = Math.max(0, progress - step);
+                    break;
+                default:
+                    return;
+            }
+            
+            params.progress = progress;
+            pointMaterial.uniforms.uProgress.value = progress;
+            updateProgressDisplay();
+            event.preventDefault();
+        });
+    </script>
+</body>
+</html>
