@@ -1,5 +1,8 @@
 \documentclass{jcgt}
 
+\usepackage[dvipsnames]{xcolor}
+\usepackage{multirow}
+
 \setciteauthor{Name(s) as they should appear in the citation}
 \setcitetitle{hello}
 %\setheadtitle{Abbreviated title, only if full title won't fit in page headers}
@@ -14,6 +17,8 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+\newcommand{\MA}[1]{{\color{blue}  {HH: #1}}}
+\newcommand{\AW}[1]{{\color{olive} {AW: #1}}}
 
 \begin{document}
 
@@ -22,8 +27,8 @@
 % Authors with brief affiliation and ORCID you have one. 
 % More detailed affiliations can appear in the contact blocks at the end of the paper
 \author
-       {Roy G. Biv~\href{https://orcid.org/XXXX-XXXX-XXXX-XXXX}{\includegraphics[width=8pt]{ORCIDlogo}}\\Colortech, Inc.
-        \and Raymond Trace\\Graphica University
+       {Muhammad Anas
+        \and Alan Wolfe~\href{https://orcid.org/0000-0001-9100-4928}{\includegraphics[width=8pt]{ORCIDlogo}}
        }
 
 \teaser{
@@ -42,6 +47,7 @@ for  \textit{JCGT} articles.  The author names on this document are fictional an
 how to format affiliations.
 \end{abstract}
 
+\AW{Alan: This is a comment i put into the file. You have one too that is \textbackslash MA.  We can leave notes to ourselves and each other using these, and remove them before submission.}
 
 %-------------------------------------------------------------------------
 \section{Introduction}
