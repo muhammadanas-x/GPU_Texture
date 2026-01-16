@@ -1,10 +1,12 @@
 A possible paper outline and some details, to get discussion and writing started. Nothing here is set in stone at all :)
 
+Names put on sections for who is intending to write it, tentatively. Plans can change as we continue the project!
+
 ===== Abstract =====
 
 <yes>
 
-===== Intro =====
+===== Intro ===== (Muhammad)
  * Something about what Bezier curves are used for. 
   * Bezier curves have found use in graphics and graphic design since their creation by French car companies Citroën and Renault in the 1960s where they were used to improve curves in CAD.
   * In more modern times, Bezier curves are used as a simple yet powerful interface for artists to control parameters for graphical effects or animations, when those parameters vary with some other parameter such as time or space.
@@ -13,14 +15,14 @@ A possible paper outline and some details, to get discussion and writing started
  * This has benefits of ... (offloading work from compute to the texture unit? reducing memory usage to read control points? use in a specific situation like color grading / tone mapping?)
  * This paper's contributions are: <then we list the things we show / do, as bullet points>
 
-===== Evaluating Bezier Curves Using Texture Interpolation =====
+===== Evaluating Bezier Curves Using Texture Interpolation =====  (Alan)
  * show basic quadratic technique for a 2x2 texture. Explain why it works (2 lerps on X and then one on Y is the same as de casteljau?)
  * Say that it goes higher dimensions / orders.  A 2x2x2 texture can calculate a cubic curve.
  * talk about chaining them together like a 3x2 texture can have 2 curves in it.  (Talk about how the diagonals only have to AVERAGE to the right value, so there is freedom. Otherwise there are too many constraints which my blog post talks about)
  * and how you can "zig zag chain" them if you want C0 continuous curves.
 
  * limitations:
-  * U8 textures can't have negative values, or values > 1.  When a problem, can use higher bit count textures, like float16 or float32.
+  * Unorm8 textures are in [0,1]. Snorm8 are in [-1,1].  When a problem, can use higher bit count textures, like float16 or float32.  Or you can remap to 0 to 1 and rescale in the shader after evaluating the curve.
   * "jaggies" from interpolation happening in a fixed point X.8 format. When a problem, can do some of the lerps in compute, which works at full float32 precision.
 
  * Other possibilities (some of these should be "show", others can be "tell", i'd say. Unsure if appropriate to have all these)
@@ -31,23 +33,36 @@ A possible paper outline and some details, to get discussion and writing started
   * Can do surfaces: for a Bicubic patch, read a cubic curve in each channel of an RGBA image, to get 4 values out. These are the 4 control points of the axis aligned isoline on your surface (E.g. The X coordinate). Evaluate that cubic Beizer curve in shaders to get the other coordinate (E.g. The Y coordinate).
    * can also do it with conditional reads, which isn't as attractive, but works for higher degree surfaces.
    * can also extend to volumes.
-  * can do weird things with where you sample the texture. ("Strolling between the pixels" blog post)
+  * can do weird things with where you sample the texture. ("Strolling between the pixels" blog post) - maybe not.
   * can convert power basis polynomials into Bernstein basis, so this evaluates polynomials, not just curves.
 
-===== Extending to Selier interpolation =====
+===== Extending to Selier interpolation ===== (Muhammad)
 
 How that works, and showing it in action
 
-===== Results ? =====
+===== Results ? ===== (Muhammad)
 
 * we show visual results and / or performance comparisons vs other methods?
 * also, if we have a usage case of when these are actually useful, we could show that here
 * We should have a couple diagrams in the paper to visually show what we are talking about.
 
-===== Conclusion / Future Work =====
+? color grading?
+ * or particle flow fields
+ * it's a challenge to fit Bezier volumes to volumetric data.
+
+! the texture is larger than the control points
+ * because you have to duplicate the control point data a bit
+ * but it's lower in memory bandwidth because the texture interpolator sends you the value instead of the controls points.
+
+* maybe we just make a benchmark that shows it can be faster, and we mention usage cases that use Bezier curves instead of showing a use?
+ * any post processing effect that uses (or can use) a Bezier curve is already millions of curves, because there are millions of pixels.
+ * also - small textures, so should be (texture) cache friendly.
+
+===== Conclusion / Future Work ===== (Alan)
 
 Sumarize what we showed.
 If we have any thoughts on how this work could continue, we could mention it here.
+extending to volumes?
 
 ===== References =====
 
