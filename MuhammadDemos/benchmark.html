@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Seiler's Interpolation - GPU Hardware Benchmark</title>
+    <title>Seiler's Interpolation GPU Benchmark</title>
     <style>
         * {
             margin: 0;
@@ -13,171 +13,167 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-            background-color: #111827;
+            background: #111827;
             color: white;
             overflow: hidden;
         }
 
         .container {
             display: flex;
-            width: 100vw;
             height: 100vh;
         }
 
-        .sidebar {
-            width: 384px;
-            background-color: #1f2937;
-            padding: 24px;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-        }
-
-        .main-content {
+        .canvas-container {
             flex: 1;
             position: relative;
         }
 
-        #canvas-container {
+        #canvas {
             width: 100%;
             height: 100%;
+            display: block;
         }
 
-        .title {
-            font-size: 1.5rem;
+        .controls-panel {
+            width: 400px;
+            background: rgba(31, 41, 55, 0.9);
+            backdrop-filter: blur(10px);
+            border-left: 1px solid #374151;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .header {
+            margin-bottom: 24px;
+        }
+
+        .header h1 {
+            color: #93c5fd;
+            font-size: 24px;
             font-weight: bold;
-            margin-bottom: 4px;
         }
 
-        .subtitle {
-            font-size: 0.875rem;
-            color: #9ca3af;
+        .header h2 {
+            color: #d1d5db;
+            font-size: 16px;
         }
 
         .section {
-            border-top: 1px solid #374151;
-            padding-top: 16px;
+            background: rgba(55, 65, 81, 0.5);
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 16px;
         }
 
         .section-title {
-            font-size: 1.125rem;
+            font-size: 18px;
             font-weight: 600;
             margin-bottom: 12px;
         }
 
-        .control-group {
-            margin-bottom: 12px;
+        .slider-container {
+            margin-bottom: 16px;
         }
 
-        .control-label {
-            font-size: 0.875rem;
-            color: #9ca3af;
+        .slider-label {
             display: block;
+            font-size: 14px;
             margin-bottom: 4px;
+        }
+
+        .slider-value {
+            float: right;
+            color: #9ca3af;
         }
 
         input[type="range"] {
             width: 100%;
-            height: 6px;
-            -webkit-appearance: none;
-            background: #374151;
-            border-radius: 3px;
+            height: 4px;
+            background: #4b5563;
+            border-radius: 2px;
             outline: none;
+            -webkit-appearance: none;
         }
 
         input[type="range"]::-webkit-slider-thumb {
             -webkit-appearance: none;
             width: 16px;
             height: 16px;
-            border-radius: 50%;
             background: #3b82f6;
+            border-radius: 50%;
             cursor: pointer;
         }
 
         .button-group {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
+            display: flex;
             gap: 8px;
+            flex-wrap: wrap;
             margin-bottom: 8px;
         }
 
-        .button-group-3 {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 8px;
-            margin-bottom: 8px;
-        }
-
-        button {
-            padding: 8px;
+        .button {
+            padding: 8px 12px;
+            background: #374151;
             border: none;
             border-radius: 6px;
-            background-color: #374151;
             color: white;
-            font-size: 0.75rem;
             cursor: pointer;
-            transition: background-color 0.2s;
+            font-size: 14px;
+            transition: background 0.2s;
         }
 
-        button:hover {
-            background-color: #4b5563;
+        .button:hover {
+            background: #4b5563;
         }
 
-        button.active {
-            background-color: #059669;
-        }
-
-        button.active-purple {
-            background-color: #7c3aed;
-        }
-
-        button.active-blue {
-            background-color: #2563eb;
+        .button.active {
+            background: #3b82f6;
         }
 
         .method-button {
             width: 100%;
-            padding: 12px;
-            border-radius: 6px;
             text-align: left;
-            background-color: #374151;
+            margin-bottom: 8px;
+            padding: 12px;
+            background: #374151;
             border: none;
+            border-radius: 6px;
             color: white;
             cursor: pointer;
-            margin-bottom: 8px;
         }
 
         .method-button.active {
-            background-color: #2563eb;
+            background: #2563eb;
         }
 
-        .metrics-card {
-            background-color: #374151;
+        .method-title {
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .method-desc {
+            font-size: 12px;
+            color: #9ca3af;
+            margin-top: 4px;
+        }
+
+        .performance-metrics {
+            background: rgba(55, 65, 81, 0.5);
+            border-radius: 8px;
             padding: 16px;
-            border-radius: 6px;
-            margin-bottom: 16px;
-        }
-
-        .metrics-title {
-            font-size: 0.875rem;
-            color: #d1d5db;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            margin-bottom: 8px;
         }
 
         .fps-display {
-            font-size: 2.25rem;
+            font-size: 32px;
             font-weight: bold;
-            margin-bottom: 8px;
+            margin-bottom: 12px;
         }
 
         .fps-good {
             color: #34d399;
         }
 
-        .fps-medium {
+        .fps-okay {
             color: #fbbf24;
         }
 
@@ -187,508 +183,501 @@
 
         .metrics-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 4px;
-            font-size: 0.75rem;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+        }
+
+        .metric-item {
+            font-size: 12px;
         }
 
         .metric-label {
-            color: #d1d5db;
+            color: #9ca3af;
         }
 
         .metric-value {
-            text-align: right;
             font-family: 'Courier New', monospace;
+            font-size: 14px;
         }
 
-        .control-buttons {
+        .comparison {
+            background: rgba(55, 65, 81, 0.5);
+            border-radius: 8px;
+            padding: 16px;
+        }
+
+        .comparison-item {
             display: flex;
-            gap: 8px;
-            margin-top: 12px;
-        }
-
-        .control-buttons button {
-            flex: 1;
+            justify-content: space-between;
+            align-items: center;
             padding: 8px;
-        }
-
-        .graph-container {
-            background-color: #374151;
-            padding: 12px;
+            background: #374151;
             border-radius: 6px;
-            margin-bottom: 16px;
+            margin-bottom: 8px;
         }
 
-        #performance-graph {
-            width: 100%;
-            height: 120px;
-            background-color: #1f2937;
-            border-radius: 4px;
+        .comparison-item.best {
+            background: rgba(37, 99, 235, 0.3);
         }
 
-        .comparison-section {
-            background-color: #374151;
-            padding: 12px;
+        .speedup {
+            background: rgba(52, 211, 153, 0.2);
             border-radius: 6px;
-            margin-bottom: 16px;
-        }
-
-        .winner-badge {
-            color: #fbbf24;
-            font-size: 0.875rem;
-        }
-
-        .speedup-banner {
-            background-color: #065f46;
-            border: 1px solid #10b981;
             padding: 12px;
-            border-radius: 6px;
             margin-top: 12px;
         }
 
-        .results-table {
-            background-color: #374151;
+        .speedup-value {
+            font-weight: bold;
+            color: #34d399;
+            font-size: 18px;
+        }
+
+        .speedup-label {
+            font-size: 12px;
+            color: #9ca3af;
+        }
+
+        .record-button {
+            width: 100%;
+            padding: 12px;
+            background: #3b82f6;
+            border: none;
             border-radius: 6px;
-            overflow: hidden;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
             margin-bottom: 12px;
         }
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.75rem;
+        .record-button.recording {
+            background: #dc2626;
         }
 
-        th {
-            background-color: #1f2937;
-            padding: 8px;
-            text-align: left;
-            font-weight: 600;
-        }
-
-        td {
-            padding: 8px;
-            border-top: 1px solid #4b5563;
-        }
-
-        .export-buttons {
-            display: flex;
-            gap: 8px;
-            margin-top: 12px;
-        }
-
-        .export-buttons button {
-            flex: 1;
-            padding: 8px;
-        }
-
-        .info-text {
-            font-size: 0.75rem;
+        .info-section {
+            font-size: 12px;
             color: #9ca3af;
-            line-height: 1.4;
+            line-height: 1.5;
         }
 
-        .research-highlight {
-            background-color: #1e40af;
-            color: #bfdbfe;
-            padding: 8px;
-            border-radius: 4px;
-            margin-top: 8px;
-            font-size: 0.75rem;
+        .info-section ul {
+            padding-left: 20px;
+            margin: 8px 0;
+        }
+
+        .info-section li {
+            margin-bottom: 4px;
+        }
+
+        @media (max-width: 1024px) {
+            .container {
+                flex-direction: column;
+            }
+            
+            .canvas-container {
+                height: 60vh;
+            }
+            
+            .controls-panel {
+                width: 100%;
+                height: 40vh;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="sidebar">
-            <div>
-                <div class="title">Seiler's Interpolation</div>
-                <div class="subtitle">GPU Hardware Benchmark</div>
-            </div>
-
-            <div class="section">
-                <div class="section-title">Curve Shape Controls</div>
-                
-                <div class="control-group">
-                    <label class="control-label" id="radius-label">Radius: 8.0</label>
-                    <input type="range" id="radius-slider" min="3" max="15" step="0.5" value="8">
-                </div>
-                
-                <div class="control-group">
-                    <label class="control-label" id="height-label">Height Amplitude: 3.0</label>
-                    <input type="range" id="height-slider" min="0" max="8" step="0.5" value="3">
-                </div>
-                
-                <div class="control-group">
-                    <label class="control-label" id="twist-label">Twist: 0.5</label>
-                    <input type="range" id="twist-slider" min="0" max="5" step="0.1" value="0.5">
-                </div>
-                
-                <div class="control-group">
-                    <label class="control-label" id="spread-label">Spread: 2.0</label>
-                    <input type="range" id="spread-slider" min="0.5" max="5" step="0.1" value="2">
-                </div>
-            </div>
-
-            <div class="section">
-                <div class="section-title">Particle Count</div>
-                <div class="button-group">
-                    <button class="particle-btn" data-count="100000">100K</button>
-                    <button class="particle-btn" data-count="500000">500K</button>
-                    <button class="particle-btn active" data-count="1000000">1M</button>
-                    <button class="particle-btn" data-count="5000000">5M</button>
-                    <button class="particle-btn" data-count="10000000">10M</button>
-                    <button class="particle-btn" data-count="15000000">15M</button>
-                </div>
-                <div class="info-text">Current: <span id="current-particles">1.0</span>M particles</div>
-            </div>
-
-            <div class="section">
-                <div class="section-title">Curve Segments</div>
-                <div class="button-group-3">
-                    <button class="segment-btn" data-segments="5">5</button>
-                    <button class="segment-btn active-purple" data-segments="10">10</button>
-                    <button class="segment-btn" data-segments="50">50</button>
-                    <button class="segment-btn" data-segments="100">100</button>
-                    <button class="segment-btn" data-segments="1000">1000</button>
-                    <button class="segment-btn" data-segments="1500">1500</button>
-                </div>
-                <div class="info-text">Segments in the curve path</div>
-            </div>
-
-            <div class="section">
-                <div class="section-title">Evaluation Method</div>
-                <button class="method-button active" id="method-texture">
-                    <div style="font-weight: 600; display: flex; justify-content: space-between; align-items: center;">
-                        Seiler's (GPU Hardware)
-                        <span id="texture-winner" class="winner-badge" style="display: none;">👑</span>
-                    </div>
-                    <div class="info-text" style="margin-top: 4px;">
-                        Texture atlas + hardware lerp filtering
-                    </div>
-                    <div class="info-text">
-                        ~10 ALU + 1 texture fetch
-                    </div>
-                </button>
-                <button class="method-button" id="method-math">
-                    <div style="font-weight: 600; display: flex; justify-content: space-between; align-items: center;">
-                        Traditional Polynomial
-                        <span id="math-winner" class="winner-badge" style="display: none;">👑</span>
-                    </div>
-                    <div class="info-text" style="margin-top: 4px;">
-                        De Casteljau / polynomial form (BufferAttributes)
-                    </div>
-                    <div class="info-text">
-                        ~33 ALU ops per segment (no uniforms limit)
-                    </div>
-                </button>
-            </div>
-
-            <div class="section">
-                <div class="section-title">Current Performance Metrics</div>
-                <div class="metrics-card">
-                    <div class="metrics-title" id="method-title">Seiler's Method</div>
-                    <div class="fps-display fps-good" id="fps-display">0.0 FPS</div>
-                    <div class="metrics-grid">
-                        <div class="metric-label">Avg Frame:</div>
-                        <div class="metric-value" id="avg-frame">0.00ms</div>
-                        <div class="metric-label">Min Frame:</div>
-                        <div class="metric-value" id="min-frame">0.00ms</div>
-                        <div class="metric-label">Max Frame:</div>
-                        <div class="metric-value" id="max-frame">0.00ms</div>
-                        <div class="metric-label">Std Dev:</div>
-                        <div class="metric-value" id="std-dev">0.00ms</div>
-                        <div class="metric-label">Draw Calls:</div>
-                        <div class="metric-value" id="draw-calls">0</div>
-                        <div class="metric-label">Points:</div>
-                        <div class="metric-value" id="points-count">0</div>
-                        <div class="metric-label">Particles:</div>
-                        <div class="metric-value" id="particles-count">1.0M</div>
-                        <div class="metric-label">Segments:</div>
-                        <div class="metric-value" id="segments-count">10</div>
-                    </div>
-                </div>
-                
-                <div class="control-buttons">
-                    <button id="record-btn" style="background-color: #2563eb;">⏺ Start Recording</button>
-                    <button id="graph-toggle" style="background-color: #4b5563;">📈</button>
-                </div>
-            </div>
-
-            <div class="section" id="graph-section" style="display: none;">
-                <div class="section-title">Performance Graph</div>
-                <div class="graph-container">
-                    <svg id="performance-graph" viewBox="0 0 300 120"></svg>
-                    <div class="info-text">Last 60 measurements</div>
-                </div>
-            </div>
-
-            <div class="section">
-                <div class="section-title">Comparison</div>
-                <div id="comparison-container">
-                    <div class="info-text">Test both methods to see comparison</div>
-                </div>
-            </div>
-
-            <div class="section">
-                <div class="section-title">All Results</div>
-                <div class="results-table">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Method</th>
-                                <th style="text-align: right;">Particles</th>
-                                <th style="text-align: right;">Segs</th>
-                                <th style="text-align: right;">FPS</th>
-                            </tr>
-                        </thead>
-                        <tbody id="results-table-body">
-                            <!-- Results will be populated here -->
-                        </tbody>
-                    </table>
-                </div>
-                <div class="export-buttons">
-                    <button id="export-csv" style="background-color: #065f46;">📊 Export CSV</button>
-                    <button id="export-json" style="background-color: #1d4ed8;">💾 Export JSON</button>
-                </div>
-            </div>
-
-            <div class="info-text" style="margin-top: auto;">
-                <div style="font-weight: 600; color: #d1d5db; margin-bottom: 4px;">Research Benchmark:</div>
-                <div>• <span style="color: white; font-family: monospace;">1.0M</span> particles rendering in real-time</div>
-                <div>• <span style="color: white; font-family: monospace;">10</span> connected Bezier segments forming ONE continuous curve</div>
-                <div>• Particles flow sequentially through the entire curve</div>
-                <div>• Each particle evaluates curve position every frame</div>
-                
-                <div style="margin-top: 8px; padding-top: 8px; border-top: 1px solid #4b5563;">
-                    <div>
-                        <span style="color: #60a5fa; font-weight: 600;">Seiler's Method:</span>
-                        <div style="font-size: 10px; margin-left: 8px; margin-top: 2px;">
-                            Leverages GPU texture filtering hardware to perform lerp operations. Complexity is O(1) - constant time regardless of segment count!
-                        </div>
-                    </div>
-                    <div style="margin-top: 4px;">
-                        <span style="color: #fb923c; font-weight: 600;">Traditional Method (Fixed):</span>
-                        <div style="font-size: 10px; margin-left: 8px; margin-top: 2px;">
-                            Uses BufferAttributes instead of uniforms. Each particle has its own control points. No uniform limits, but still O(n) computation.
-                        </div>
-                    </div>
-                </div>
-                
-                <div style="margin-top: 8px; color: #6b7280; font-size: 10px;">
-                    Based on "Seiler's Interpolation" paper (Lin et al. 2021)
-                </div>
-            </div>
+        <div class="canvas-container">
+            <canvas id="canvas"></canvas>
         </div>
+        
+        <div class="controls-panel">
+            <div class="header">
+                <h1>Seiler's Interpolation</h1>
+                <h2>GPU Hardware Benchmark</h2>
+            </div>
 
-        <div class="main-content">
-            <div id="canvas-container"></div>
+            <div class="section">
+                <h3 class="section-title">Curve Shape</h3>
+                <div class="slider-container">
+                    <label class="slider-label">
+                        Radius: <span class="slider-value" id="radiusValue">8.0</span>
+                    </label>
+                    <input type="range" id="radiusSlider" min="1" max="20" step="0.1" value="8">
+                </div>
+                <div class="slider-container">
+                    <label class="slider-label">
+                        Height: <span class="slider-value" id="heightValue">3.0</span>
+                    </label>
+                    <input type="range" id="heightSlider" min="0" max="10" step="0.1" value="3">
+                </div>
+                <div class="slider-container">
+                    <label class="slider-label">
+                        Twist: <span class="slider-value" id="twistValue">0.5</span>
+                    </label>
+                    <input type="range" id="twistSlider" min="0" max="2" step="0.1" value="0.5">
+                </div>
+                <div class="slider-container">
+                    <label class="slider-label">
+                        Spread: <span class="slider-value" id="spreadValue">2.0</span>
+                    </label>
+                    <input type="range" id="spreadSlider" min="0.1" max="5" step="0.1" value="2">
+                </div>
+            </div>
+
+            <div class="section">
+                <h3 class="section-title">Particle Count</h3>
+                <div class="button-group">
+                    <button class="button" data-particles="100000">100K</button>
+                    <button class="button" data-particles="500000">500K</button>
+                    <button class="button active" data-particles="1000000">1M</button>
+                    <button class="button" data-particles="5000000">5M</button>
+                    <button class="button" data-particles="10000000">10M</button>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3 class="section-title">Curve Segments</h3>
+                <div class="button-group">
+                    <button class="button" data-segments="5">5</button>
+                    <button class="button" data-segments="10">10</button>
+                    <button class="button" data-segments="50">50</button>
+                    <button class="button" data-segments="100">100</button>
+                    <button class="button active" data-segments="1000">1000</button>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3 class="section-title">Evaluation Method</h3>
+                <button class="method-button" data-method="texture">
+                    <div class="method-title">Seiler's (GPU Hardware) <span id="textureCrown"></span></div>
+                    <div class="method-desc">Texture atlas + hardware lerp filtering</div>
+                </button>
+                <button class="method-button" data-method="seiler-math">
+                    <div class="method-title">Seiler's (Manual Lerp) <span id="seilerMathCrown"></span></div>
+                    <div class="method-desc">Seiler's algorithm with manual calculations</div>
+                </button>
+                <button class="method-button" data-method="math">
+                    <div class="method-title">Traditional Polynomial <span id="mathCrown"></span></div>
+                    <div class="method-desc">De Casteljau / polynomial form</div>
+                </button>
+            </div>
+
+            <div class="performance-metrics">
+                <div class="fps-display" id="fpsDisplay">0.0 FPS</div>
+                <div class="metrics-grid">
+                    <div class="metric-item">
+                        <div class="metric-label">Avg Frame Time</div>
+                        <div class="metric-value" id="avgFrameTime">0.0ms</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-label">Min</div>
+                        <div class="metric-value" id="minFrameTime">0.0ms</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-label">Max</div>
+                        <div class="metric-value" id="maxFrameTime">0.0ms</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-label">Particles</div>
+                        <div class="metric-value" id="particleCount">1M</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-label">Segments</div>
+                        <div class="metric-value" id="segmentCount">1000</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-label">Std Dev</div>
+                        <div class="metric-value" id="stdDev">0.0ms</div>
+                    </div>
+                </div>
+            </div>
+
+            <button class="record-button" id="recordButton">
+                ⏺ Start Recording
+            </button>
+
+            <div class="comparison">
+                <h3 class="section-title">Comparison</h3>
+                <div id="comparisonResults">
+                    <div class="comparison-item">
+                        <span>Seiler's (GPU)</span>
+                        <span class="metric-value">0.0 FPS</span>
+                    </div>
+                    <div class="comparison-item">
+                        <span>Seiler's (Math)</span>
+                        <span class="metric-value">0.0 FPS</span>
+                    </div>
+                    <div class="comparison-item">
+                        <span>Polynomial</span>
+                        <span class="metric-value">0.0 FPS</span>
+                    </div>
+                </div>
+                <div class="speedup" id="speedupDisplay" style="display: none;">
+                    <div class="speedup-value" id="speedupValue">0.0x</div>
+                    <div class="speedup-label" id="speedupLabel">faster</div>
+                </div>
+            </div>
+
+            <div class="info-section">
+                <p><strong>Research Benchmark:</strong></p>
+                <ul>
+                    <li>1M particles rendering in real-time</li>
+                    <li>1000 connected Bezier segments forming ONE continuous curve</li>
+                    <li>Particles flow sequentially through the entire curve</li>
+                    <li>Each particle evaluates curve position every frame</li>
+                </ul>
+                <p><strong>Seiler's Method:</strong> Leverages GPU texture filtering hardware to perform lerp operations. Complexity is O(1) - constant time regardless of segment count!</p>
+                <p><strong>Traditional Method:</strong> Uses polynomial calculations per frame. Complexity is O(n) per particle.</p>
+                <p><em>Based on "Seiler's Interpolation" paper (Lin et al. 2021)</em></p>
+            </div>
         </div>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
-    <script>
-        // Benchmark state
-        const state = {
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.162.0/build/three.module.js",
+                "three/addons/": "https://unpkg.com/three@0.162.0/examples/jsm/"
+            }
+        }
+    </script>
+
+    <script type="module">
+        import * as THREE from 'three';
+        import { OrbitControls } from 'https://unpkg.com/three@0.162.0/examples/jsm/controls/OrbitControls.js';
+
+        // Configuration
+        let config = {
             method: 'texture',
-            numSegments: 10,
+            numSegments: 1000,
             numParticles: 1000000,
             curveRadius: 8,
             curveHeight: 3,
             curveTwist: 0.5,
             curveSpread: 2,
-            performance: { avg: 0, min: 0, max: 0, fps: 0, stdDev: 0, drawCalls: 0, points: 0 },
-            results: {},
-            benchmarkHistory: [],
-            isRecording: false,
-            showGraphs: true,
-            frameTimes: [],
-            lastTime: performance.now(),
-            bestMethod: null,
-            renderer: null,
-            scene: null,
-            camera: null,
-            controls: null,
-            particles: null,
-            clock: new THREE.Clock(),
-            animationId: null
+            isMobile: window.innerWidth < 1024
+        };
+
+        // State
+        let scene, camera, renderer, controls;
+        let particles = null;
+        let frameTimes = [];
+        let lastTime = performance.now();
+        let results = {};
+        let benchmarkHistory = [];
+        let isRecording = false;
+        let performanceData = {
+            avg: 0,
+            min: 0,
+            max: 0,
+            fps: 0,
+            stdDev: 0
         };
 
         // DOM Elements
-        const dom = {
-            canvasContainer: document.getElementById('canvas-container'),
-            radiusSlider: document.getElementById('radius-slider'),
-            heightSlider: document.getElementById('height-slider'),
-            twistSlider: document.getElementById('twist-slider'),
-            spreadSlider: document.getElementById('spread-slider'),
-            radiusLabel: document.getElementById('radius-label'),
-            heightLabel: document.getElementById('height-label'),
-            twistLabel: document.getElementById('twist-label'),
-            spreadLabel: document.getElementById('spread-label'),
-            particleButtons: document.querySelectorAll('.particle-btn'),
-            segmentButtons: document.querySelectorAll('.segment-btn'),
-            methodTexture: document.getElementById('method-texture'),
-            methodMath: document.getElementById('method-math'),
-            methodTitle: document.getElementById('method-title'),
-            fpsDisplay: document.getElementById('fps-display'),
-            avgFrame: document.getElementById('avg-frame'),
-            minFrame: document.getElementById('min-frame'),
-            maxFrame: document.getElementById('max-frame'),
-            stdDev: document.getElementById('std-dev'),
-            drawCalls: document.getElementById('draw-calls'),
-            pointsCount: document.getElementById('points-count'),
-            particlesCount: document.getElementById('particles-count'),
-            segmentsCount: document.getElementById('segments-count'),
-            currentParticles: document.getElementById('current-particles'),
-            recordBtn: document.getElementById('record-btn'),
-            graphToggle: document.getElementById('graph-toggle'),
-            graphSection: document.getElementById('graph-section'),
-            comparisonContainer: document.getElementById('comparison-container'),
-            resultsTableBody: document.getElementById('results-table-body'),
-            exportCsv: document.getElementById('export-csv'),
-            exportJson: document.getElementById('export-json'),
-            textureWinner: document.getElementById('texture-winner'),
-            mathWinner: document.getElementById('math-winner')
-        };
+        const canvas = document.getElementById('canvas');
+        const radiusSlider = document.getElementById('radiusSlider');
+        const radiusValue = document.getElementById('radiusValue');
+        const heightSlider = document.getElementById('heightSlider');
+        const heightValue = document.getElementById('heightValue');
+        const twistSlider = document.getElementById('twistSlider');
+        const twistValue = document.getElementById('twistValue');
+        const spreadSlider = document.getElementById('spreadSlider');
+        const spreadValue = document.getElementById('spreadValue');
+        const fpsDisplay = document.getElementById('fpsDisplay');
+        const avgFrameTime = document.getElementById('avgFrameTime');
+        const minFrameTime = document.getElementById('minFrameTime');
+        const maxFrameTime = document.getElementById('maxFrameTime');
+        const particleCount = document.getElementById('particleCount');
+        const segmentCount = document.getElementById('segmentCount');
+        const stdDev = document.getElementById('stdDev');
+        const recordButton = document.getElementById('recordButton');
+        const comparisonResults = document.getElementById('comparisonResults');
+        const speedupDisplay = document.getElementById('speedupDisplay');
+        const speedupValue = document.getElementById('speedupValue');
+        const speedupLabel = document.getElementById('speedupLabel');
+        const textureCrown = document.getElementById('textureCrown');
+        const seilerMathCrown = document.getElementById('seilerMathCrown');
+        const mathCrown = document.getElementById('mathCrown');
 
         // Initialize Three.js
-        function initThreeJS() {
-            // Create renderer
-            state.renderer = new THREE.WebGLRenderer({ antialias: true });
-            state.renderer.setSize(dom.canvasContainer.clientWidth, dom.canvasContainer.clientHeight);
-            state.renderer.setPixelRatio(window.devicePixelRatio);
-            dom.canvasContainer.appendChild(state.renderer.domElement);
+        function init() {
+            // Scene
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x111827);
 
-            // Create scene
-            state.scene = new THREE.Scene();
-            state.scene.background = new THREE.Color(0x111827);
+            // Camera
+            camera = new THREE.PerspectiveCamera(
+                50,
+                canvas.clientWidth / canvas.clientHeight,
+                0.1,
+                1000
+            );
+            camera.position.set(0, 5, 15);
 
-            // Create camera
-            state.camera = new THREE.PerspectiveCamera(60, dom.canvasContainer.clientWidth / dom.canvasContainer.clientHeight, 0.1, 1000);
-            state.camera.position.set(0, 8, 20);
+            // Renderer
+            renderer = new THREE.WebGLRenderer({
+                canvas: canvas,
+                antialias: true,
+                alpha: true
+            });
+            renderer.setSize(canvas.clientWidth, canvas.clientHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
-            // Create orbit controls
-            state.controls = new THREE.OrbitControls(state.camera, state.renderer.domElement);
-            state.controls.enableDamping = false;
+            // Controls
+            controls = new OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
 
-            // Create particles system
-            createParticles();
+            // Lights
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.2);
+            scene.add(ambientLight);
 
-            // Start animation loop
+            const pointLight = new THREE.PointLight(0xffffff, 0.5);
+            pointLight.position.set(10, 10, 10);
+            scene.add(pointLight);
+
+            // Create initial particles
+            updateParticles();
+
+            // Event Listeners
+            setupEventListeners();
+
+            // Start animation
             animate();
         }
 
-        // Generate control points for the Bezier curve
+        // Generate control points for the continuous curve
         function generateControlPoints() {
             const points = [];
-            const { numSegments, curveRadius, curveHeight, curveTwist, curveSpread } = state;
-            
-            for (let i = 0; i < numSegments; i++) {
-                const t = i / numSegments;
-                const nextT = (i + 1) / numSegments;
-                
+            for (let i = 0; i < config.numSegments; i++) {
+                const t = i / config.numSegments;
+                const nextT = (i + 1) / config.numSegments;
+
                 const angle = t * Math.PI * 2;
                 const nextAngle = nextT * Math.PI * 2;
-                
-                const height = Math.sin(t * curveTwist * Math.PI * 2) * curveHeight;
-                const nextHeight = Math.sin(nextT * curveTwist * Math.PI * 2) * curveHeight;
-                
-                const p0 = i === 0 ? new THREE.Vector3(
-                    Math.cos(angle) * curveRadius,
-                    height,
-                    Math.sin(angle) * curveRadius
-                ) : points[i - 1].p3;
-                
+                const height = Math.sin(t * config.curveTwist * Math.PI * 2) * config.curveHeight;
+                const nextHeight = Math.sin(nextT * config.curveTwist * Math.PI * 2) * config.curveHeight;
+
+                const p0 = i === 0 
+                    ? new THREE.Vector3(
+                        Math.cos(angle) * config.curveRadius,
+                        height,
+                        Math.sin(angle) * config.curveRadius
+                    )
+                    : points[i - 1].p3;
+
                 const p3 = new THREE.Vector3(
-                    Math.cos(nextAngle) * curveRadius,
+                    Math.cos(nextAngle) * config.curveRadius,
                     nextHeight,
-                    Math.sin(nextAngle) * curveRadius
+                    Math.sin(nextAngle) * config.curveRadius
                 );
-                
-                const tangentLength = curveRadius * curveSpread / numSegments;
-                
+
+                const tangentLength = config.curveRadius * config.curveSpread / config.numSegments;
+                const tangentAngle = angle + Math.PI / 2;
+                const nextTangentAngle = nextAngle + Math.PI / 2;
+
                 const dir0 = new THREE.Vector3(
-                    -Math.sin(angle),
-                    Math.cos(t * curveTwist * Math.PI * 2) * curveTwist * curveHeight,
-                    Math.cos(angle)
+                    Math.cos(tangentAngle),
+                    Math.cos(t * config.curveTwist * Math.PI * 2) * config.curveTwist * config.curveHeight,
+                    Math.sin(tangentAngle)
                 ).normalize().multiplyScalar(tangentLength);
-                
+
                 const dir3 = new THREE.Vector3(
-                    -Math.sin(nextAngle),
-                    Math.cos(nextT * curveTwist * Math.PI * 2) * curveTwist * curveHeight,
-                    Math.cos(nextAngle)
+                    Math.cos(nextTangentAngle),
+                    Math.cos(nextT * config.curveTwist * Math.PI * 2) * config.curveTwist * config.curveHeight,
+                    Math.sin(nextTangentAngle)
                 ).normalize().multiplyScalar(tangentLength);
-                
+
                 const p1 = new THREE.Vector3().addVectors(p0, dir0);
                 const p2 = new THREE.Vector3().subVectors(p3, dir3);
-                
+
                 points.push({ p0, p1, p2, p3 });
             }
-            
             return points;
         }
 
-        // Create texture atlas for Seiler's method
-        function createCurveAtlasTexture(controlPoints) {
-            const width = state.numSegments * 2;
-            const height = 2;
-            const data = new Float32Array(width * height * 4);
+        // Create Seiler's texture atlas
+        function createSeilerTextureAtlas(controlPoints) {
+            const segmentsPerTexture = Math.min(config.numSegments, 1500);
+            const textureWidth = segmentsPerTexture * 2;
+            const textureHeight = 2;
             
-            controlPoints.forEach((seg, segIdx) => {
+            const data = new Float32Array(textureWidth * textureHeight * 4);
+            
+            for (let segIdx = 0; segIdx < Math.min(config.numSegments, segmentsPerTexture); segIdx++) {
+                const seg = controlPoints[segIdx];
                 const { p0, p1, p2, p3 } = seg;
                 
-                const d1 = new THREE.Vector3().subVectors(p1, p0).multiplyScalar(3.0)
-                    .sub(new THREE.Vector3().subVectors(p3, p0));
-                const d2 = new THREE.Vector3().subVectors(p2, p3).multiplyScalar(3.0)
-                    .sub(new THREE.Vector3().subVectors(p0, p3));
-                
+                const d1 = new THREE.Vector3().subVectors(p1, p0).multiplyScalar(3.0);
+                d1.sub(new THREE.Vector3().subVectors(p3, p0));
                 const s1 = new THREE.Vector3().addVectors(p0, d1);
+                
+                const d2 = new THREE.Vector3().subVectors(p2, p3).multiplyScalar(3.0);
+                d2.sub(new THREE.Vector3().subVectors(p0, p3));
                 const s2 = new THREE.Vector3().addVectors(p3, d2);
                 
                 const baseIdx = segIdx * 2;
-                const idx0 = (baseIdx + 0) * 4;
-                data[idx0] = p0.x; data[idx0 + 1] = p0.y; data[idx0 + 2] = p0.z; data[idx0 + 3] = 0;
                 
-                const idx1 = (baseIdx + 1) * 4;
-                data[idx1] = p3.x; data[idx1 + 1] = p3.y; data[idx1 + 2] = p3.z; data[idx1 + 3] = 0;
+                const idxP0 = baseIdx * 4;
+                data[idxP0] = p0.x;
+                data[idxP0 + 1] = p0.y;
+                data[idxP0 + 2] = p0.z;
+                data[idxP0 + 3] = segIdx;
                 
-                const idx2 = (width + baseIdx + 0) * 4;
-                data[idx2] = s1.x; data[idx2 + 1] = s1.y; data[idx2 + 2] = s1.z; data[idx2 + 3] = 0;
+                const idxP3 = (baseIdx + 1) * 4;
+                data[idxP3] = p3.x;
+                data[idxP3 + 1] = p3.y;
+                data[idxP3 + 2] = p3.z;
+                data[idxP3 + 3] = segIdx;
                 
-                const idx3 = (width + baseIdx + 1) * 4;
-                data[idx3] = s2.x; data[idx3 + 1] = s2.y; data[idx3 + 2] = s2.z; data[idx3 + 3] = 0;
-            });
-
-            const tex = new THREE.DataTexture(data, width, height, THREE.RGBAFormat, THREE.FloatType);
+                const idxS1 = (textureWidth + baseIdx) * 4;
+                data[idxS1] = s1.x;
+                data[idxS1 + 1] = s1.y;
+                data[idxS1 + 2] = s1.z;
+                data[idxS1 + 3] = segIdx;
+                
+                const idxS2 = (textureWidth + baseIdx + 1) * 4;
+                data[idxS2] = s2.x;
+                data[idxS2 + 1] = s2.y;
+                data[idxS2 + 2] = s2.z;
+                data[idxS2 + 3] = segIdx;
+            }
+            
+            const tex = new THREE.DataTexture(
+                data, 
+                textureWidth, 
+                textureHeight, 
+                THREE.RGBAFormat, 
+                THREE.FloatType
+            );
             tex.magFilter = THREE.LinearFilter;
             tex.minFilter = THREE.LinearFilter;
             tex.wrapS = THREE.ClampToEdgeWrapping;
             tex.wrapT = THREE.ClampToEdgeWrapping;
             tex.needsUpdate = true;
+            
             return tex;
         }
 
         // Create particle geometry
         function createParticleGeometry() {
             const geometry = new THREE.BufferGeometry();
-            const { numParticles, numSegments } = state;
+            const positions = new Float32Array(config.numParticles * 3);
+            const birthTimes = new Float32Array(config.numParticles);
+            const lifetimes = new Float32Array(config.numParticles);
+            const randomSeeds = new Float32Array(config.numParticles);
+            const segmentIndices = new Float32Array(config.numParticles);
             
-            const positions = new Float32Array(numParticles * 3);
-            const birthTimes = new Float32Array(numParticles);
-            const lifetimes = new Float32Array(numParticles);
-            const randomSeeds = new Float32Array(numParticles);
-            const segmentIndices = new Float32Array(numParticles);
-            
-            for (let i = 0; i < numParticles; i++) {
+            for (let i = 0; i < config.numParticles; i++) {
                 positions[i * 3] = 0;
                 positions[i * 3 + 1] = 0;
                 positions[i * 3 + 2] = 0;
                 
-                birthTimes[i] = -(i / numParticles) * 8.0;
+                birthTimes[i] = -(i / config.numParticles) * 8.0;
                 lifetimes[i] = 5.0 + Math.random() * 2.0;
                 randomSeeds[i] = Math.random();
-                segmentIndices[i] = (i * numSegments / numParticles) % numSegments;
+                segmentIndices[i] = Math.floor((i / config.numParticles) * config.numSegments) % config.numSegments;
             }
             
             geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
@@ -700,38 +689,151 @@
             return geometry;
         }
 
-        // Create particles system
-        function createParticles() {
-            // Remove existing particles
-            if (state.particles) {
-                state.scene.remove(state.particles);
-                if (state.particles.geometry) {
-                    state.particles.geometry.dispose();
+        // Create shader material based on method
+        function createShaderMaterial(controlPoints, particleGeometry) {
+            let vertexShader, fragmentShader, uniforms;
+            
+            // Common fragment shader
+            fragmentShader = `
+                varying float vLifeProgress;
+                
+                void main() {
+                    vec2 center = gl_PointCoord - vec2(0.5);
+                    if (length(center) > 0.5) discard;
+                    
+                    vec3 color = mix(
+                        vec3(0.2, 0.6, 1.0),
+                        vec3(1.0, 0.2, 0.6),
+                        vLifeProgress
+                    );
+                    
+                    float alpha = 0.6 * (1.0 - length(center) * 2.0);
+                    gl_FragColor = vec4(color, alpha);
                 }
-                if (state.particles.material) {
-                    state.particles.material.dispose();
-                }
-            }
+            `;
 
-            const controlPoints = generateControlPoints();
-            const curveAtlasTexture = createCurveAtlasTexture(controlPoints);
-            const particleGeometry = createParticleGeometry();
-
-            // Create instanced geometry for math method
-            let instancedGeometry = null;
-            if (state.method === 'math') {
-                instancedGeometry = particleGeometry.clone();
-                const { numParticles, numSegments } = state;
+            if (config.method === 'texture') {
+                const seilerTextureAtlas = createSeilerTextureAtlas(controlPoints);
                 
-                const p0Data = new Float32Array(numParticles * 3);
-                const p1Data = new Float32Array(numParticles * 3);
-                const p2Data = new Float32Array(numParticles * 3);
-                const p3Data = new Float32Array(numParticles * 3);
+                vertexShader = `
+                    uniform sampler2D uCurveAtlas;
+                    uniform float uTime;
+                    uniform float uNumSegments;
+                    attribute float aBirthTime;
+                    attribute float aLifetime;
+                    attribute float aRandomSeed;
+                    attribute float aSegmentIndex;
+                    
+                    varying float vLifeProgress;
+                    
+                    vec3 evaluateSeilerBezier(sampler2D atlas, float segmentIndex, float t) {
+                        float segmentU = (segmentIndex * 2.0) / (uNumSegments * 2.0);
+                        float u = segmentU + (t * 0.5 + 0.25) / uNumSegments;
+                        float v = t * (1.0 - t) * 0.5 + 0.25;
+                        
+                        return texture2D(atlas, vec2(u, v)).rgb;
+                    }
+                    
+                    void main() {
+                        float age = mod(uTime - aBirthTime, aLifetime);
+                        float lifeProgress = clamp(age / aLifetime, 0.0, 1.0);
+                        vLifeProgress = lifeProgress;
+                        
+                        vec3 curvePosition = evaluateSeilerBezier(uCurveAtlas, aSegmentIndex, lifeProgress);
+                        
+                        vec3 randomOffset = vec3(
+                            sin(aRandomSeed * 123.456) * 0.5,
+                            cos(aRandomSeed * 123.456) * 0.5,
+                            sin(aRandomSeed * 123.456) * 0.5
+                        );
+                        
+                        curvePosition += randomOffset;
+                        
+                        float sizeFactor = 1.0;
+                        if (lifeProgress < 0.1) {
+                            sizeFactor = lifeProgress / 0.1;
+                        } else if (lifeProgress > 0.9) {
+                            sizeFactor = (1.0 - lifeProgress) / 0.1;
+                        }
+                        
+                        gl_Position = projectionMatrix * modelViewMatrix * vec4(curvePosition, 1.0);
+                        gl_PointSize = 3.0 * sizeFactor;
+                    }
+                `;
                 
-                const segmentIndices = instancedGeometry.attributes.aSegmentIndex.array;
+                uniforms = {
+                    uTime: { value: 0 },
+                    uNumSegments: { value: config.numSegments },
+                    uCurveAtlas: { value: seilerTextureAtlas }
+                };
                 
-                for (let i = 0; i < numParticles; i++) {
-                    const segIdx = Math.floor(segmentIndices[i] % numSegments);
+            } else if (config.method === 'seiler-math') {
+                vertexShader = `
+                    uniform float uTime;
+                    uniform float uNumSegments;
+                    attribute vec3 aP0;
+                    attribute vec3 aP1;
+                    attribute vec3 aP2;
+                    attribute vec3 aP3;
+                    attribute float aBirthTime;
+                    attribute float aLifetime;
+                    attribute float aRandomSeed;
+                    
+                    varying float vLifeProgress;
+                    
+                    vec3 lerp(vec3 a, vec3 b, float t) {
+                        return a + t * (b - a);
+                    }
+                    
+                    vec3 evaluateSeilerBezier(vec3 p0, vec3 p1, vec3 p2, vec3 p3, float t) {
+                        vec3 d1 = 3.0 * (p1 - p0) - (p3 - p0);
+                        vec3 d2 = 3.0 * (p2 - p3) - (p0 - p3);
+                        vec3 b03 = lerp(p0, p3, t);
+                        vec3 d12 = lerp(d1, d2, t);
+                        return b03 + (1.0 - t) * t * d12;
+                    }
+                    
+                    void main() {
+                        float age = mod(uTime - aBirthTime, aLifetime);
+                        float lifeProgress = clamp(age / aLifetime, 0.0, 1.0);
+                        vLifeProgress = lifeProgress;
+                        
+                        vec3 curvePosition = evaluateSeilerBezier(aP0, aP1, aP2, aP3, lifeProgress);
+                        
+                        vec3 randomOffset = vec3(
+                            sin(aRandomSeed * 123.456) * 0.5,
+                            cos(aRandomSeed * 123.456) * 0.5,
+                            sin(aRandomSeed * 123.456) * 0.5
+                        );
+                        
+                        curvePosition += randomOffset;
+                        
+                        float sizeFactor = 1.0;
+                        if (lifeProgress < 0.1) {
+                            sizeFactor = lifeProgress / 0.1;
+                        } else if (lifeProgress > 0.9) {
+                            sizeFactor = (1.0 - lifeProgress) / 0.1;
+                        }
+                        
+                        gl_Position = projectionMatrix * modelViewMatrix * vec4(curvePosition, 1.0);
+                        gl_PointSize = 3.0 * sizeFactor;
+                    }
+                `;
+                
+                uniforms = {
+                    uTime: { value: 0 },
+                    uNumSegments: { value: config.numSegments }
+                };
+                
+                const p0Data = new Float32Array(config.numParticles * 3);
+                const p1Data = new Float32Array(config.numParticles * 3);
+                const p2Data = new Float32Array(config.numParticles * 3);
+                const p3Data = new Float32Array(config.numParticles * 3);
+                
+                const segmentIndices = particleGeometry.attributes.aSegmentIndex.array;
+                
+                for (let i = 0; i < config.numParticles; i++) {
+                    const segIdx = Math.floor(segmentIndices[i]) % config.numSegments;
                     const seg = controlPoints[segIdx];
                     const idx = i * 3;
                     
@@ -752,87 +854,26 @@
                     p3Data[idx + 2] = seg.p3.z;
                 }
                 
-                instancedGeometry.setAttribute('aP0', new THREE.BufferAttribute(p0Data, 3));
-                instancedGeometry.setAttribute('aP1', new THREE.BufferAttribute(p1Data, 3));
-                instancedGeometry.setAttribute('aP2', new THREE.BufferAttribute(p2Data, 3));
-                instancedGeometry.setAttribute('aP3', new THREE.BufferAttribute(p3Data, 3));
-            }
-
-            // Create shader material
-            const baseUniforms = {
-                uTime: { value: 0 },
-                uPointSize: { value: 3.0 },
-                uEmissionRate: { value: 0.01 },
-                uNumSegments: { value: state.numSegments }
-            };
-
-            let vertexShader, uniforms;
-
-            if (state.method === 'texture') {
-                vertexShader = `
-                    uniform sampler2D uCurveAtlas;
-                    uniform float uTime, uPointSize, uEmissionRate, uNumSegments;
-                    
-                    attribute float aBirthTime, aLifetime, aRandomSeed, aSegmentIndex;
-                    varying float vLifeProgress, vIsAlive;
-                    
-                    vec3 evaluateBezier(float segmentIndex, float t) {
-                        t = clamp(t, 0.0, 1.0);
-                        float segmentU = (segmentIndex * 2.0) / (uNumSegments * 2.0);
-                        float u = segmentU + (t * 0.5 + 0.25) / uNumSegments;
-                        float v = t * (1.0 - t) * 0.5 + 0.25;
-                        
-                        return texture2D(uCurveAtlas, vec2(u, v)).rgb;
-                    }
-                    
-                    void main() {
-                        float age = mod(uTime - aBirthTime, aLifetime + uEmissionRate);
-                        float isAlive = step(0.0, age) * step(age, aLifetime);
-                        vIsAlive = isAlive;
-                        
-                        float lifeProgress = clamp(age / aLifetime, 0.0, 1.0);
-                        vLifeProgress = lifeProgress;
-                        
-                        float totalProgress = lifeProgress;
-                        
-                        float continuousCurveProgress = totalProgress * uNumSegments;
-                        float segmentIndex = floor(continuousCurveProgress);
-                        float segmentProgress = fract(continuousCurveProgress);
-                        
-                        segmentIndex = mod(segmentIndex + aSegmentIndex + floor(uTime * 0.3), uNumSegments);
-                        
-                        vec3 curvePosition = evaluateBezier(segmentIndex, segmentProgress);
-                        
-                        vec3 randomOffset = vec3(
-                            sin(aRandomSeed * 123.456) * 0.05,
-                            cos(aRandomSeed * 234.567) * 0.05,
-                            sin(aRandomSeed * 345.678) * 0.05
-                        );
-                        curvePosition += randomOffset;
-                        
-                        float sizeFactor = 1.0;
-                        if (lifeProgress < 0.1) sizeFactor = lifeProgress / 0.1;
-                        else if (lifeProgress > 0.9) sizeFactor = (1.0 - lifeProgress) / 0.1;
-                        
-                        gl_Position = projectionMatrix * modelViewMatrix * vec4(curvePosition, 1.0);
-                        gl_PointSize = uPointSize * sizeFactor * isAlive;
-                    }
-                `;
+                particleGeometry.setAttribute('aP0', new THREE.BufferAttribute(p0Data, 3));
+                particleGeometry.setAttribute('aP1', new THREE.BufferAttribute(p1Data, 3));
+                particleGeometry.setAttribute('aP2', new THREE.BufferAttribute(p2Data, 3));
+                particleGeometry.setAttribute('aP3', new THREE.BufferAttribute(p3Data, 3));
                 
-                uniforms = {
-                    ...baseUniforms,
-                    uCurveAtlas: { value: curveAtlasTexture }
-                };
-            } else {
+            } else { // 'math' method
                 vertexShader = `
-                    uniform float uTime, uPointSize, uEmissionRate, uNumSegments;
+                    uniform float uTime;
+                    uniform float uNumSegments;
+                    attribute vec3 aP0;
+                    attribute vec3 aP1;
+                    attribute vec3 aP2;
+                    attribute vec3 aP3;
+                    attribute float aBirthTime;
+                    attribute float aLifetime;
+                    attribute float aRandomSeed;
                     
-                    attribute vec3 aP0, aP1, aP2, aP3;
-                    attribute float aBirthTime, aLifetime, aRandomSeed;
-                    varying float vLifeProgress, vIsAlive;
+                    varying float vLifeProgress;
                     
                     vec3 evaluateBezier(vec3 p0, vec3 p1, vec3 p2, vec3 p3, float t) {
-                        t = clamp(t, 0.0, 1.0);
                         float t2 = t * t;
                         float t3 = t2 * t;
                         float mt = 1.0 - t;
@@ -843,47 +884,71 @@
                     }
                     
                     void main() {
-                        float age = mod(uTime - aBirthTime, aLifetime + uEmissionRate);
-                        float isAlive = step(0.0, age) * step(age, aLifetime);
-                        vIsAlive = isAlive;
-                        
+                        float age = mod(uTime - aBirthTime, aLifetime);
                         float lifeProgress = clamp(age / aLifetime, 0.0, 1.0);
                         vLifeProgress = lifeProgress;
                         
                         vec3 curvePosition = evaluateBezier(aP0, aP1, aP2, aP3, lifeProgress);
                         
                         vec3 randomOffset = vec3(
-                            sin(aRandomSeed * 123.456) * 0.05,
-                            cos(aRandomSeed * 234.567) * 0.05,
-                            sin(aRandomSeed * 345.678) * 0.05
+                            sin(aRandomSeed * 123.456) * 0.5,
+                            cos(aRandomSeed * 123.456) * 0.5,
+                            sin(aRandomSeed * 123.456) * 0.5
                         );
+                        
                         curvePosition += randomOffset;
                         
                         float sizeFactor = 1.0;
-                        if (lifeProgress < 0.1) sizeFactor = lifeProgress / 0.1;
-                        else if (lifeProgress > 0.9) sizeFactor = (1.0 - lifeProgress) / 0.1;
+                        if (lifeProgress < 0.1) {
+                            sizeFactor = lifeProgress / 0.1;
+                        } else if (lifeProgress > 0.9) {
+                            sizeFactor = (1.0 - lifeProgress) / 0.1;
+                        }
                         
                         gl_Position = projectionMatrix * modelViewMatrix * vec4(curvePosition, 1.0);
-                        gl_PointSize = uPointSize * sizeFactor * isAlive;
+                        gl_PointSize = 3.0 * sizeFactor;
                     }
                 `;
                 
-                uniforms = baseUniforms;
-            }
-
-            const fragmentShader = `
-                varying float vLifeProgress, vIsAlive;
+                uniforms = {
+                    uTime: { value: 0 },
+                    uNumSegments: { value: config.numSegments }
+                };
                 
-                void main() {
-                    if (vIsAlive < 0.5) discard;
+                const p0Data = new Float32Array(config.numParticles * 3);
+                const p1Data = new Float32Array(config.numParticles * 3);
+                const p2Data = new Float32Array(config.numParticles * 3);
+                const p3Data = new Float32Array(config.numParticles * 3);
+                
+                const segmentIndices = particleGeometry.attributes.aSegmentIndex.array;
+                
+                for (let i = 0; i < config.numParticles; i++) {
+                    const segIdx = Math.floor(segmentIndices[i]) % config.numSegments;
+                    const seg = controlPoints[segIdx];
+                    const idx = i * 3;
                     
-                    vec2 center = gl_PointCoord - vec2(0.5);
-                    if (length(center) > 0.5) discard;
+                    p0Data[idx] = seg.p0.x;
+                    p0Data[idx + 1] = seg.p0.y;
+                    p0Data[idx + 2] = seg.p0.z;
                     
-                    vec3 color = mix(vec3(0.2, 0.6, 1.0), vec3(1.0, 0.2, 0.6), vLifeProgress);
-                    gl_FragColor = vec4(color, 0.6);
+                    p1Data[idx] = seg.p1.x;
+                    p1Data[idx + 1] = seg.p1.y;
+                    p1Data[idx + 2] = seg.p1.z;
+                    
+                    p2Data[idx] = seg.p2.x;
+                    p2Data[idx + 1] = seg.p2.y;
+                    p2Data[idx + 2] = seg.p2.z;
+                    
+                    p3Data[idx] = seg.p3.x;
+                    p3Data[idx + 1] = seg.p3.y;
+                    p3Data[idx + 2] = seg.p3.z;
                 }
-            `;
+                
+                particleGeometry.setAttribute('aP0', new THREE.BufferAttribute(p0Data, 3));
+                particleGeometry.setAttribute('aP1', new THREE.BufferAttribute(p1Data, 3));
+                particleGeometry.setAttribute('aP2', new THREE.BufferAttribute(p2Data, 3));
+                particleGeometry.setAttribute('aP3', new THREE.BufferAttribute(p3Data, 3));
+            }
 
             const material = new THREE.ShaderMaterial({
                 uniforms: uniforms,
@@ -894,409 +959,261 @@
                 depthWrite: false
             });
 
-            state.particles = new THREE.Points(
-                state.method === 'math' ? instancedGeometry : particleGeometry,
-                material
-            );
-            
-            state.scene.add(state.particles);
+            return material;
+        }
+
+        // Update particles
+        function updateParticles() {
+            if (particles) {
+                scene.remove(particles);
+            }
+
+            const controlPoints = generateControlPoints();
+            const particleGeometry = createParticleGeometry();
+            const shaderMaterial = createShaderMaterial(controlPoints, particleGeometry);
+
+            particles = new THREE.Points(particleGeometry, shaderMaterial);
+            scene.add(particles);
         }
 
         // Update performance metrics
         function updatePerformance(frameTime) {
-            state.frameTimes.push(frameTime);
-            if (state.frameTimes.length > 120) {
-                state.frameTimes.shift();
+            frameTimes.push(frameTime);
+            if (frameTimes.length > 120) {
+                frameTimes.shift();
             }
-            
-            if (state.frameTimes.length >= 60) {
-                const avg = state.frameTimes.reduce((a, b) => a + b) / state.frameTimes.length;
-                const min = Math.min(...state.frameTimes);
-                const max = Math.max(...state.frameTimes);
+
+            if (frameTimes.length === 120) {
+                const avg = frameTimes.reduce((a, b) => a + b) / frameTimes.length;
+                const min = Math.min(...frameTimes);
+                const max = Math.max(...frameTimes);
                 const fps = 1000 / avg;
-                const variance = state.frameTimes.reduce((sum, ft) => sum + Math.pow(ft - avg, 2), 0) / state.frameTimes.length;
+                const variance = frameTimes.reduce((sum, ft) => sum + Math.pow(ft - avg, 2), 0) / frameTimes.length;
                 const stdDev = Math.sqrt(variance);
-                
-                state.performance = {
-                    avg,
-                    min,
-                    max,
-                    fps,
-                    stdDev,
-                    drawCalls: state.renderer.info.render.calls,
-                    points: state.renderer.info.render.points,
-                    triangles: state.renderer.info.render.triangles
-                };
-                
-                const key = `${state.method}-${state.numParticles}-${state.numSegments}`;
-                state.results[key] = { ...state.performance, method: state.method };
-                
-                if (state.isRecording) {
-                    state.benchmarkHistory.push({
+
+                performanceData = { avg, min, max, fps, stdDev };
+
+                const key = `${config.method}-${config.numParticles}-${config.numSegments}`;
+                results[key] = performanceData;
+
+                if (isRecording) {
+                    benchmarkHistory.push({
                         timestamp: Date.now(),
-                        ...state.performance,
-                        method: state.method
+                        ...performanceData
                     });
                 }
-                
+
                 updateUI();
                 updateComparison();
-                updateResultsTable();
-                updatePerformanceGraph();
             }
         }
 
         // Update UI elements
         function updateUI() {
-            const perf = state.performance;
+            // Update slider values
+            radiusValue.textContent = config.curveRadius.toFixed(1);
+            heightValue.textContent = config.curveHeight.toFixed(1);
+            twistValue.textContent = config.curveTwist.toFixed(1);
+            spreadValue.textContent = config.curveSpread.toFixed(1);
+
+            // Update performance display
+            fpsDisplay.textContent = `${performanceData.fps.toFixed(1)} FPS`;
+            avgFrameTime.textContent = `${performanceData.avg.toFixed(1)}ms`;
+            minFrameTime.textContent = `${performanceData.min.toFixed(1)}ms`;
+            maxFrameTime.textContent = `${performanceData.max.toFixed(1)}ms`;
+            stdDev.textContent = `${performanceData.stdDev.toFixed(1)}ms`;
             
-            // Update method title
-            dom.methodTitle.textContent = state.method === 'texture' ? "Seiler's Method" : "Polynomial Math";
-            
-            // Update FPS display
-            dom.fpsDisplay.textContent = `${perf.fps.toFixed(1)} FPS`;
-            
-            // Update FPS color
-            if (perf.fps >= 55) {
-                dom.fpsDisplay.className = 'fps-display fps-good';
-            } else if (perf.fps >= 40) {
-                dom.fpsDisplay.className = 'fps-display fps-medium';
+            // Update particle and segment counts
+            if (config.numParticles >= 1000000) {
+                particleCount.textContent = `${(config.numParticles / 1000000).toFixed(1)}M`;
             } else {
-                dom.fpsDisplay.className = 'fps-display fps-poor';
+                particleCount.textContent = `${(config.numParticles / 1000).toFixed(0)}K`;
             }
-            
-            // Update metrics
-            dom.avgFrame.textContent = `${perf.avg.toFixed(2)}ms`;
-            dom.minFrame.textContent = `${perf.min.toFixed(2)}ms`;
-            dom.maxFrame.textContent = `${perf.max.toFixed(2)}ms`;
-            dom.stdDev.textContent = `${perf.stdDev.toFixed(2)}ms`;
-            dom.drawCalls.textContent = perf.drawCalls || '0';
-            dom.pointsCount.textContent = perf.points?.toLocaleString() || '0';
-            dom.particlesCount.textContent = `${(state.numParticles / 1000000).toFixed(1)}M`;
-            dom.segmentsCount.textContent = state.numSegments;
-            dom.currentParticles.textContent = `${(state.numParticles / 1000000).toFixed(1)}`;
-            
-            // Update curve parameter labels
-            dom.radiusLabel.textContent = `Radius: ${state.curveRadius.toFixed(1)}`;
-            dom.heightLabel.textContent = `Height Amplitude: ${state.curveHeight.toFixed(1)}`;
-            dom.twistLabel.textContent = `Twist: ${state.curveTwist.toFixed(1)}`;
-            dom.spreadLabel.textContent = `Spread: ${state.curveSpread.toFixed(1)}`;
-            
+            segmentCount.textContent = config.numSegments;
+
+            // Update FPS color
+            if (performanceData.fps >= 55) {
+                fpsDisplay.className = 'fps-display fps-good';
+            } else if (performanceData.fps >= 40) {
+                fpsDisplay.className = 'fps-display fps-okay';
+            } else {
+                fpsDisplay.className = 'fps-display fps-poor';
+            }
+
+            // Update active buttons
+            document.querySelectorAll('.button[data-particles]').forEach(btn => {
+                btn.classList.toggle('active', 
+                    parseInt(btn.dataset.particles) === config.numParticles
+                );
+            });
+
+            document.querySelectorAll('.button[data-segments]').forEach(btn => {
+                btn.classList.toggle('active', 
+                    parseInt(btn.dataset.segments) === config.numSegments
+                );
+            });
+
+            document.querySelectorAll('.method-button').forEach(btn => {
+                btn.classList.toggle('active', 
+                    btn.dataset.method === config.method
+                );
+            });
+
             // Update record button
-            dom.recordBtn.textContent = state.isRecording ? '⏹ Stop Recording' : '⏺ Start Recording';
-            dom.recordBtn.style.backgroundColor = state.isRecording ? '#dc2626' : '#2563eb';
+            recordButton.textContent = isRecording ? '⏹ Stop Recording' : '⏺ Start Recording';
+            recordButton.classList.toggle('recording', isRecording);
         }
 
         // Update comparison section
         function updateComparison() {
-            const currentResults = Object.entries(state.results)
-                .filter(([key]) => key.endsWith(`-${state.numParticles}-${state.numSegments}`))
+            const currentResults = Object.entries(results)
+                .filter(([key]) => key.endsWith(`-${config.numParticles}-${config.numSegments}`))
                 .map(([key, val]) => [key.split('-')[0], val]);
-            
-            if (currentResults.length === 0) {
-                dom.comparisonContainer.innerHTML = '<div class="info-text">Test both methods to see comparison</div>';
-                dom.textureWinner.style.display = 'none';
-                dom.mathWinner.style.display = 'none';
-                return;
-            }
-            
-            let html = '';
-            let bestFps = 0;
-            let bestMethod = '';
-            
-            currentResults.forEach(([method, val]) => {
-                if (val.fps > bestFps) {
-                    bestFps = val.fps;
-                    bestMethod = method;
-                }
+
+            // Clear crowns
+            textureCrown.textContent = '';
+            seilerMathCrown.textContent = '';
+            mathCrown.textContent = '';
+
+            if (currentResults.length > 0) {
+                let bestMethod = null;
+                let bestFps = 0;
+
+                // Find best method
+                currentResults.forEach(([method, data]) => {
+                    if (data.fps > bestFps) {
+                        bestFps = data.fps;
+                        bestMethod = method;
+                    }
+                });
+
+                // Update crowns
+                if (bestMethod === 'texture') textureCrown.textContent = '👑';
+                if (bestMethod === 'seiler-math') seilerMathCrown.textContent = '👑';
+                if (bestMethod === 'math') mathCrown.textContent = '👑';
+
+                // Update comparison items
+                comparisonResults.innerHTML = '';
                 
-                const methodName = method === 'texture' ? "Seiler's (GPU)" : 'Polynomial';
-                const fpsColor = val.fps >= 55 ? 'fps-good' : val.fps >= 40 ? 'fps-medium' : 'fps-poor';
-                
-                html += `
-                    <div class="comparison-section" style="margin-bottom: 12px;">
-                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
-                            <div style="font-weight: 600;">${methodName}</div>
-                            ${bestMethod === method ? '<span class="winner-badge">👑 Winner</span>' : ''}
-                        </div>
-                        <div class="${fpsColor}" style="font-size: 1.5rem; font-weight: bold;">
-                            ${val.fps.toFixed(1)} FPS
-                        </div>
-                        <div class="info-text">
-                            ${val.avg.toFixed(2)}ms average frame time
-                        </div>
-                    </div>
-                `;
-            });
-            
-            // Add speedup calculation
-            if (currentResults.length === 2) {
-                const textureResult = currentResults.find(([k]) => k === 'texture')?.[1];
-                const mathResult = currentResults.find(([k]) => k === 'math')?.[1];
-                
-                if (textureResult && mathResult) {
-                    const speedup = (textureResult.fps / mathResult.fps).toFixed(2);
-                    html += `
-                        <div class="speedup-banner">
-                            <div style="font-size: 0.875rem; color: #34d399; font-weight: 600;">Performance Gain</div>
-                            <div style="font-size: 1.5rem; font-weight: bold; color: #a7f3d0;">${speedup}x faster</div>
-                            <div class="info-text" style="margin-top: 4px;">
-                                Seiler's method vs Traditional
-                            </div>
-                        </div>
+                ['texture', 'seiler-math', 'math'].forEach(method => {
+                    const result = currentResults.find(([m]) => m === method);
+                    const fps = result ? result[1].fps : 0;
+                    const isBest = method === bestMethod;
+                    
+                    const div = document.createElement('div');
+                    div.className = `comparison-item ${isBest ? 'best' : ''}`;
+                    div.innerHTML = `
+                        <span>${method === 'texture' ? "Seiler's (GPU)" : 
+                                 method === 'seiler-math' ? "Seiler's (Math)" : 
+                                 "Polynomial"}</span>
+                        <span class="metric-value">${fps.toFixed(1)} FPS</span>
                     `;
+                    comparisonResults.appendChild(div);
+                });
+
+                // Calculate speedup if we have multiple methods
+                if (currentResults.length >= 2) {
+                    const textureFps = currentResults.find(([m]) => m === 'texture')?.[1]?.fps || 0;
+                    const seilerMathFps = currentResults.find(([m]) => m === 'seiler-math')?.[1]?.fps || 0;
+                    const mathFps = currentResults.find(([m]) => m === 'math')?.[1]?.fps || 0;
+
+                    if (textureFps && mathFps) {
+                        speedupValue.textContent = `${(textureFps / mathFps).toFixed(2)}x`;
+                        speedupLabel.textContent = "Seiler's (GPU) vs Polynomial";
+                        speedupDisplay.style.display = 'block';
+                    } else if (seilerMathFps && mathFps) {
+                        speedupValue.textContent = `${(seilerMathFps / mathFps).toFixed(2)}x`;
+                        speedupLabel.textContent = "Seiler's (Math) vs Polynomial";
+                        speedupDisplay.style.display = 'block';
+                    } else if (textureFps && seilerMathFps) {
+                        speedupValue.textContent = `${(textureFps / seilerMathFps).toFixed(2)}x`;
+                        speedupLabel.textContent = "GPU vs Manual Lerp";
+                        speedupDisplay.style.display = 'block';
+                    }
                 }
             }
-            
-            dom.comparisonContainer.innerHTML = html;
-            
-            // Update winner badges
-            dom.textureWinner.style.display = bestMethod === 'texture' ? 'inline' : 'none';
-            dom.mathWinner.style.display = bestMethod === 'math' ? 'inline' : 'none';
         }
 
-        // Update results table
-        function updateResultsTable() {
-            const results = Object.entries(state.results)
-                .sort((a, b) => b[1].fps - a[1].fps)
-                .slice(0, 10);
-            
-            let html = '';
-            
-            results.forEach(([key, val]) => {
-                const [method, particles, segments] = key.split('-');
-                const methodName = method === 'texture' ? 'Texture Interpolation Seiler' : 'Traditional DeCasteljau';
-                const fpsColor = val.fps >= 55 ? 'fps-good' : val.fps >= 40 ? 'fps-medium' : 'fps-poor';
-                
-                html += `
-                    <tr>
-                        <td>${methodName}</td>
-                        <td style="text-align: right; font-family: monospace;">${(parseInt(particles)/1000000).toFixed(1)}M</td>
-                        <td style="text-align: right; font-family: monospace;">${segments}</td>
-                        <td style="text-align: right; font-family: monospace; font-weight: bold;" class="${fpsColor}">${val.fps.toFixed(1)}</td>
-                    </tr>
-                `;
+        // Setup event listeners
+        function setupEventListeners() {
+            // Curve shape sliders
+            radiusSlider.addEventListener('input', (e) => {
+                config.curveRadius = parseFloat(e.target.value);
+                updateParticles();
             });
-            
-            dom.resultsTableBody.innerHTML = html;
-        }
 
-        // Update performance graph
-        function updatePerformanceGraph() {
-            if (!state.showGraphs || state.benchmarkHistory.length < 10) return;
-            
-            const svg = document.getElementById('performance-graph');
-            const recentData = state.benchmarkHistory.slice(-60);
-            const maxFps = Math.max(...recentData.map(d => d.fps), 120);
-            
-            let pathData = '';
-            recentData.forEach((d, i) => {
-                const x = (i / recentData.length) * 300;
-                const y = 120 - (d.fps / maxFps) * 100;
-                if (i === 0) {
-                    pathData += `M ${x},${y} `;
-                } else {
-                    pathData += `L ${x},${y} `;
-                }
+            heightSlider.addEventListener('input', (e) => {
+                config.curveHeight = parseFloat(e.target.value);
+                updateParticles();
             });
-            
-            svg.innerHTML = `
-                <defs>
-                    <linearGradient id="fpsGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-                        <stop offset="0%" style="stop-color:#22c55e;stop-opacity:0.3"/>
-                        <stop offset="100%" style="stop-color:#22c55e;stop-opacity:0.05"/>
-                    </linearGradient>
-                </defs>
-                <polygon points="${pathData} L 300,120 L 0,120" fill="url(#fpsGradient)" stroke="#22c55e" stroke-width="2"/>
-                <line x1="0" y1="60" x2="300" y2="60" stroke="#374151" stroke-width="1" stroke-dasharray="2,2"/>
-                <text x="5" y="15" fill="#9ca3af" font-size="10">${maxFps.toFixed(0)} FPS</text>
-                <text x="5" y="65" fill="#9ca3af" font-size="10">${(maxFps/2).toFixed(0)} FPS</text>
-            `;
+
+            twistSlider.addEventListener('input', (e) => {
+                config.curveTwist = parseFloat(e.target.value);
+                updateParticles();
+            });
+
+            spreadSlider.addEventListener('input', (e) => {
+                config.curveSpread = parseFloat(e.target.value);
+                updateParticles();
+            });
+
+            // Particle count buttons
+            document.querySelectorAll('.button[data-particles]').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    config.numParticles = parseInt(btn.dataset.particles);
+                    updateParticles();
+                });
+            });
+
+            // Segment count buttons
+            document.querySelectorAll('.button[data-segments]').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    config.numSegments = parseInt(btn.dataset.segments);
+                    updateParticles();
+                });
+            });
+
+            // Method buttons
+            document.querySelectorAll('.method-button').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    config.method = btn.dataset.method;
+                    updateParticles();
+                });
+            });
+
+            // Record button
+            recordButton.addEventListener('click', () => {
+                isRecording = !isRecording;
+                updateUI();
+            });
+
+            // Window resize
+            window.addEventListener('resize', () => {
+                camera.aspect = canvas.clientWidth / canvas.clientHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(canvas.clientWidth, canvas.clientHeight);
+            });
         }
 
         // Animation loop
         function animate() {
-            state.animationId = requestAnimationFrame(animate);
-            
-            // Calculate frame time
+            requestAnimationFrame(animate);
+
             const now = performance.now();
-            const frameTime = now - state.lastTime;
-            state.lastTime = now;
-            
-            // Update particles
-            if (state.particles && state.particles.material) {
-                state.particles.material.uniforms.uTime.value = state.clock.getElapsedTime();
-            }
-            
-            // Update controls
-            state.controls.update();
-            
-            // Render scene
-            state.renderer.render(state.scene, state.camera);
-            
-            // Update performance metrics
+            const frameTime = now - lastTime;
+            lastTime = now;
+
             updatePerformance(frameTime);
+
+            if (particles && particles.material) {
+                particles.material.uniforms.uTime.value = now / 1000;
+            }
+
+            controls.update();
+            renderer.render(scene, camera);
         }
 
-        // Event Listeners
-        function setupEventListeners() {
-            // Curve parameter sliders
-            dom.radiusSlider.addEventListener('input', (e) => {
-                state.curveRadius = parseFloat(e.target.value);
-                createParticles();
-                updateUI();
-            });
-            
-            dom.heightSlider.addEventListener('input', (e) => {
-                state.curveHeight = parseFloat(e.target.value);
-                createParticles();
-                updateUI();
-            });
-            
-            dom.twistSlider.addEventListener('input', (e) => {
-                state.curveTwist = parseFloat(e.target.value);
-                createParticles();
-                updateUI();
-            });
-            
-            dom.spreadSlider.addEventListener('input', (e) => {
-                state.curveSpread = parseFloat(e.target.value);
-                createParticles();
-                updateUI();
-            });
-            
-            // Particle count buttons
-            dom.particleButtons.forEach(btn => {
-                btn.addEventListener('click', () => {
-                    dom.particleButtons.forEach(b => b.classList.remove('active'));
-                    btn.classList.add('active');
-                    
-                    state.numParticles = parseInt(btn.dataset.count);
-                    createParticles();
-                    updateUI();
-                });
-            });
-            
-            // Segment count buttons
-            dom.segmentButtons.forEach(btn => {
-                btn.addEventListener('click', () => {
-                    dom.segmentButtons.forEach(b => b.classList.remove('active-purple'));
-                    btn.classList.add('active-purple');
-                    
-                    state.numSegments = parseInt(btn.dataset.segments);
-                    createParticles();
-                    updateUI();
-                });
-            });
-            
-            // Method buttons
-            dom.methodTexture.addEventListener('click', () => {
-                state.method = 'texture';
-                dom.methodTexture.classList.add('active');
-                dom.methodMath.classList.remove('active');
-                createParticles();
-                updateUI();
-            });
-            
-            dom.methodMath.addEventListener('click', () => {
-                state.method = 'math';
-                dom.methodMath.classList.add('active');
-                dom.methodTexture.classList.remove('active');
-                createParticles();
-                updateUI();
-            });
-            
-            // Record button
-            dom.recordBtn.addEventListener('click', () => {
-                state.isRecording = !state.isRecording;
-                updateUI();
-            });
-            
-            // Graph toggle button
-            dom.graphToggle.addEventListener('click', () => {
-                state.showGraphs = !state.showGraphs;
-                dom.graphSection.style.display = state.showGraphs ? 'block' : 'none';
-                dom.graphToggle.textContent = state.showGraphs ? '📊' : '📈';
-            });
-            
-            // Export buttons
-            dom.exportCsv.addEventListener('click', exportCSV);
-            dom.exportJson.addEventListener('click', exportJSON);
-            
-            // Window resize
-            window.addEventListener('resize', () => {
-                const width = dom.canvasContainer.clientWidth;
-                const height = dom.canvasContainer.clientHeight;
-                
-                state.camera.aspect = width / height;
-                state.camera.updateProjectionMatrix();
-                state.renderer.setSize(width, height);
-            });
-        }
-
-        // Export to CSV
-        function exportCSV() {
-            const headers = ['Method', 'Particles', 'Segments', 'Avg FPS', 'Min Frame Time', 'Max Frame Time', 'Std Dev', 'Draw Calls', 'Triangles', 'Points'];
-            const rows = Object.entries(state.results).map(([key, val]) => {
-                const [method, particles, segments] = key.split('-');
-                return [
-                    method === 'texture' ? "Seiler's (GPU)" : "Traditional",
-                    particles,
-                    segments,
-                    val.fps.toFixed(2),
-                    val.min.toFixed(2),
-                    val.max.toFixed(2),
-                    val.stdDev?.toFixed(2) || 'N/A',
-                    val.drawCalls || 'N/A',
-                    val.triangles || 'N/A',
-                    val.points || 'N/A'
-                ];
-            });
-            
-            const csv = [headers, ...rows].map(row => row.join(',')).join('\n');
-            const blob = new Blob([csv], { type: 'text/csv' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `bezier-benchmark-${Date.now()}.csv`;
-            a.click();
-        }
-
-        // Export to JSON
-        function exportJSON() {
-            const data = {
-                benchmarkResults: state.results,
-                history: state.benchmarkHistory,
-                testConfiguration: {
-                    particleCounts: [100000, 500000, 1000000, 5000000, 10000000, 15000000],
-                    segmentCounts: [5, 10, 50, 100, 1000, 1500],
-                    methods: ['texture', 'math'],
-                    curveParameters: {
-                        curveRadius: state.curveRadius,
-                        curveHeight: state.curveHeight,
-                        curveTwist: state.curveTwist,
-                        curveSpread: state.curveSpread
-                    }
-                },
-                timestamp: new Date().toISOString()
-            };
-            
-            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `bezier-benchmark-${Date.now()}.json`;
-            a.click();
-        }
-
-        // Initialize everything
-        function init() {
-            initThreeJS();
-            setupEventListeners();
-            updateUI();
-        }
-
-        // Start the application
+        // Initialize the app
         init();
     </script>
 </body>
