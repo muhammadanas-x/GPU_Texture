@@ -56,7 +56,16 @@ how to format affiliations.
 \section{Introduction}
 \label{sec:introduction}
 
-\AW{In our notes you had this section. I might take a stab at it though at least for a first pass? Obviously, if you hate it we can change it!}
+Bezier curves were invented in the late 1950s and early 1960s by Pierre Bezier and Paul de Casteljau, respectively, for use in automobile body design at Renault and Citro\"en. They
+were needed to create smooth curves that could be easily controlled and reproduced in computer-aided design. Since then, Bezier curves have been widely adopted in computer graphics
+not just for describing geometry, but also for modeling how data animates with respect to another parameter, such as time. Bezier curves have also been generalized in various ways,
+such as to B-splines and NURBS, to increase their expressiveness and flexibility.
+
+Yuksel recently described how Seiler’s interpolation can be used to evaluate polynomial curves, such as Bezier curves, and mentioned that GPU linear texture filtering could be used
+to perform part of the evaluation \cite{10.1145/3641233.3664331}.
+
+In this paper, we present the details of evaluating Bezier curves using hardware-accelerated texture interpolation, demonstrate non-obvious extensions, and show how to achieve Seiler
+interpolation as well. We also provide performance and quality comparisons to other standard methods of evaluating Bezier curves.
 
 \section{Evaluating Bezier Curves Using Texture Interpolation}
 
