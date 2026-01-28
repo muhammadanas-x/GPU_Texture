@@ -40,8 +40,7 @@
 \maketitle
 \thispagestyle{firstpagestyle}
 
-\AW{We will need a title for the paper}
-\AW{We will need a teaser image. It is usually the main figure of the paper. Maybe a screenshot of the benchmark, showing the perf numbers, and the quality difference?}
+\AW{Whichever diagram we make the looks the best can be the teaser image.}
 
 \begin{abstract}
 \small
@@ -50,18 +49,16 @@ The method relies on fixed-function hardware texel interpolation, whose limited 
 However, the method is well suited for large-scale particle simulations and similar effects-driven workloads, where approximate curve evaluation is sufficient and the ability to evaluate vast numbers of trajectories efficiently outweighs the loss of geometric accuracy.
 \end{abstract}
 
-\AW{We need to replace the abstract}
-
 %-------------------------------------------------------------------------
 \section{Introduction}
 \label{sec:introduction}
 
 Bezier curves were invented in the late 1950s and early 1960s by Pierre Bezier and Paul de Casteljau, respectively, for use in automobile body design at Renault and Citro\"en. They
 were needed to create smooth curves that could be easily controlled and reproduced in computer-aided design. Since then, Bezier curves have been widely adopted in computer graphics
-not just for describing geometry, but also for modeling how data animates with respect to another parameter, such as time. Bezier curves have also been generalized in various ways,
+not just for describing geometry, but also for modeling how data animates with respect time, or other parameters. Bezier curves have also been generalized in various ways,
 such as to B-splines and NURBS, to increase their expressiveness and flexibility.
 
-Yuksel recently described how Seiler’s interpolation can be used to evaluate polynomial curves, such as Bezier curves, and mentioned that GPU linear texture filtering could be used
+Yuksel recently described how Seiler’s interpolation can be used to evaluate polynomial curves, including Bezier curves, and mentioned that GPU linear texture filtering could be used
 to perform part of the evaluation \cite{10.1145/3641233.3664331}.
 
 In this paper, we present the details of evaluating Bezier curves using hardware-accelerated texture interpolation, demonstrate non-obvious extensions, and show how to achieve Seiler
@@ -69,15 +66,12 @@ interpolation as well. We also provide performance and quality comparisons to ot
 
 \section{Evaluating Bezier Curves Using Linear Texture Interpolation}
 
-The link between Bezier curves and texture interpolation lies in the de Casteljau algorithm which is based on recursive linear interpolation.  For a quadratic Bezier curve with
-control points A, B and C, the de Casteljau algorithm interpolates between A and B to get point AB, and between B and C to get point BC, both at time t.  It then interpolates
-between points AB and BC at time t to get the final point on the curve.
+The link between Bezier curves and texture interpolation lies in the de Casteljau algorithm which is based on recursive interpolation. A quadratic Bezier curve is a linear interpolation
+of two linear interpolations, and a cubic Bezier curve is a linear interpolation of two quadratic curves.
 
-When sampling a two dimensional texture at coordinate (u,v) using bilinear interpolation, the GPU performs a similar operation. After finding the 4 texels surrounding the coordinate,
-it effectively does two horizontal linear interpolations followed by a vertical linear interpolation to get the final pixel value.
-
-Both operations do two linear operations and then interpolate between them.  If we make a 2x2 texture with a top row of A, B and a bottom row of B, C, sampling the texture at
-coordinate (t,t) will exactly perform the de Caseljau algorithm.
+When sampling a two dimensional texture at coordinate $(u,v)$ using bilinear interpolation, the GPU performs a similar operation. After finding the 4 texels surrounding the coordinate,
+it effectively does two horizontal linear interpolations followed by a vertical linear interpolation to get the final pixel value. If we make a 2x2 texture with a top row of $A$, $B$ and a
+bottom row of $B$, $C$, sampling the texture at coordinate $(t,t)$ will exactly perform the de Caseljau algorithm for a quadratic Bezier Curve with control points $A$, $B$, $C$.
 
 \AW{Make a diagram showing the link between bilinear texture interpolation and de casteljau.}
 
@@ -93,8 +87,9 @@ curves to be $C0$ continuous, we can alternate the direction of reading the text
 control points need to be exact values, and the interior control points have more freedom to deviate individually, so long as the average is correct.
 \AW{Show a diagram of this}
 \AW{Re-verify this is true about higher order curves. It's been a while since I worked it out.}
+\AW{I'm being loose with (u,v) and not accounting for half pixel offset. should fix that}
 
-Bezier tensor product surfaces and volumes can be evaluated using this technique.  If you are using the texture interpolator and the shader to evaluate an order $O$ curve, you can break
+Bezier tensor product surfaces and volumes can be evaluated using this technique as well.  If you are using the texture interpolator and the shader to evaluate an order $O$ curve, you can break
 that into order $M$ and $N$ such that $M+N=O$, to evaluate order $M$ with coordinate $t$ and order $N$ with coordinate $u$ to get the point on a surface.  The simplest incarnation of this
 is sampling a 2D texture at coordinate $(t, u)$ to evaluate a bilinear Bezier surface. Similarly, for volumes, you can break the order $O$ into $M$, $N$ and $P$ such that $M+N+P=O$, to make
 a Bezier volume. The pattern continues for hypervolumes as well.
@@ -108,18 +103,18 @@ Bezier curves using Boehm's algorithm.
 Lastly, as power basis polynomials can be converted to and from Bernstein basis (Bezier) polynomials, this technique can be used to evaluate general polynomials as well.
 
 \AW{use math symbols for letters}
-\AW{The other possibilities}
 
 \subsection{limitations}
 If using a low bit depth texture format, the values the control points can take are limited - such as 8 bit textures being limited to 255 values, or being limited to $[0,1]$ if using
-a unorm format. To deal with this limitation, it is possible to rescale the curves to fit within the range. However, higher bit depth textures can be used, which can also help
-if 8 bit discretization of control points is too coarse. \AW{and resulting curve values discretized? are they? find out.}
+a unorm format. Furthermore, the values read from the curves are also limited to the same range and discretization as the texture format! To deal with this limitation, it is possible to
+rescale the curves to fit within the range. However, higher bit depth textures can be used, which can also help if 8 bit discretization of control points is too coarse.
 
 Another source of discretization error is in the texture sampling itself. When performing interpolation, the (u,v) coordinates themselves are commonly converted to a fixed point X.8 bit
 format, leading to unavoidable quantization errors.  If this is a problem, doing some of the interpolation levels in the shader can help reduce the error, since shaders run at full
-32 bit float precision. \AW{cite the source you have about X.8 bit format. it's on the other paper.}
+32 bit float precision. \AW{cite the source you have about X.8 bit format. it's on the other paper. in chat was a better citation i think}
 
 \AW{Show jaggies from X.8 interpolation in one of the diagrams}
+\AW{Figure 8 in the original paper is not accounted for here. Unsure if we want to}
 
 \section{Extending to Seiler interpolation}
 
