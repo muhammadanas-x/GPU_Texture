@@ -66,17 +66,18 @@ interpolation as well. We also provide performance and quality comparisons to ot
 
 \section{Evaluating Bezier Curves Using Linear Texture Interpolation}
 
-The link between Bezier curves and texture interpolation lies in the de Casteljau algorithm which is based on recursive interpolation. A quadratic Bezier curve is a linear interpolation
-of two linear interpolations, and a cubic Bezier curve is a linear interpolation of two quadratic curves.
+The link between Bezier curves and linear texture interpolation lies in the de Casteljau algorithm which is based on recursive linear interpolation. For a quadratic curve with control
+points $A$, $B$ and $C$, the de Casteljau algorithm linearly interpolates between $A$ and $B$ to get point $AB$, between $B$ and $C$ to get point $BC$, and between $AB$ and $BC$
+to get the final point $ABC$, all with the same interpolation time $t$.
 
-When sampling a two dimensional texture at coordinate $(u,v)$ using bilinear interpolation, the GPU performs a similar operation. After finding the 4 texels surrounding the coordinate,
-it effectively does two horizontal linear interpolations followed by a vertical linear interpolation to get the final pixel value. If we make a 2x2 texture with a top row of $A$, $B$ and a
-bottom row of $B$, $C$, sampling the texture at coordinate $(t,t)$ will exactly perform the de Caseljau algorithm for a quadratic Bezier Curve with control points $A$, $B$, $C$.
+Similarly, we can make a 2x2 texture that has a top row of pixels with values $A$, $B$, and a bottom row with values $B$, $C$. When this texture is linearly sampled at $(t, t)$, there
+are effectively two horizontal interpolations which make $AB$ and $BC$ and then a vertical interpolation between them which makes $ABC$.
 
+For a cubic curve, the de Casteljau algorithm linearly interpolates between two quadratic curve points $ABC$ and $BCD$ to make cubic curve point $ABCD$. If we make a 2x2x2 volume
+texture which has a front slice encoding the quadratic bezier curve $ABC$ and a back slice encoding $BCD$, sampling at $(t,t,t)$ gives point $ABCD$.
+
+\AW{talk about calculating t with a half pixel offset}
 \AW{Make a diagram showing the link between bilinear texture interpolation and de casteljau.}
-
-The pattern continues beyond quadratic curves. Sampling a 3D texture can evaluate a cubic Bezier curve, and sampling an nD texture can evaluate an n-degree Bezier curve. In practice,
-however, GPUs only support up to 3D textures. To evaluate curves higher degree than cubic, we can perform the remainder of the interpolations in the shader after texture sampling.
 
 \subsection{Extensions}
 
@@ -87,7 +88,6 @@ curves to be $C0$ continuous, we can alternate the direction of reading the text
 control points need to be exact values, and the interior control points have more freedom to deviate individually, so long as the average is correct.
 \AW{Show a diagram of this}
 \AW{Re-verify this is true about higher order curves. It's been a while since I worked it out.}
-\AW{I'm being loose with (u,v) and not accounting for half pixel offset. should fix that}
 
 Bezier tensor product surfaces and volumes can be evaluated using this technique as well.  If you are using the texture interpolator and the shader to evaluate an order $O$ curve, you can break
 that into order $M$ and $N$ such that $M+N=O$, to evaluate order $M$ with coordinate $t$ and order $N$ with coordinate $u$ to get the point on a surface.  The simplest incarnation of this
