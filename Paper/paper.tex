@@ -4,7 +4,7 @@
 \usepackage{multirow}
 
 \setciteauthor{Name(s) as they should appear in the citation}
-\setcitetitle{hello}
+\setcitetitle{A Texture Lookup Approach to Scalable Bézier Curve Evaluation on the GPU}
 %\setheadtitle{Abbreviated title, only if full title won't fit in page headers}
 
 % Mark submissions with the date of submission using the following line:
@@ -22,12 +22,12 @@
 
 \begin{document}
 
-\title{hello}
+\title{A Texture Lookup Approach to Scalable Bézier Curve Evaluation on the GPU}
 
 % Authors with brief affiliation and ORCID you have one. 
 % More detailed affiliations can appear in the contact blocks at the end of the paper
 \author
-       {Muhammad Anas
+       {Muhammad Anas~\href{https://orcid.org/0009-0007-7348-9934}{\includegraphics[width=8pt]{ORCIDlogo}}
         \and Alan Wolfe~\href{https://orcid.org/0000-0001-9100-4928}{\includegraphics[width=8pt]{ORCIDlogo}}
        }
 
@@ -45,9 +45,9 @@
 
 \begin{abstract}
 \small
-This document is the \textit{JCGT} formatting template \textit{and} a description of the guidelines
-for  \textit{JCGT} articles.  The author names on this document are fictional and chosen to show
-how to format affiliations.
+Modern techniques for evaluating Bézier curves typically rely on CPU or GPU arithmetic, which becomes increasingly expensive as the number of curves and evaluation samples grows. We introduce a texture-based evaluation approach that trades a modest increase in memory usage for substantially improved throughput and predictable performance. Curve samples are precomputed and stored in textures, and curve evaluation is performed on the GPU via texture lookups, avoiding costly per-curve arithmetic.
+The method relies on fixed-function hardware texel interpolation, whose limited fractional precision (typically 8 bits) introduces quantization error. Consequently, the reconstructed curves are not strictly continuous and may exhibit visible jaggedness unless a high sampling density is used. This limits the suitability of the approach for precision-sensitive applications such as motion path animation and vector graphics rendering.
+However, the method is well suited for large-scale particle simulations and similar effects-driven workloads, where approximate curve evaluation is sufficient and the ability to evaluate vast numbers of trajectories efficiently outweighs the loss of geometric accuracy.
 \end{abstract}
 
 \AW{We need to replace the abstract}
