@@ -113,13 +113,16 @@ Lastly, as power basis polynomials can be converted to and from Bernstein basis 
 \subsection{limitations}
 If using a low bit depth texture format, the values the control points can take are limited - such as 8 bit textures being limited to 255 values, or being limited to $[0,1]$ if using
 a unorm format. To deal with this limitation, it is possible to rescale the curves to fit within the range. However, higher bit depth textures can be used, which can also help
-if 8 bit discretization of control points is too coarse. \AW{and resulting curve values discretized? are they? find out.}
+if 8 bit discretization of control points is too coarse.
+
+\AW{and resulting curve values discretized? are they? find out. I think so. https://iquilezles.org/articles/hwinterpolation/ and https://gamestech.slack.com/archives/C1TGTLV1N/p1769405584042439}
 
 Another source of discretization error is in the texture sampling itself. When performing interpolation, the (u,v) coordinates themselves are commonly converted to a fixed point X.8 bit
 format, leading to unavoidable quantization errors.  If this is a problem, doing some of the interpolation levels in the shader can help reduce the error, since shaders run at full
 32 bit float precision. \AW{cite the source you have about X.8 bit format. it's on the other paper.}
 
 \AW{Show jaggies from X.8 interpolation in one of the diagrams}
+\AW{you are being loose about sampling locations. maybe talk about the data being at the center of a pixel?}
 
 \section{Extending to Seiler interpolation}
 
