@@ -74,10 +74,13 @@ Similarly, we can make a 2x2 texture that has a top row of pixels with values $A
 are effectively two horizontal interpolations which make $AB$ and $BC$ and then a vertical interpolation between them which makes $ABC$.
 
 For a cubic curve, the de Casteljau algorithm linearly interpolates between two quadratic curve points $ABC$ and $BCD$ to make cubic curve point $ABCD$. If we make a 2x2x2 volume
-texture which has a front slice encoding the quadratic bezier curve $ABC$ and a back slice encoding $BCD$, sampling at $(t,t,t)$ gives point $ABCD$.
+texture which has a front slice encoding the quadratic bezier curve $ABC$ and a back slice encoding $BCD$, sampling at $(t,t,t)$ gives point $ABCD$.  For higher order curves, Further
+interpolations levels can be done in the shader after the texture reads.
 
-\AW{talk about calculating t with a half pixel offset}
-\AW{Make a diagram showing the link between bilinear texture interpolation and de casteljau.}
+When linearly sampling textures, the pixel value is at the center of the pixel, so the $t$ values need to range from the center of one pixel to the next, instead of being in the usual
+$[0,1]$ range. For a 2x2 texture, that means that $t$ is in the range $[0.25, 0.75]$.
+
+\AW{TODO: a diagram showing how bilinear texture interpolation and de casteljau can be the same}
 
 \subsection{Extensions}
 
