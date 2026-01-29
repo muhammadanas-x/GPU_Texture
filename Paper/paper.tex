@@ -66,11 +66,13 @@ interpolation as well. We also provide performance and quality comparisons to ot
 
 \section{Evaluating Bezier Curves Using Linear Texture Interpolation}
 
-The link between Bezier curves and linear texture interpolation lies in the de Casteljau algorithm which is based on recursive linear interpolation. For a quadratic curve with control
-points $A$, $B$ and $C$, the de Casteljau algorithm linearly interpolates between $A$ and $B$ to get point $AB$, between $B$ and $C$ to get point $BC$, and between $AB$ and $BC$
-to get the final point $ABC$, all with the same interpolation time $t$.
+\input{Diagrams/BezDecasteljau/figure.tex}
 
-Similarly, we can make a 2x2 texture that has a top row of pixels with values $A$, $B$, and a bottom row with values $B$, $C$. When this texture is linearly sampled at $(t, t)$, there
+The link between Bezier curves and linear texture interpolation lies in the de Casteljau algorithm which is based on recursive linear interpolation as can be seen in figure \ref{fig_tex_decasteljau}.
+For a quadratic curve with control points $A$, $B$ and $C$, the de Casteljau algorithm linearly interpolates between $A$ and $B$ to get point $AB$, between $B$ and $C$ to get point $BC$, and between
+$AB$ and $BC$ to get the final point $ABC$, all with the same interpolation time $t$.
+
+Similarly, we can make a 2x2 texture that has a row of pixels with values $A$, $B$, and a row with values $B$, $C$. When this texture is linearly sampled at $(t, t)$, there
 are effectively two horizontal interpolations which make $AB$ and $BC$ and then a vertical interpolation between them which makes $ABC$.
 
 For a cubic curve, the de Casteljau algorithm linearly interpolates between two quadratic curve points $ABC$ and $BCD$ to make cubic curve point $ABCD$. If we make a 2x2x2 volume
@@ -79,8 +81,6 @@ interpolations levels can be done in the shader after the texture reads.
 
 When linearly sampling textures, the pixel value is at the center of the pixel, so the $t$ values need to range from the center of one pixel to the next, instead of being in the usual
 $[0,1]$ range. For a 2x2 texture, that means that $t$ is in the range $[0.25, 0.75]$.
-
-\AW{TODO: a diagram showing how bilinear texture interpolation and de casteljau can be the same}
 
 \subsection{Extensions}
 
