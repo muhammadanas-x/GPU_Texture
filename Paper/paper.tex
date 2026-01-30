@@ -129,11 +129,10 @@ a unorm format. Furthermore, the values read from the curves are also limited to
 rescale the curves to fit within the range. However, higher bit depth textures can be used, which can also help if 8 bit discretization of control points is too coarse.
 
 Another source of discretization error is in the texture sampling itself. When performing interpolation, the (u,v) coordinates themselves are commonly converted to a fixed point X.8 bit
-format, leading to unavoidable quantization errors.  If this is a problem, doing some of the interpolation levels in the shader can help reduce the error, since shaders run at full
-32 bit float precision. \AW{cite the source you have about X.8 bit format. it's on the other paper. in chat was a better citation i think}
+format, leading to unavoidable quantization errors \cite{CUDA_PG}.  If this is a problem, doing some of the interpolation levels in the shader can help reduce the error, since shaders run at full
+32 bit float precision.
 
 \AW{Show jaggies from X.8 interpolation in one of the diagrams}
-\AW{Figure 8 in the original paper is not accounted for here. Unsure if we want to}
 
 \section{Extending to Seiler interpolation}
 
