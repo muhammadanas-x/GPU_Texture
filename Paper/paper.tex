@@ -84,11 +84,30 @@ $[0,1]$ range. For a 2x2 texture, that means that $t$ is in the range $[0.25, 0.
 
 \subsection{Extensions}
 
-\AW{prove the diagonal only has to average to B}
-If we wanted to store multiple quadratic curves in a single texture, naively we would need a 2x2 region of pixels for each curve. However, it can be observated that the diagonal texels
-don't need to store B exactly, but only need to average to B.  This allows us to store $N$ curves in a texture width of $N+1$ instead of $2N$. Furthermore, if it is desirable for the
-curves to be $C0$ continuous, we can alternate the direction of reading the texture in a zig zag pattern.  This property holds true for higher order curves as well, that only the end
-control points need to be exact values, and the interior control points have more freedom to deviate individually, so long as the average is correct.
+If we wanted to store multiple quadratic curves in a single texture, naively we would need a 2x2 region of pixels for each curve. However, it can be observed that the diagonal texels
+don't need to store B exactly, but only need to average to B.  If we set $s = 1- t$, we can write linear interpolation between point A and B at time $t$ as $As + Bt$.  If we have a 2x2
+texture with rows $A, B$ and $C, D$, a bilinear interpolation is written and expanded as:
+
+\begin{equation}
+\begin{split}
+(As + Bt)s + (Cs + Dt)t \\ AS^2 + (B+C)st + Dt^2
+\end{split}
+\end{equation}
+
+If we do the same with a 2x2 texture that has rows $A, E$ and $E, D$, we get:
+
+\begin{equation}
+\begin{split}
+(As + Et)s + (Es + Dt)t \\ AS^2 + 2Est + Dt^2
+\end{split}
+\end{equation}
+
+These two equations are equal when $E = (B+C)/2$.  Thus, when the diagonal values mismatch, the control point is defined as their average.
+
+This property allows us to store $N$ curves in a texture width of $N+1$ instead of $2N$. Furthermore, if it is desirable for the curves to be $C0$ continuous, we can alternate the direction
+of reading the texture in a zig zag pattern.  This property holds true for higher order curves as well, that only the end control points need to be exact values, and the interior control
+points have more freedom to deviate individually, so long as the average is correct.
+
 \AW{Show a diagram of this}
 \AW{Re-verify this is true about higher order curves. It's been a while since I worked it out.}
 
@@ -104,8 +123,6 @@ With some pre-processing, it is also possible to evaluate NURBS. Rational spline
 Bezier curves using Boehm's algorithm.
 
 Lastly, as power basis polynomials can be converted to and from Bernstein basis (Bezier) polynomials, this technique can be used to evaluate general polynomials as well.
-
-\AW{use math symbols for letters}
 
 \subsection{limitations}
 If using a low bit depth texture format, the values the control points can take are limited - such as 8 bit textures being limited to 255 values, or being limited to $[0,1]$ if using
