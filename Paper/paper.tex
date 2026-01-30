@@ -68,48 +68,47 @@ interpolation as well. We also provide performance and quality comparisons to ot
 
 \input{Diagrams/BezDecasteljau/figure.tex}
 
-The link between Bezier curves and linear texture interpolation lies in the de Casteljau algorithm which is based on recursive linear interpolation as can be seen in figure \ref{fig_tex_decasteljau}.
+The link between Bezier curves and linear texture interpolation lies in the de Casteljau algorithm which is based on recursive linear interpolation as shown in figure \ref{fig_tex_decasteljau}.
 For a quadratic curve with control points $A$, $B$ and $C$, the de Casteljau algorithm linearly interpolates between $A$ and $B$ to get point $AB$, between $B$ and $C$ to get point $BC$, and between
 $AB$ and $BC$ to get the final point $ABC$, all with the same interpolation time $t$.
 
 Similarly, we can make a 2x2 texture that has a row of pixels with values $A$, $B$, and a row with values $B$, $C$. When this texture is linearly sampled at $(t, t)$, there
 are effectively two horizontal interpolations which make $AB$ and $BC$ and then a vertical interpolation between them which makes $ABC$.
 
-For a cubic curve, the de Casteljau algorithm linearly interpolates between two quadratic curve points $ABC$ and $BCD$ to make cubic curve point $ABCD$. If we make a 2x2x2 volume
+Extending this to a cubic curve, the de Casteljau algorithm linearly interpolates between two quadratic curve points $ABC$ and $BCD$ to make cubic curve point $ABCD$. If we make a 2x2x2 volume
 texture which has a front slice encoding the quadratic bezier curve $ABC$ and a back slice encoding $BCD$, sampling at $(t,t,t)$ gives point $ABCD$.  For higher order curves, Further
-interpolations levels can be done in the shader after the texture reads.
+interpolations levels can be done in the shader after the texture reads, since 4D and higher textures are not supported on modern GPUs.
 
 When linearly sampling textures, the pixel value is at the center of the pixel, so the $t$ values need to range from the center of one pixel to the next, instead of being in the usual
 $[0,1]$ range. For a 2x2 texture, that means that $t$ is in the range $[0.25, 0.75]$.
 
-\subsection{Extensions}
+\subsection{C0 Continuous Piecewise Curves}
 
-If we wanted to store multiple quadratic curves in a single texture, naively we would need a 2x2 region of pixels for each curve. However, it can be observed that the diagonal texels
-don't need to store B exactly, but only need to average to B.  If we set $s = 1- t$, we can write linear interpolation between point A and B at time $t$ as $As + Bt$.  If we have a 2x2
-texture with rows $A, B$ and $C, D$, a bilinear interpolation is written and expanded as:
-
-\begin{equation}
-\begin{split}
-(As + Bt)s + (Cs + Dt)t \\ AS^2 + (B+C)st + Dt^2
-\end{split}
-\end{equation}
-
-If we do the same with a 2x2 texture that has rows $A, E$ and $E, D$, we get:
+To store multiple quadratic curves in a single texture, we would naively need a 2x2 group of pixels for each curve. However, it can be observed that the diagonal texels
+don't need to store $B$ exactly, and only need to average to $B$. If we have a 2x2 texture with rows $A, B$ and $C, D$, and we define $s = 1 - t$, a bilinear interpolation is written as
+and expanded to:
 
 \begin{equation}
 \begin{split}
-(As + Et)s + (Es + Dt)t \\ AS^2 + 2Est + Dt^2
+(As + Bt)s + (Cs + Dt)t \Rightarrow \\ AS^2 + (B+C)st + Dt^2
 \end{split}
 \end{equation}
 
-These two equations are equal when $E = (B+C)/2$.  Thus, when the diagonal values mismatch, the control point is defined as their average.
+Doing the same for a texture with rows $A, E$ and $E, D$, we get:
 
-This property allows us to store $N$ curves in a texture width of $N+1$ instead of $2N$. Furthermore, if it is desirable for the curves to be $C0$ continuous, we can alternate the direction
-of reading the texture in a zig zag pattern.  This property holds true for higher order curves as well, that only the end control points need to be exact values, and the interior control
-points have more freedom to deviate individually, so long as the average is correct.
+\begin{equation}
+AS^2 + 2Est + Dt^2
+\end{equation}
+
+The curves are equal when $2E = B+C$ which can be rewritten as $E = (B+C)/2$.  Thus, when the diagonal values mismatch, the control point is defined as their average. If we use this fact
+while also reading in a zig zag pattern, we can add two pixels for each additional quadratic bezier segment, instead of four.
 
 \AW{Show a diagram of this}
-\AW{Re-verify this is true about higher order curves. It's been a while since I worked it out.}
+
+Since a 2d texture is able to store arbitrary $C0$ continuous quadratic Bezier curves, we can put two of them side by side into a 3d texture and interpolate to make a cubic curve. The pattern would
+continue for higher order curves if higher dimensional textures were supported.
+
+\subsection{Surfaces, Volumes, and NURBS}
 
 Bezier tensor product surfaces and volumes can be evaluated using this technique as well.  If you are using the texture interpolator and the shader to evaluate an order $O$ curve, you can break
 that into order $M$ and $N$ such that $M+N=O$, to evaluate order $M$ with coordinate $t$ and order $N$ with coordinate $u$ to get the point on a surface.  The simplest incarnation of this
