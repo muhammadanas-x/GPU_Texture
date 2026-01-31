@@ -1,0 +1,188 @@
+{
+    "$schema": "gigischema.json",
+    "version": "1.01",
+    "variables": [
+        {
+            "name": "CurveOrder",
+            "type": "Int",
+            "dflt": "Quintic",
+            "visibility": "User",
+            "Enum": "CurveOrders"
+        },
+        {
+            "name": "CP1",
+            "type": "Float",
+            "dflt": "0",
+            "visibility": "User",
+            "UISettings": {
+                "UIHint": "Slider",
+                "min": "0",
+                "max": "1"
+            }
+        },
+        {
+            "name": "CP2",
+            "type": "Float",
+            "dflt": "1",
+            "visibility": "User",
+            "UISettings": {
+                "UIHint": "Slider",
+                "min": "0",
+                "max": "1"
+            }
+        },
+        {
+            "name": "CP3",
+            "type": "Float",
+            "dflt": "0",
+            "visibility": "User",
+            "UISettings": {
+                "UIHint": "Slider",
+                "min": "0",
+                "max": "1"
+            }
+        },
+        {
+            "name": "CP4",
+            "type": "Float",
+            "dflt": "1",
+            "visibility": "User",
+            "UISettings": {
+                "UIHint": "Slider",
+                "min": "0",
+                "max": "1"
+            }
+        },
+        {
+            "name": "CP5",
+            "type": "Float",
+            "dflt": "0",
+            "visibility": "User",
+            "UISettings": {
+                "UIHint": "Slider",
+                "min": "0",
+                "max": "1"
+            }
+        },
+        {
+            "name": "CP6",
+            "type": "Float",
+            "dflt": "1",
+            "visibility": "User",
+            "UISettings": {
+                "UIHint": "Slider",
+                "min": "0",
+                "max": "1"
+            }
+        },
+        {
+            "name": "ShowPolynomial",
+            "type": "Bool",
+            "dflt": "true",
+            "visibility": "User"
+        },
+        {
+            "name": "ShowControlPoints",
+            "type": "Bool",
+            "dflt": "true",
+            "visibility": "User"
+        },
+        {
+            "name": "RenderSize",
+            "type": "Uint2",
+            "dflt": "512, 512",
+            "visibility": "User"
+        }
+    ],
+    "shaders": [
+        {
+            "name": "DrawCurves",
+            "fileName": "ViewCurves_DrawCurves.hlsl",
+            "resources": [
+                {
+                    "name": "Output",
+                    "access": "UAV",
+                    "type": "Texture"
+                }
+            ]
+        }
+    ],
+    "fileCopies": [
+        {
+            "fileName": "sRGB.hlsli",
+            "type": "Shader"
+        },
+        {
+            "fileName": "Bezier.hlsli",
+            "type": "Shader"
+        }
+    ],
+    "nodes": [
+        {
+            "resourceTexture": {
+                "name": "Output",
+                "editorPos": [
+                    -19.0,
+                    0.0
+                ],
+                "format": {
+                    "format": "RGBA8_Unorm"
+                },
+                "size": {
+                    "variable": {
+                        "name": "RenderSize"
+                    }
+                }
+            }
+        },
+        {
+            "actionComputeShader": {
+                "name": "DrawCurves",
+                "editorPos": [
+                    121.0,
+                    2.0
+                ],
+                "linkProperties": [
+                    {}
+                ],
+                "connections": [
+                    {
+                        "srcPin": "Output",
+                        "dstNode": "Output",
+                        "dstPin": "resource"
+                    }
+                ],
+                "shader": {
+                    "name": "DrawCurves"
+                },
+                "dispatchSize": {
+                    "node": {
+                        "name": "Output"
+                    }
+                }
+            }
+        }
+    ],
+    "enums": [
+        {
+            "name": "CurveOrders",
+            "items": [
+                {
+                    "label": "Linear"
+                },
+                {
+                    "label": "Quadratic"
+                },
+                {
+                    "label": "Cubic"
+                },
+                {
+                    "label": "Quartic"
+                },
+                {
+                    "label": "Quintic"
+                }
+            ]
+        }
+    ]
+}
