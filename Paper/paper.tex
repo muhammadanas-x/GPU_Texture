@@ -168,14 +168,9 @@ Using Seiler's method, cubic curves can be efficiently stored in a $2 \times 2$ 
 
 For multiple curve segments, parametric data are encoded in a texture atlas, with each segment occupying a distinct horizontal region. Segment-specific geometric data are stored per region, while the parametric blending behavior is shared globally. The horizontal coordinate $u$ selects both the curve segment and the parameter value, while the vertical coordinate $v$ encodes the parametric basis.
 
-For both quadratic and cubic Bézier curves under Seiler's formulation, the basis function is $(1-t)t$, resulting in:
-\[
-C(t) = L(b_{03}, s_{12}, (1-t)t)
-\]
-
 This formulation is independent of individual segments and is well-suited for GPU evaluation.
 
-Furthermore, Seiler's cubic curves can be leveraged to construct higher-degree curves, such as quartic and quintic, by interpolating between two cubic or quartic curves via texture-based interpolation. However, Seiler curves have not been formally extended to higher-degree polynomials because the underlying difference rules are limited to degrees $d \leq 6$, where $d$ denotes the curve degree.
+Furthermore, Seiler's cubic curves can be leveraged to construct higher-degree curves, such as quartic and quintic, by interpolating between two cubic or quartic curves via texture-based interpolation. However, Seiler curves have not been formally extended to higher-degree polynomials because the underlying difference rules are limited to degrees $d \leq 5$, where $d$ denotes the curve degree.
 
 \section{Results}
 

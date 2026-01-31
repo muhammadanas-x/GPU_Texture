@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quintic Curve Comparison - Three.js</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            font-family: monospace;
+        }
+        #canvas-container {
+            width: 100vw;
+            height: 100vh;
+        }
+        #info-panel {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            color: white;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 15px;
+            border-radius: 5px;
+            max-width: 500px;
+        }
+        #info-panel h3 {
+            margin: 0 0 10px 0;
+        }
+        #info-panel p {
+            margin: 5px 0;
+            font-size: 13px;
+        }
+        .section {
+            margin-bottom: 10px;
+        }
+        .footer {
+            font-size: 12px;
+            border-top: 1px solid #555;
+            padding-top: 10px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div id="canvas-container"></div>
+    
+    <div id="info-panel">
+        <h3>Quintic Curve Comparison</h3>
+        
+        <div class="section">
+            <strong style="color: #00ff00">Left - Standard Method:</strong>
+            <p>
+                Uses Bernstein polynomials<br/>
+                6 basis evaluations per point<br/>
+                Cyan control points
+            </p>
+        </div>
+        
+        <div class="section">
+            <strong style="color: #ff8833">Right - Volume Texture:</strong>
+            <p>
+                Single texture fetch at (t, st, st)<br/>
+                2×2×2 volume texture<br/>
+                Blue control points<br/>
+                <em>Animates with uProgress uniform</em>
+            </p>
+        </div>
+        
+        <div class="footer">
+            <p>🔴 Red spheres: Endpoints (b₀, b₅)</p>
+            <p>⚪ Gray lines: Control polygons</p>
+            <p style="margin-top: 10px">
+                Both curves are identical - the volume texture method trades preprocessing for GPU efficiency.
+            </p>
+        </div>
+    </div>
+
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+            "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+        }
+    }
+    </script>
+
+    <script type="module">
+        import * as THREE from 'three';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+        // Bernstein basis function for degree 5
+        function bernstein5(i, t) {
+            const s = 1 - t;
+            const coefficients = [1, 5, 10, 10, 5, 1];
+            const powers = [
+                [5, 0], [4, 1], [3, 2], [2, 3], [1, 4], [0, 5]
+            ];
+            return coefficients[i] * Math.pow(s, powers[i][0]) * Math.pow(t, powers[i][1]);
+        }
+
+        // Create quintic curve using standard Bernstein method
+        function createQuinticCurveStandard(controlPoints, offset = 0) {
+            const segments = 100;
+            const points = [];
+            
+            for (let i = 0; i <= segments; i++) {
+                const t = i / segments;
+                const point = new THREE.Vector3(0, 0, 0);
+                
+                for (let j = 0; j < 6; j++) {
+                    const basis = bernstein5(j, t);
+                    point.x += basis * controlPoints[j].x;
+                    point.y += basis * controlPoints[j].y;
+                    point.z += basis * controlPoints[j].z;
+                }
+                
+                point.x += offset;
+                points.push(point);
+            }
+            
+            const geometry = new THREE.BufferGeometry().setFromPoints(points);
+            const material = new THREE.LineBasicMaterial({ color: 0x00ff00, linewidth: 2 });
+            return new THREE.Line(geometry, material);
+        }
+
+        // Create quintic curve using volume texture method
+        function createQuinticCurveVolumeTexture(controlPoints, offset = 0) {
+            const points = controlPoints;
+            const b0 = points[0];
+            const b1 = points[1];
+            const b2 = points[2];
+            const b3 = points[3];
+            const b4 = points[4];
+            const b5 = points[5];
+            
+            const d = 5; // degree
+            
+            // Calculate d1, d2, d3, d4
+            const d1 = new THREE.Vector3()
+                .copy(b1).sub(b0).multiplyScalar(d)
+                .sub(new THREE.Vector3().copy(b5).sub(b0));
+            
+            const d4 = new THREE.Vector3()
+                .copy(b4).sub(b5).multiplyScalar(d)
+                .sub(new THREE.Vector3().copy(b0).sub(b5));
+            
+            const binomial_d_2 = (d * (d - 1)) / 2;
+            const binomial_d2_2 = ((d - 2) * (d - 3)) / 2;
+            
+            const d2 = new THREE.Vector3()
+                .copy(b2).sub(b1).multiplyScalar(binomial_d_2)
+                .sub(new THREE.Vector3().copy(b1).sub(b0).multiplyScalar(binomial_d2_2))
+                .sub(new THREE.Vector3().copy(b4).sub(b5).multiplyScalar(d - 3))
+                .sub(new THREE.Vector3().copy(b4).sub(b1).multiplyScalar(3));
+            
+            const d3 = new THREE.Vector3()
+                .copy(b3).sub(b4).multiplyScalar(binomial_d_2)
+                .sub(new THREE.Vector3().copy(b4).sub(b5).multiplyScalar(binomial_d2_2))
+                .sub(new THREE.Vector3().copy(b1).sub(b0).multiplyScalar(d - 3))
+                .sub(new THREE.Vector3().copy(b1).sub(b4).multiplyScalar(3));
+            
+            // Create 3D volume texture
+            const size = 2;
+            const data = new Float32Array(size * size * size * 4);
+            
+            const setPixel = (x, y, z, vec) => {
+                const index = (z * size * size + y * size + x) * 4;
+                data[index] = vec.x;
+                data[index + 1] = vec.y;
+                data[index + 2] = vec.z;
+                data[index + 3] = 1.0;
+            };
+
+            setPixel(0, 0, 0, b0);
+            setPixel(1, 0, 0, b5);
+            setPixel(0, 1, 0, b0);
+            setPixel(1, 1, 0, b5);
+            setPixel(0, 0, 1, new THREE.Vector3().copy(b0).add(d1));
+            setPixel(1, 0, 1, new THREE.Vector3().copy(b5).add(d4));
+            setPixel(0, 1, 1, new THREE.Vector3().copy(b0).add(d1).add(d2));
+            setPixel(1, 1, 1, new THREE.Vector3().copy(b5).add(d4).add(d3));
+
+            const texture = new THREE.Data3DTexture(data, size, size, size);
+            texture.format = THREE.RGBAFormat;
+            texture.type = THREE.FloatType;
+            texture.minFilter = THREE.LinearFilter;
+            texture.magFilter = THREE.LinearFilter;
+            texture.wrapS = THREE.ClampToEdgeWrapping;
+            texture.wrapT = THREE.ClampToEdgeWrapping;
+            texture.wrapR = THREE.ClampToEdgeWrapping;
+            texture.needsUpdate = true;
+            
+            // Create geometry
+            const segments = 100;
+            const positions = new Float32Array((segments + 1) * 3);
+            const uvs = new Float32Array((segments + 1));
+            
+            for (let i = 0; i <= segments; i++) {
+                const t = i / segments;
+                positions[i * 3] = t;
+                positions[i * 3 + 1] = 0;
+                positions[i * 3 + 2] = 0;
+                uvs[i] = t;
+            }
+            
+            const geometry = new THREE.BufferGeometry();
+            geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+            geometry.setAttribute('uv', new THREE.BufferAttribute(uvs, 1));
+            
+            // Create shader material
+            const material = new THREE.ShaderMaterial({
+                uniforms: {
+                    volumeTexture: { value: texture },
+                    offset: { value: offset },
+                    uProgress: { value: 0.0 }
+                },
+                vertexShader: `
+                    uniform sampler3D volumeTexture;
+                    uniform float offset;
+                    uniform float uProgress;
+                    
+                    void main() {
+                        float t = uProgress;
+                        float s = 1.0 - t;
+                        float st = s * t;
+                        
+                        vec3 curvePosition = texture(volumeTexture, vec3(t, st, st)).rgb;
+                        
+                        gl_Position = projectionMatrix * modelViewMatrix * vec4(curvePosition, 1.0);
+                        gl_PointSize = 5.0;
+                    }
+                `,
+                fragmentShader: `
+                    uniform float uProgress;
+                    
+                    void main() {
+                        gl_FragColor = vec4(1.0, 0.5, 0.2, 1.0);
+                    }
+                `
+            });
+            
+            return new THREE.Line(geometry, material);
+        }
+
+        // Create control points visualization
+        function createControlPoints(points, offset = 0, color = 0x0000ff) {
+            const group = new THREE.Group();
+            
+            points.forEach((point, i) => {
+                const geometry = new THREE.SphereGeometry(0.1, 16, 16);
+                const material = new THREE.MeshStandardMaterial({
+                    color: (i === 0 || i === 5) ? 0xff0000 : color
+                });
+                const sphere = new THREE.Mesh(geometry, material);
+                sphere.position.set(point.x + offset, point.y, point.z);
+                group.add(sphere);
+            });
+            
+            const linePoints = points.map(p => new THREE.Vector3(p.x + offset, p.y, p.z));
+            const lineGeometry = new THREE.BufferGeometry().setFromPoints(linePoints);
+            const lineMaterial = new THREE.LineBasicMaterial({
+                color: 0x808080,
+                opacity: 0.3,
+                transparent: true
+            });
+            const line = new THREE.Line(lineGeometry, lineMaterial);
+            group.add(line);
+            
+            return group;
+        }
+
+        // Setup scene
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x1a1a2e);
+
+        const camera = new THREE.PerspectiveCamera(
+            50,
+            window.innerWidth / window.innerHeight,
+            0.1,
+            1000
+        );
+        camera.position.set(8, 6, 8);
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.getElementById('canvas-container').appendChild(renderer.domElement);
+
+        const controls = new OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+        scene.add(ambientLight);
+
+        const pointLight = new THREE.PointLight(0xffffff, 1);
+        pointLight.position.set(10, 10, 10);
+        scene.add(pointLight);
+
+        const controlPoints = [
+            new THREE.Vector3(-3, 0, 0),
+            new THREE.Vector3(-2, 2, 1),
+            new THREE.Vector3(-1, -1, -1),
+            new THREE.Vector3(1, 1, 1),
+            new THREE.Vector3(2, -2, -1),
+            new THREE.Vector3(3, 0, 0),
+        ];
+
+        const leftGroup = new THREE.Group();
+        leftGroup.position.set(-4, 0, 0);
+        const standardCurve = createQuinticCurveStandard(controlPoints, 0);
+        const standardPoints = createControlPoints(controlPoints, 0, 0x00ffff);
+        leftGroup.add(standardCurve);
+        leftGroup.add(standardPoints);
+        scene.add(leftGroup);
+
+        const rightGroup = new THREE.Group();
+        rightGroup.position.set(4, 0, 0);
+        const volumeCurve = createQuinticCurveVolumeTexture(controlPoints, 0);
+        const volumePoints = createControlPoints(controlPoints, 0, 0x0000ff);
+        rightGroup.add(volumeCurve);
+        rightGroup.add(volumePoints);
+        scene.add(rightGroup);
+
+        // Animation loop
+        const clock = new THREE.Clock();
+        
+        function animate() {
+            requestAnimationFrame(animate);
+            
+            const elapsedTime = clock.getElapsedTime();
+            const progress = (Math.sin(elapsedTime * 0.5) + 1) / 2;
+            
+            // Update volume texture curve progress
+            if (volumeCurve.material.uniforms) {
+                volumeCurve.material.uniforms.uProgress.value = progress;
+            }
+            
+            controls.update();
+            renderer.render(scene, camera);
+        }
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        animate();
+    </script>
+</body>
+</html>
