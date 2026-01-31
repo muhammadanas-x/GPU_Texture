@@ -320,7 +320,7 @@
                     "multiply": [
                         2,
                         2,
-                        3
+                        4
                     ]
                 },
                 "dimension": "Texture3D"

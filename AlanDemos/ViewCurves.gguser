@@ -3,6 +3,11 @@
     "snapshot": {
         "resourceViewNodeIndex": 1,
         "resourceViewResourceIndex": 6,
+        "cameraPos": [
+            0.0,
+            0.0,
+            -10.02029037475586
+        ],
         "savedVariables": [
             {
                 "name": "CurveOrder",
