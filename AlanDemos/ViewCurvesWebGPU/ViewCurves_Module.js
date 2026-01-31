@@ -156,16 +156,25 @@ fn EvaluateBezierPolynomial_0( t_8 : f32) -> f32
 
 fn EvaluateSeilerTexture_Linear_0( tex_2 : texture_2d<f32>,  t_9 : f32) -> f32
 {
-    return (textureSampleLevel((tex_2), (LinearSampler), (mix(vec2<f32>(0.25f, 0.25f), vec2<f32>(0.75f, 0.25f), vec2<f32>(t_9))), (0.0f)).x);
+    return (textureSampleLevel((tex_2), (LinearSampler), (mix(vec2<f32>(0.25f, 0.25f), vec2<f32>(0.75f, 0.75f), vec2<f32>(t_9, 0.0f))), (0.0f)).x);
 }
 
-fn EvaluateSeilerTexture_0( t_10 : f32) -> f32
+fn EvaluateSeilerTexture_Quadratic_0( tex_3 : texture_2d<f32>,  t_10 : f32) -> f32
+{
+    return (textureSampleLevel((tex_3), (LinearSampler), (mix(vec2<f32>(0.25f, 0.25f), vec2<f32>(0.75f, 0.75f), vec2<f32>(t_10, (1.0f - t_10) * t_10))), (0.0f)).x);
+}
+
+fn EvaluateSeilerTexture_0( t_11 : f32) -> f32
 {
     switch(_DrawCurves_0CB.CurveOrder_0)
     {
     case i32(0), :
         {
-            return EvaluateSeilerTexture_Linear_0(SeilerTexture2D, t_10);
+            return EvaluateSeilerTexture_Linear_0(SeilerTexture2D, t_11);
+        }
+    case i32(1), :
+        {
+            return EvaluateSeilerTexture_Quadratic_0(SeilerTexture2D, t_11);
         }
     case default, :
         {
@@ -241,11 +250,11 @@ fn main(@builtin(global_invocation_id) DTid_0 : vec3<u32>)
     var uv_2 : vec2<f32> = _S4;
     uv_2[i32(1)] = 1.0f - _S4.y;
     var color_1 : vec3<f32> = vec3<f32>(0.10000000149011612f, 0.10000000149011612f, 0.10000000149011612f);
-    var t_11 : f32 = uv_2.x;
+    var t_12 : f32 = uv_2.x;
     var _S5 : bool;
     if(bool(_DrawCurves_0CB.ShowDeCasteljauTexture_0))
     {
-        _S5 = (uv_2.y) < (EvaluateDeCasteljauTexture_0(t_11));
+        _S5 = (uv_2.y) < (EvaluateDeCasteljauTexture_0(t_12));
     }
     else
     {
@@ -257,19 +266,7 @@ fn main(@builtin(global_invocation_id) DTid_0 : vec3<u32>)
     }
     if(bool(_DrawCurves_0CB.ShowPolynomial_0))
     {
-        _S5 = (uv_2.y) < (EvaluateBezierPolynomial_0(t_11));
-    }
-    else
-    {
-        _S5 = false;
-    }
-    if(_S5)
-    {
-        color_1[i32(2)] = 0.89999997615814209f;
-    }
-    if(bool(_DrawCurves_0CB.ShowSeilerTexture_0))
-    {
-        _S5 = (uv_2.y) < (EvaluateSeilerTexture_0(t_11));
+        _S5 = (uv_2.y) < (EvaluateBezierPolynomial_0(t_12));
     }
     else
     {
@@ -278,6 +275,18 @@ fn main(@builtin(global_invocation_id) DTid_0 : vec3<u32>)
     if(_S5)
     {
         color_1[i32(1)] = 0.89999997615814209f;
+    }
+    if(bool(_DrawCurves_0CB.ShowSeilerTexture_0))
+    {
+        _S5 = (uv_2.y) < (EvaluateSeilerTexture_0(t_12));
+    }
+    else
+    {
+        _S5 = false;
+    }
+    if(_S5)
+    {
+        color_1[i32(2)] = 0.89999997615814209f;
     }
     if(bool(_DrawCurves_0CB.ShowControlPoints_0))
     {
@@ -295,8 +304,8 @@ struct Struct_MakeCurveTextures_0CB_std140_0
 {
     @align(16) CP1_0 : f32,
     @align(4) CP2_0 : f32,
-    @align(8) CurveOrder_0 : i32,
-    @align(4) _padding0_0 : f32,
+    @align(8) CP3_0 : f32,
+    @align(4) CurveOrder_0 : i32,
 };
 
 @binding(8) @group(0) var<uniform> _MakeCurveTextures_0CB : Struct_MakeCurveTextures_0CB_std140_0;
@@ -315,28 +324,48 @@ fn MakeLinear_0()
     return;
 }
 
+fn MakeQuadratic_0()
+{
+    const _S3 : vec2<u32> = vec2<u32>(u32(0), u32(0));
+    textureStore((DCTexture2D), (_S3), vec4<f32>((_MakeCurveTextures_0CB.CP1_0), 0, 0, 1));
+    const _S4 : vec2<u32> = vec2<u32>(u32(1), u32(0));
+    textureStore((DCTexture2D), (_S4), vec4<f32>((_MakeCurveTextures_0CB.CP2_0), 0, 0, 1));
+    const _S5 : vec2<u32> = vec2<u32>(u32(0), u32(1));
+    textureStore((DCTexture2D), (_S5), vec4<f32>((_MakeCurveTextures_0CB.CP2_0), 0, 0, 1));
+    const _S6 : vec2<u32> = vec2<u32>(u32(1), u32(1));
+    textureStore((DCTexture2D), (_S6), vec4<f32>((_MakeCurveTextures_0CB.CP3_0), 0, 0, 1));
+    var b0_0 : f32 = _MakeCurveTextures_0CB.CP1_0;
+    var b2_0 : f32 = _MakeCurveTextures_0CB.CP3_0;
+    var d1_0 : f32 = 2.0f * (_MakeCurveTextures_0CB.CP2_0 - _MakeCurveTextures_0CB.CP1_0) - (_MakeCurveTextures_0CB.CP3_0 - _MakeCurveTextures_0CB.CP1_0);
+    textureStore((SeilerTexture2D), (_S3), vec4<f32>((_MakeCurveTextures_0CB.CP1_0), 0, 0, 1));
+    textureStore((SeilerTexture2D), (_S4), vec4<f32>((b2_0), 0, 0, 1));
+    textureStore((SeilerTexture2D), (_S5), vec4<f32>((b0_0 + d1_0), 0, 0, 1));
+    textureStore((SeilerTexture2D), (_S6), vec4<f32>((b2_0 + d1_0), 0, 0, 1));
+    return;
+}
+
 @compute
 @workgroup_size(1, 1, 1)
 fn main(@builtin(global_invocation_id) DTid_0 : vec3<u32>)
 {
-    var _S3 : bool;
+    var _S7 : bool;
     if((DTid_0.x) > u32(0))
     {
-        _S3 = true;
+        _S7 = true;
     }
     else
     {
-        _S3 = (DTid_0.y) > u32(0);
+        _S7 = (DTid_0.y) > u32(0);
     }
-    if(_S3)
+    if(_S7)
     {
-        _S3 = true;
+        _S7 = true;
     }
     else
     {
-        _S3 = (DTid_0.z) > u32(0);
+        _S7 = (DTid_0.z) > u32(0);
     }
-    if(_S3)
+    if(_S7)
     {
         return;
     }
@@ -345,6 +374,11 @@ fn main(@builtin(global_invocation_id) DTid_0 : vec3<u32>)
     case i32(0), :
         {
             MakeLinear_0();
+            break;
+        }
+    case i32(1), :
+        {
+            MakeQuadratic_0();
             break;
         }
     case default, :
@@ -517,8 +551,8 @@ static StructOffsets__MakeCurveTextures_0CB =
 {
     CP1: 0,
     CP2: 4,
-    CurveOrder: 8,
-    _padding0: 12,
+    CP3: 8,
+    CurveOrder: 12,
     _size: 16,
 }
 
@@ -1341,6 +1375,7 @@ async FillEncoder(device, encoder)
         const view = new DataView(bufferCPU);
         view.setFloat32(this.constructor.StructOffsets__MakeCurveTextures_0CB.CP1, this.variable_CP1, true);
         view.setFloat32(this.constructor.StructOffsets__MakeCurveTextures_0CB.CP2, this.variable_CP2, true);
+        view.setFloat32(this.constructor.StructOffsets__MakeCurveTextures_0CB.CP3, this.variable_CP3, true);
         view.setInt32(this.constructor.StructOffsets__MakeCurveTextures_0CB.CurveOrder, this.variable_CurveOrder, true);
         device.queue.writeBuffer(this.constantBuffer__MakeCurveTextures_0CB, 0, bufferCPU);
     }
