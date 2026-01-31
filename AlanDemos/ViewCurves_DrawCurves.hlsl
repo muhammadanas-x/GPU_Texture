@@ -4,7 +4,7 @@
 #include "sRGB.hlsli"
 #include "Bezier.hlsli"
 
-float EvaluateBezier(float t)
+float EvaluateBezierPolynomial(float t)
 {
     switch (/*$(Variable:CurveOrder)*/)
     {
@@ -14,7 +14,47 @@ float EvaluateBezier(float t)
         case CurveOrders::Quartic: return EvaluateBezier_Quartic(t, /*$(Variable:CP1)*/, /*$(Variable:CP2)*/, /*$(Variable:CP3)*/, /*$(Variable:CP4)*/, /*$(Variable:CP5)*/);
         case CurveOrders::Quintic: return EvaluateBezier_Quintic(t, /*$(Variable:CP1)*/, /*$(Variable:CP2)*/, /*$(Variable:CP3)*/, /*$(Variable:CP4)*/, /*$(Variable:CP5)*/, /*$(Variable:CP6)*/);
     }
-    return 0.5f;
+    return 0.0f;
+}
+
+float EvaluateSeilerTexture_Linear(in Texture2D<float> tex, float t)
+{
+    // change percentage into uv
+    float2 uv = lerp(float2(0.25f, 0.25f), float2(0.75f, 0.25f), t);
+    return tex.SampleLevel(LinearSampler, uv, 0);
+}
+
+float EvaluateSeilerTexture(float t)
+{
+    switch (/*$(Variable:CurveOrder)*/)
+    {
+        case CurveOrders::Linear: return EvaluateSeilerTexture_Linear(SeilerTexture2D, t);
+    }
+    return 0.0f;
+}
+
+float EvaluateDeCasteljauTexture_Linear(in Texture2D<float> tex, float t)
+{
+    // change percentage into uv
+    float2 uv = lerp(float2(0.25f, 0.25f), float2(0.75f, 0.25f), t);
+    return tex.SampleLevel(LinearSampler, uv, 0);
+}
+
+float EvaluateDeCasteljauTexture_Quadratic(in Texture2D<float> tex, float t)
+{
+    // change percentage into uv
+    float2 uv = lerp(float2(0.25f, 0.25f), float2(0.75f, 0.75f), t);
+    return tex.SampleLevel(LinearSampler, uv, 0);
+}
+
+float EvaluateDeCasteljauTexture(float t)
+{
+    switch (/*$(Variable:CurveOrder)*/)
+    {
+        case CurveOrders::Linear: return EvaluateDeCasteljauTexture_Linear(DCTexture2D, t);
+		case CurveOrders::Quadratic: return EvaluateDeCasteljauTexture_Quadratic(DCTexture2D, t);
+    }
+    return 0.0f;
 }
 
 float SDFCircle(float2 uv, float2 center, float radius)
@@ -53,8 +93,15 @@ void ShowControlPoints(inout float3 color, float2 uv)
     float3 color = float3(0.1f, 0.1f, 0.1f);
 
     float t = uv.x;
-    if (/*$(Variable:ShowPolynomial)*/ && uv.y < EvaluateBezier(t))
+
+    if (/*$(Variable:ShowDeCasteljauTexture)*/ && uv.y < EvaluateDeCasteljauTexture(t))
+        color.r = 0.9f;
+
+    if (/*$(Variable:ShowPolynomial)*/ && uv.y < EvaluateBezierPolynomial(t))
         color.b = 0.9f;
+
+    if (/*$(Variable:ShowSeilerTexture)*/ && uv.y < EvaluateSeilerTexture(t))
+        color.g = 0.9f;
 
     if (/*$(Variable:ShowControlPoints)*/)
         ShowControlPoints(color, uv);
@@ -65,4 +112,8 @@ void ShowControlPoints(inout float3 color, float2 uv)
 /*
 Shader Resources:
     Texture Output (as UAV)
+    Texture DCTexture2D (as SRV)
+    Texture DCTexture3D (as SRV)
+    Texture SeilerTexture2D (as SRV)
+    Texture SeilerTexture3D (as SRV)
 */

@@ -11,8 +11,8 @@ const navigator = { gpu: create(["enable-dawn-features=use_dxc"]) };
 
 const adapter = await navigator.gpu?.requestAdapter();
 const device = await adapter?.requestDevice({
-    requiredLimits: {  },
-    requiredFeatures: [  ],
+    requiredLimits: { maxStorageTexturesPerShaderStage: 8 },
+    requiredFeatures: [ 'float32-filterable' ],
 });
 device.pushErrorScope("validation");
 
@@ -28,7 +28,9 @@ provide imported resources or variable values to the technique:
                     ViewCurves.variable_CP4 = 1.; // (Float)
                     ViewCurves.variable_CP5 = 0.; // (Float)
                     ViewCurves.variable_CP6 = 1.; // (Float)
+                    ViewCurves.variable_ShowDeCasteljauTexture = true; // (Bool)
                     ViewCurves.variable_ShowPolynomial = true; // (Bool)
+                    ViewCurves.variable_ShowSeilerTexture = true; // (Bool)
                     ViewCurves.variable_ShowControlPoints = true; // (Bool)
                     ViewCurves.variable_RenderSize = 512, 512; // (Uint2)
 

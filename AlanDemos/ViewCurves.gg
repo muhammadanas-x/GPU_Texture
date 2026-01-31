@@ -76,7 +76,19 @@
             }
         },
         {
+            "name": "ShowDeCasteljauTexture",
+            "type": "Bool",
+            "dflt": "true",
+            "visibility": "User"
+        },
+        {
             "name": "ShowPolynomial",
+            "type": "Bool",
+            "dflt": "true",
+            "visibility": "User"
+        },
+        {
+            "name": "ShowSeilerTexture",
             "type": "Bool",
             "dflt": "true",
             "visibility": "User"
@@ -103,6 +115,90 @@
                     "name": "Output",
                     "access": "UAV",
                     "type": "Texture"
+                },
+                {
+                    "name": "DCTexture2D",
+                    "access": "SRV",
+                    "type": "Texture",
+                    "texture": {
+                        "viewType": "Float"
+                    }
+                },
+                {
+                    "name": "DCTexture3D",
+                    "access": "SRV",
+                    "type": "Texture",
+                    "texture": {
+                        "dimension": "Texture3D",
+                        "viewType": "Float"
+                    }
+                },
+                {
+                    "name": "SeilerTexture2D",
+                    "access": "SRV",
+                    "type": "Texture",
+                    "texture": {
+                        "viewType": "Float"
+                    }
+                },
+                {
+                    "name": "SeilerTexture3D",
+                    "access": "SRV",
+                    "type": "Texture",
+                    "texture": {
+                        "dimension": "Texture3D",
+                        "viewType": "Float"
+                    }
+                }
+            ],
+            "samplers": [
+                {
+                    "name": "LinearSampler"
+                }
+            ]
+        },
+        {
+            "name": "MakeCurveTextures",
+            "fileName": "ViewCurves_MakeCurveTextures.hlsl",
+            "NumThreads": [
+                1,
+                1,
+                1
+            ],
+            "resources": [
+                {
+                    "name": "DCTexture2D",
+                    "access": "UAV",
+                    "type": "Texture",
+                    "texture": {
+                        "viewType": "Float"
+                    }
+                },
+                {
+                    "name": "DCTexture3D",
+                    "access": "UAV",
+                    "type": "Texture",
+                    "texture": {
+                        "dimension": "Texture3D",
+                        "viewType": "Float"
+                    }
+                },
+                {
+                    "name": "SeilerTexture2D",
+                    "access": "UAV",
+                    "type": "Texture",
+                    "texture": {
+                        "viewType": "Float"
+                    }
+                },
+                {
+                    "name": "SeilerTexture3D",
+                    "access": "UAV",
+                    "type": "Texture",
+                    "texture": {
+                        "dimension": "Texture3D",
+                        "viewType": "Float"
+                    }
                 }
             ]
         }
@@ -122,8 +218,8 @@
             "resourceTexture": {
                 "name": "Output",
                 "editorPos": [
-                    -19.0,
-                    0.0
+                    187.0,
+                    50.0
                 ],
                 "format": {
                     "format": "RGBA8_Unorm"
@@ -139,10 +235,14 @@
             "actionComputeShader": {
                 "name": "DrawCurves",
                 "editorPos": [
-                    121.0,
-                    2.0
+                    309.0,
+                    89.0
                 ],
                 "linkProperties": [
+                    {},
+                    {},
+                    {},
+                    {},
                     {}
                 ],
                 "connections": [
@@ -150,6 +250,26 @@
                         "srcPin": "Output",
                         "dstNode": "Output",
                         "dstPin": "resource"
+                    },
+                    {
+                        "srcPin": "DCTexture2D",
+                        "dstNode": "MakeCurveTextures",
+                        "dstPin": "DCTexture2D"
+                    },
+                    {
+                        "srcPin": "DCTexture3D",
+                        "dstNode": "MakeCurveTextures",
+                        "dstPin": "DCTexture3D"
+                    },
+                    {
+                        "srcPin": "SeilerTexture2D",
+                        "dstNode": "MakeCurveTextures",
+                        "dstPin": "SeilerTexture2D"
+                    },
+                    {
+                        "srcPin": "SeilerTexture3D",
+                        "dstNode": "MakeCurveTextures",
+                        "dstPin": "SeilerTexture3D"
                     }
                 ],
                 "shader": {
@@ -159,6 +279,130 @@
                     "node": {
                         "name": "Output"
                     }
+                }
+            }
+        },
+        {
+            "resourceTexture": {
+                "name": "DCTexture2D",
+                "editorPos": [
+                    -40.0,
+                    66.0
+                ],
+                "format": {
+                    "format": "R32_Float"
+                },
+                "size": {
+                    "multiply": [
+                        2,
+                        2,
+                        1
+                    ]
+                }
+            }
+        },
+        {
+            "resourceTexture": {
+                "name": "DCTexture3D",
+                "editorPos": [
+                    -40.0,
+                    114.0
+                ],
+                "format": {
+                    "node": {
+                        "name": "DCTexture2D"
+                    }
+                },
+                "size": {
+                    "multiply": [
+                        2,
+                        2,
+                        2
+                    ]
+                },
+                "dimension": "Texture3D"
+            }
+        },
+        {
+            "resourceTexture": {
+                "name": "SeilerTexture2D",
+                "editorPos": [
+                    -57.0,
+                    162.0
+                ],
+                "format": {
+                    "node": {
+                        "name": "DCTexture2D"
+                    }
+                },
+                "size": {
+                    "multiply": [
+                        2,
+                        2,
+                        1
+                    ]
+                }
+            }
+        },
+        {
+            "resourceTexture": {
+                "name": "SeilerTexture3D",
+                "editorPos": [
+                    -59.0,
+                    210.0
+                ],
+                "format": {
+                    "node": {
+                        "name": "DCTexture2D"
+                    }
+                },
+                "size": {
+                    "multiply": [
+                        2,
+                        2,
+                        2
+                    ]
+                },
+                "dimension": "Texture3D"
+            }
+        },
+        {
+            "actionComputeShader": {
+                "name": "MakeCurveTextures",
+                "editorPos": [
+                    117.0,
+                    108.0
+                ],
+                "linkProperties": [
+                    {},
+                    {},
+                    {},
+                    {}
+                ],
+                "connections": [
+                    {
+                        "srcPin": "DCTexture2D",
+                        "dstNode": "DCTexture2D",
+                        "dstPin": "resource"
+                    },
+                    {
+                        "srcPin": "DCTexture3D",
+                        "dstNode": "DCTexture3D",
+                        "dstPin": "resource"
+                    },
+                    {
+                        "srcPin": "SeilerTexture2D",
+                        "dstNode": "SeilerTexture2D",
+                        "dstPin": "resource"
+                    },
+                    {
+                        "srcPin": "SeilerTexture3D",
+                        "dstNode": "SeilerTexture3D",
+                        "dstPin": "resource"
+                    }
+                ],
+                "shader": {
+                    "name": "MakeCurveTextures"
                 }
             }
         }
@@ -185,6 +429,19 @@
             ]
         }
     ],
+    "settings": {
+        "webGPU": {
+            "features": {
+                "float32Filterable": true
+            },
+            "limits": {
+                "maxStorageTexturesPerShaderStage": 8
+            }
+        }
+    },
+    "buildSettings": {
+        "outWebGPU": "ViewCurvesWebGPU/"
+    },
     "PrimaryOutput": {
         "name": "Output"
     }

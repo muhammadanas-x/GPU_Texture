@@ -227,8 +227,8 @@
             }
 
             const device = await adapter.requestDevice({
-                requiredLimits: {  },
-                requiredFeatures: [  ],
+                requiredLimits: { maxStorageTexturesPerShaderStage: 8 },
+                requiredFeatures: [ 'float32-filterable' ],
             });
 
             const context = canvas.getContext("webgpu");
@@ -261,7 +261,9 @@
             document.getElementById('inputBox_CP4').addEventListener('change',(event) => {event.target.value=parseFloat(event.target.value); ViewCurves.variable_CP4=event.target.value;});
             document.getElementById('inputBox_CP5').addEventListener('change',(event) => {event.target.value=parseFloat(event.target.value); ViewCurves.variable_CP5=event.target.value;});
             document.getElementById('inputBox_CP6').addEventListener('change',(event) => {event.target.value=parseFloat(event.target.value); ViewCurves.variable_CP6=event.target.value;});
+            document.getElementById('inputBox_ShowDeCasteljauTexture').addEventListener('change',(event) => {ViewCurves.variable_ShowDeCasteljauTexture=event.target.checked;});
             document.getElementById('inputBox_ShowPolynomial').addEventListener('change',(event) => {ViewCurves.variable_ShowPolynomial=event.target.checked;});
+            document.getElementById('inputBox_ShowSeilerTexture').addEventListener('change',(event) => {ViewCurves.variable_ShowSeilerTexture=event.target.checked;});
             document.getElementById('inputBox_ShowControlPoints').addEventListener('change',(event) => {ViewCurves.variable_ShowControlPoints=event.target.checked;});
             document.getElementById('inputBox_RenderSize0').addEventListener('change',(event) => {event.target.value=parseUint(event.target.value); ViewCurves.variable_RenderSize[0]=event.target.value;});
             document.getElementById('inputBox_RenderSize1').addEventListener('change',(event) => {event.target.value=parseUint(event.target.value); ViewCurves.variable_RenderSize[1]=event.target.value;});
@@ -275,7 +277,9 @@
                     ViewCurves.variable_CP4 = ViewCurves.variableDefault_CP4;
                     ViewCurves.variable_CP5 = ViewCurves.variableDefault_CP5;
                     ViewCurves.variable_CP6 = ViewCurves.variableDefault_CP6;
+                    ViewCurves.variable_ShowDeCasteljauTexture = ViewCurves.variableDefault_ShowDeCasteljauTexture;
                     ViewCurves.variable_ShowPolynomial = ViewCurves.variableDefault_ShowPolynomial;
+                    ViewCurves.variable_ShowSeilerTexture = ViewCurves.variableDefault_ShowSeilerTexture;
                     ViewCurves.variable_ShowControlPoints = ViewCurves.variableDefault_ShowControlPoints;
                     ViewCurves.variable_RenderSize[0] = ViewCurves.variableDefault_RenderSize[0];
                     ViewCurves.variable_RenderSize[1] = ViewCurves.variableDefault_RenderSize[1];
@@ -290,7 +294,9 @@
                     document.getElementById('inputBox_CP4').value = ViewCurves.variable_CP4;
                     document.getElementById('inputBox_CP5').value = ViewCurves.variable_CP5;
                     document.getElementById('inputBox_CP6').value = ViewCurves.variable_CP6;
+                    document.getElementById('inputBox_ShowDeCasteljauTexture').checked = Boolean(ViewCurves.variable_ShowDeCasteljauTexture);
                     document.getElementById('inputBox_ShowPolynomial').checked = Boolean(ViewCurves.variable_ShowPolynomial);
+                    document.getElementById('inputBox_ShowSeilerTexture').checked = Boolean(ViewCurves.variable_ShowSeilerTexture);
                     document.getElementById('inputBox_ShowControlPoints').checked = Boolean(ViewCurves.variable_ShowControlPoints);
                     document.getElementById('inputBox_RenderSize0').value = ViewCurves.variable_RenderSize[0];
                     document.getElementById('inputBox_RenderSize1').value = ViewCurves.variable_RenderSize[1];
@@ -311,7 +317,9 @@
                     ViewCurves.variable_CP4 = 1.; // (Float)
                     ViewCurves.variable_CP5 = 0.; // (Float)
                     ViewCurves.variable_CP6 = 1.; // (Float)
+                    ViewCurves.variable_ShowDeCasteljauTexture = true; // (Bool)
                     ViewCurves.variable_ShowPolynomial = true; // (Bool)
+                    ViewCurves.variable_ShowSeilerTexture = true; // (Bool)
                     ViewCurves.variable_ShowControlPoints = true; // (Bool)
                     ViewCurves.variable_RenderSize = 512, 512; // (Uint2)
 
@@ -359,7 +367,9 @@
                     ViewCurves.variable_CP4 = 1.; // (Float)
                     ViewCurves.variable_CP5 = 0.; // (Float)
                     ViewCurves.variable_CP6 = 1.; // (Float)
+                    ViewCurves.variable_ShowDeCasteljauTexture = true; // (Bool)
                     ViewCurves.variable_ShowPolynomial = true; // (Bool)
+                    ViewCurves.variable_ShowSeilerTexture = true; // (Bool)
                     ViewCurves.variable_ShowControlPoints = true; // (Bool)
                     ViewCurves.variable_RenderSize = 512, 512; // (Uint2)
 
@@ -449,10 +459,22 @@
                     ViewCurves.variableChanged_CP6 = false;
                 }
 
+                if (ViewCurves.variableChanged_ShowDeCasteljauTexture)
+                {
+                    document.getElementById('inputBox_ShowDeCasteljauTexture').checked=Boolean(ViewCurves.variable_ShowDeCasteljauTexture);
+                    ViewCurves.variableChanged_ShowDeCasteljauTexture = false;
+                }
+
                 if (ViewCurves.variableChanged_ShowPolynomial)
                 {
                     document.getElementById('inputBox_ShowPolynomial').checked=Boolean(ViewCurves.variable_ShowPolynomial);
                     ViewCurves.variableChanged_ShowPolynomial = false;
+                }
+
+                if (ViewCurves.variableChanged_ShowSeilerTexture)
+                {
+                    document.getElementById('inputBox_ShowSeilerTexture').checked=Boolean(ViewCurves.variable_ShowSeilerTexture);
+                    ViewCurves.variableChanged_ShowSeilerTexture = false;
                 }
 
                 if (ViewCurves.variableChanged_ShowControlPoints)
@@ -522,8 +544,16 @@
                     <select name="Viewing" id="Viewing">
                         <option value="Output">Output</option><br/>
                         <option value="">----- Internal Textures -----</option><br/>
+                        <option value="DCTexture2D">DCTexture2D</option><br/>
+                        <option value="DCTexture3D">DCTexture3D</option><br/>
                         <option value="DrawCurves_Output_ReadOnly">DrawCurves_Output_ReadOnly</option><br/>
+                        <option value="MakeCurveTextures_DCTexture2D_ReadOnly">MakeCurveTextures_DCTexture2D_ReadOnly</option><br/>
+                        <option value="MakeCurveTextures_DCTexture3D_ReadOnly">MakeCurveTextures_DCTexture3D_ReadOnly</option><br/>
+                        <option value="MakeCurveTextures_SeilerTexture2D_ReadOnly">MakeCurveTextures_SeilerTexture2D_ReadOnly</option><br/>
+                        <option value="MakeCurveTextures_SeilerTexture3D_ReadOnly">MakeCurveTextures_SeilerTexture3D_ReadOnly</option><br/>
                         <option value="Output">Output</option><br/>
+                        <option value="SeilerTexture2D">SeilerTexture2D</option><br/>
+                        <option value="SeilerTexture3D">SeilerTexture3D</option><br/>
                     </select>
                 </td>
                 <td>&nbsp;</td>
@@ -580,9 +610,21 @@
                             </td>
                         </tr>
                         <tr>
+                            <td valign="top">ShowDeCasteljauTexture&nbsp;</td>
+                            <td>
+                                <input type="checkbox" id="inputBox_ShowDeCasteljauTexture">
+                            </td>
+                        </tr>
+                        <tr>
                             <td valign="top">ShowPolynomial&nbsp;</td>
                             <td>
                                 <input type="checkbox" id="inputBox_ShowPolynomial">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td valign="top">ShowSeilerTexture&nbsp;</td>
+                            <td>
+                                <input type="checkbox" id="inputBox_ShowSeilerTexture">
                             </td>
                         </tr>
                         <tr>
