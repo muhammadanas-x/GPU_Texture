@@ -2,12 +2,6 @@
     "version": "2.0",
     "snapshot": {
         "resourceViewNodeIndex": 1,
-        "resourceViewResourceIndex": 6,
-        "savedVariables": [
-            {
-                "name": "CurveOrder",
-                "value": "4"
-            }
-        ]
+        "resourceViewResourceIndex": 6
     }
 }

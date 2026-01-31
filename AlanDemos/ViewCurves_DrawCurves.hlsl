@@ -201,7 +201,7 @@ void ShowControlPoints(inout float3 color, float2 uv)
     minDist = min(minDist, SDFCircle(uv, float2(CPXSpacing * 5, /*$(Variable:CP6)*/), c_radius));
 
     if (minDist < 0.0f)
-        color = float3(1.0f, 1.0f, 1.0f);
+        color = float3(0.0f, 0.0f, 0.0f);
 }
 
 /*$(_compute:main)*/(uint3 DTid : SV_DispatchThreadID)
@@ -213,18 +213,23 @@ void ShowControlPoints(inout float3 color, float2 uv)
     float2 uv = (float2(px) + float2(0.5f, 0.5f)) / float2(dimensions);
     uv.y = 1.0f - uv.y;
 
-    float3 color = float3(0.1f, 0.1f, 0.1f);
+    uv = ((uv - 0.5f) * 1.05f) + 0.5f;
+
+    float3 color = float3(0.2f, 0.2f, 0.2f);
 
     float t = uv.x;
 
-    if (/*$(Variable:ShowDeCasteljauTexture)*/ && uv.y < EvaluateDeCasteljauTexture(t))
-        color.r = 0.9f;
+    if (uv.x >= 0.0f && uv.x <= 1.0f && uv.y >= 0.0f && uv.y <= 1.0f)
+    {
+        if (/*$(Variable:ShowDeCasteljauTexture)*/ && uv.y < EvaluateDeCasteljauTexture(t))
+            color.r = 1.0f;
 
-    if (/*$(Variable:ShowPolynomial)*/ && uv.y < EvaluateBezierPolynomial(t))
-        color.g = 0.9f;
+        if (/*$(Variable:ShowPolynomial)*/ && uv.y < EvaluateBezierPolynomial(t))
+            color.g = 1.0f;
 
-    if (/*$(Variable:ShowSeilerTexture)*/ && uv.y < EvaluateSeilerTexture(t))
-        color.b = 0.9f;
+        if (/*$(Variable:ShowSeilerTexture)*/ && uv.y < EvaluateSeilerTexture(t))
+            color.b = 1.0f;
+    }
 
     if (/*$(Variable:ShowControlPoints)*/)
         ShowControlPoints(color, uv);

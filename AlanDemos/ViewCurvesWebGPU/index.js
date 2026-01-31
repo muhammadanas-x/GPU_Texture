@@ -31,7 +31,7 @@ provide imported resources or variable values to the technique:
                     ViewCurves.variable_ShowDeCasteljauTexture = true; // (Bool) In Red Channel
                     ViewCurves.variable_ShowPolynomial = true; // (Bool) In Green Channel
                     ViewCurves.variable_ShowSeilerTexture = true; // (Bool) In Blue Channel
-                    ViewCurves.variable_ShowControlPoints = true; // (Bool)
+                    ViewCurves.variable_ShowControlPoints = true; // (Bool) In black
                     ViewCurves.variable_RenderSize = 512, 512; // (Uint2)
 
                 An example of how to load a texture:

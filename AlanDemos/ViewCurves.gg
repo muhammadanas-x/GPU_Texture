@@ -98,6 +98,7 @@
         },
         {
             "name": "ShowControlPoints",
+            "comment": "In black",
             "type": "Bool",
             "dflt": "true",
             "visibility": "User"

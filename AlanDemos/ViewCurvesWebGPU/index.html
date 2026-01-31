@@ -320,7 +320,7 @@
                     ViewCurves.variable_ShowDeCasteljauTexture = true; // (Bool) In Red Channel
                     ViewCurves.variable_ShowPolynomial = true; // (Bool) In Green Channel
                     ViewCurves.variable_ShowSeilerTexture = true; // (Bool) In Blue Channel
-                    ViewCurves.variable_ShowControlPoints = true; // (Bool)
+                    ViewCurves.variable_ShowControlPoints = true; // (Bool) In black
                     ViewCurves.variable_RenderSize = 512, 512; // (Uint2)
 
                 An example of how to load a texture:
@@ -331,9 +331,6 @@
 
                 See _GeneratedCode\UnitTests\WebGPU\UnitTestLogic.js for more examples of loading files of various kinds.
             */
-
-            // Set variables to what they were saved as in the gguser file
-            ViewCurves.variable_CurveOrder = 4;
 
             // Make sure the UI shows the correct variable values
             SetUIToVariables();
@@ -373,7 +370,7 @@
                     ViewCurves.variable_ShowDeCasteljauTexture = true; // (Bool) In Red Channel
                     ViewCurves.variable_ShowPolynomial = true; // (Bool) In Green Channel
                     ViewCurves.variable_ShowSeilerTexture = true; // (Bool) In Blue Channel
-                    ViewCurves.variable_ShowControlPoints = true; // (Bool)
+                    ViewCurves.variable_ShowControlPoints = true; // (Bool) In black
                     ViewCurves.variable_RenderSize = 512, 512; // (Uint2)
 
                 An example of how to load a texture:
@@ -631,7 +628,7 @@
                             </td>
                         </tr>
                         <tr>
-                            <td valign="top">ShowControlPoints&nbsp;</td>
+                            <td valign="top"><div class="tooltip">ShowControlPoints&nbsp;<span class="tooltiptext">In black</span></div></td>
                             <td>
                                 <input type="checkbox" id="inputBox_ShowControlPoints">
                             </td>

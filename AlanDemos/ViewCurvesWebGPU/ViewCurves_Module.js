@@ -299,7 +299,7 @@ fn ShowControlPoints_1( color_0 : ptr<function, vec3<f32>>,  uv_1 : vec2<f32>)
     var CPXSpacing_0 : f32 = 1.0f / f32(_DrawCurves_0CB.CurveOrder_0 + i32(2) - i32(1));
     if((min(min(min(min(min(min(0.0f, SDFCircle_0(uv_1, vec2<f32>(CPXSpacing_0 * 0.0f, _DrawCurves_0CB.CP1_0), 0.00999999977648258f)), SDFCircle_0(uv_1, vec2<f32>(CPXSpacing_0, _DrawCurves_0CB.CP2_0), 0.00999999977648258f)), SDFCircle_0(uv_1, vec2<f32>(CPXSpacing_0 * 2.0f, _DrawCurves_0CB.CP3_0), 0.00999999977648258f)), SDFCircle_0(uv_1, vec2<f32>(CPXSpacing_0 * 3.0f, _DrawCurves_0CB.CP4_0), 0.00999999977648258f)), SDFCircle_0(uv_1, vec2<f32>(CPXSpacing_0 * 4.0f, _DrawCurves_0CB.CP5_0), 0.00999999977648258f)), SDFCircle_0(uv_1, vec2<f32>(CPXSpacing_0 * 5.0f, _DrawCurves_0CB.CP6_0), 0.00999999977648258f))) < 0.0f)
     {
-        (*color_0) = vec3<f32>(1.0f, 1.0f, 1.0f);
+        (*color_0) = vec3<f32>(0.0f, 0.0f, 0.0f);
     }
     return;
 }
@@ -354,44 +354,74 @@ fn main(@builtin(global_invocation_id) DTid_0 : vec3<u32>)
     var _S25 : vec2<f32> = (vec2<f32>(px_0) + vec2<f32>(0.5f, 0.5f)) / vec2<f32>(dimensions_0);
     var uv_2 : vec2<f32> = _S25;
     uv_2[i32(1)] = 1.0f - _S25.y;
-    var color_1 : vec3<f32> = vec3<f32>(0.10000000149011612f, 0.10000000149011612f, 0.10000000149011612f);
-    var t_18 : f32 = uv_2.x;
-    var _S26 : bool;
-    if(bool(_DrawCurves_0CB.ShowDeCasteljauTexture_0))
+    var _S26 : vec2<f32> = vec2<f32>(0.5f);
+    var _S27 : vec2<f32> = (uv_2 - _S26) * vec2<f32>(1.04999995231628418f) + _S26;
+    uv_2 = _S27;
+    var color_1 : vec3<f32> = vec3<f32>(0.20000000298023224f, 0.20000000298023224f, 0.20000000298023224f);
+    var t_18 : f32 = _S27.x;
+    var _S28 : bool;
+    if(t_18 >= 0.0f)
     {
-        _S26 = (uv_2.y) < (EvaluateDeCasteljauTexture_0(t_18));
+        _S28 = (uv_2.x) <= 1.0f;
     }
     else
     {
-        _S26 = false;
+        _S28 = false;
     }
-    if(_S26)
+    if(_S28)
     {
-        color_1[i32(0)] = 0.89999997615814209f;
-    }
-    if(bool(_DrawCurves_0CB.ShowPolynomial_0))
-    {
-        _S26 = (uv_2.y) < (EvaluateBezierPolynomial_0(t_18));
+        _S28 = (uv_2.y) >= 0.0f;
     }
     else
     {
-        _S26 = false;
+        _S28 = false;
     }
-    if(_S26)
+    if(_S28)
     {
-        color_1[i32(1)] = 0.89999997615814209f;
-    }
-    if(bool(_DrawCurves_0CB.ShowSeilerTexture_0))
-    {
-        _S26 = (uv_2.y) < (EvaluateSeilerTexture_0(t_18));
+        _S28 = (uv_2.y) <= 1.0f;
     }
     else
     {
-        _S26 = false;
+        _S28 = false;
     }
-    if(_S26)
+    if(_S28)
     {
-        color_1[i32(2)] = 0.89999997615814209f;
+        if(bool(_DrawCurves_0CB.ShowDeCasteljauTexture_0))
+        {
+            _S28 = (uv_2.y) < (EvaluateDeCasteljauTexture_0(t_18));
+        }
+        else
+        {
+            _S28 = false;
+        }
+        if(_S28)
+        {
+            color_1[i32(0)] = 1.0f;
+        }
+        if(bool(_DrawCurves_0CB.ShowPolynomial_0))
+        {
+            _S28 = (uv_2.y) < (EvaluateBezierPolynomial_0(t_18));
+        }
+        else
+        {
+            _S28 = false;
+        }
+        if(_S28)
+        {
+            color_1[i32(1)] = 1.0f;
+        }
+        if(bool(_DrawCurves_0CB.ShowSeilerTexture_0))
+        {
+            _S28 = (uv_2.y) < (EvaluateSeilerTexture_0(t_18));
+        }
+        else
+        {
+            _S28 = false;
+        }
+        if(_S28)
+        {
+            color_1[i32(2)] = 1.0f;
+        }
     }
     if(bool(_DrawCurves_0CB.ShowControlPoints_0))
     {
@@ -759,8 +789,8 @@ variableChanged_ShowPolynomial = false;
 variable_ShowSeilerTexture = true;  // In Blue Channel
 variableDefault_ShowSeilerTexture = true;  // In Blue Channel
 variableChanged_ShowSeilerTexture = false;
-variable_ShowControlPoints = true;
-variableDefault_ShowControlPoints = true;
+variable_ShowControlPoints = true;  // In black
+variableDefault_ShowControlPoints = true;  // In black
 variableChanged_ShowControlPoints = false;
 variable_RenderSize = [ 512, 512 ];
 variableDefault_RenderSize = [ 512, 512 ];
