@@ -125,7 +125,7 @@ float EvaluateDeCasteljauTexture_Quartic(in Texture3D<float> tex, float t)
         B = tex.SampleLevel(LinearSampler, uvw, 0);
     }
 
-    // lerp in shaders to make a quartic
+    // lerp in shaders to make a quartic from these 2 cubics.
     return lerp(A, B, t);
 }
 
@@ -161,7 +161,8 @@ float EvaluateDeCasteljauTexture_Quintic(in Texture3D<float> tex, float t)
         C = tex.SampleLevel(LinearSampler, uvw, 0);
     }
 
-    // use quadratic bezier formulate in shaders to finish the curve
+    // Use the quadratic bezier formulate in shaders, to make a quintic from these 3 cubics.
+    // We could also do a lerp of 2 lerps instead.
     float s = 1.0f - t;
     return A * s * s + 2.0f * B * s * t + C * t * t;
 }

@@ -549,22 +549,21 @@ fn MakeQuintic_0()
     var b0_3 : f32 = _MakeCurveTextures_0CB.CP1_0;
     var b5_0 : f32 = _MakeCurveTextures_0CB.CP6_0;
     var _S27 : f32 = _MakeCurveTextures_0CB.CP2_0 - _MakeCurveTextures_0CB.CP1_0;
-    var d1_3 : f32 = 4.0f * _S27 - (_MakeCurveTextures_0CB.CP5_0 - _MakeCurveTextures_0CB.CP1_0);
-    var _S28 : f32 = _MakeCurveTextures_0CB.CP4_0 - _MakeCurveTextures_0CB.CP5_0;
-    var d4_0 : f32 = 4.0f * _S28 - (_MakeCurveTextures_0CB.CP1_0 - _MakeCurveTextures_0CB.CP5_0);
-    var _S29 : f32 = _MakeCurveTextures_0CB.CP5_0 - _MakeCurveTextures_0CB.CP6_0;
-    var d2_2 : f32 = 10.0f * (_MakeCurveTextures_0CB.CP3_0 - _MakeCurveTextures_0CB.CP2_0) - 3.0f * _S27 - 2.0f * _S29 - 3.0f * (_MakeCurveTextures_0CB.CP5_0 - _MakeCurveTextures_0CB.CP2_0);
-    var d3_1 : f32 = 10.0f * _S28 - 3.0f * _S29 - 2.0f * _S27 - 3.0f * (_MakeCurveTextures_0CB.CP2_0 - _MakeCurveTextures_0CB.CP5_0);
+    var d1_3 : f32 = 5.0f * _S27 - (_MakeCurveTextures_0CB.CP6_0 - _MakeCurveTextures_0CB.CP1_0);
+    var _S28 : f32 = _MakeCurveTextures_0CB.CP5_0 - _MakeCurveTextures_0CB.CP6_0;
+    var d4_0 : f32 = 5.0f * _S28 - (_MakeCurveTextures_0CB.CP1_0 - _MakeCurveTextures_0CB.CP6_0);
+    var d2_2 : f32 = 10.0f * (_MakeCurveTextures_0CB.CP3_0 - _MakeCurveTextures_0CB.CP2_0) - 3.0f * _S27 - 2.0f * _S28 - 3.0f * (_MakeCurveTextures_0CB.CP5_0 - _MakeCurveTextures_0CB.CP2_0);
+    var d3_1 : f32 = 10.0f * (_MakeCurveTextures_0CB.CP4_0 - _MakeCurveTextures_0CB.CP5_0) - 3.0f * _S28 - 2.0f * _S27 - 3.0f * (_MakeCurveTextures_0CB.CP2_0 - _MakeCurveTextures_0CB.CP5_0);
     textureStore((SeilerTexture3D), (_S19), vec4<f32>((_MakeCurveTextures_0CB.CP1_0), 0, 0, 1));
     textureStore((SeilerTexture3D), (_S20), vec4<f32>((b5_0), 0, 0, 1));
     textureStore((SeilerTexture3D), (_S21), vec4<f32>((b0_3), 0, 0, 1));
     textureStore((SeilerTexture3D), (_S22), vec4<f32>((b5_0), 0, 0, 1));
-    var _S30 : f32 = b0_3 + d1_3;
-    textureStore((SeilerTexture3D), (_S23), vec4<f32>((_S30), 0, 0, 1));
-    var _S31 : f32 = b5_0 + d4_0;
-    textureStore((SeilerTexture3D), (_S24), vec4<f32>((_S31), 0, 0, 1));
-    textureStore((SeilerTexture3D), (_S25), vec4<f32>((_S30 + d2_2), 0, 0, 1));
-    textureStore((SeilerTexture3D), (_S26), vec4<f32>((_S31 + d3_1), 0, 0, 1));
+    var _S29 : f32 = b0_3 + d1_3;
+    textureStore((SeilerTexture3D), (_S23), vec4<f32>((_S29), 0, 0, 1));
+    var _S30 : f32 = b5_0 + d4_0;
+    textureStore((SeilerTexture3D), (_S24), vec4<f32>((_S30), 0, 0, 1));
+    textureStore((SeilerTexture3D), (_S25), vec4<f32>((_S29 + d2_2), 0, 0, 1));
+    textureStore((SeilerTexture3D), (_S26), vec4<f32>((_S30 + d3_1), 0, 0, 1));
     return;
 }
 
@@ -572,24 +571,24 @@ fn MakeQuintic_0()
 @workgroup_size(1, 1, 1)
 fn main(@builtin(global_invocation_id) DTid_0 : vec3<u32>)
 {
-    var _S32 : bool;
+    var _S31 : bool;
     if((DTid_0.x) > u32(0))
     {
-        _S32 = true;
+        _S31 = true;
     }
     else
     {
-        _S32 = (DTid_0.y) > u32(0);
+        _S31 = (DTid_0.y) > u32(0);
     }
-    if(_S32)
+    if(_S31)
     {
-        _S32 = true;
+        _S31 = true;
     }
     else
     {
-        _S32 = (DTid_0.z) > u32(0);
+        _S31 = (DTid_0.z) > u32(0);
     }
-    if(_S32)
+    if(_S31)
     {
         return;
     }

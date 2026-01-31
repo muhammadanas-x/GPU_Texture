@@ -137,8 +137,8 @@ void MakeQuintic()
     float b4 = /*$(Variable:CP5)*/;
     float b5 = /*$(Variable:CP6)*/;
 
-    float d1 = 4.0f * (b1 - b0) - (b4 - b0);
-    float d4 = 4.0f * (b3 - b4) - (b0 - b4);
+    float d1 = 5.0f * (b1 - b0) - (b5 - b0);
+    float d4 = 5.0f * (b4 - b5) - (b0 - b5);
     float d2 = 10.0f * (b2 - b1) - 3.0f * (b1 - b0) - 2.0f * (b4 - b5) - 3.0f * (b4 - b1);
     float d3 = 10.0f * (b3 - b4) - 3.0f * (b4 - b5) - 2.0f * (b1 - b0) - 3.0f * (b1 - b4);
 
