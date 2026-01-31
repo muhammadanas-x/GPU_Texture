@@ -6,7 +6,31 @@
         "savedVariables": [
             {
                 "name": "CurveOrder",
-                "value": "1"
+                "value": "2"
+            },
+            {
+                "name": "CP4",
+                "value": "1.000000"
+            },
+            {
+                "name": "CP5",
+                "value": "0.000000"
+            },
+            {
+                "name": "CP6",
+                "value": "1.000000"
+            },
+            {
+                "name": "ShowDeCasteljauTexture",
+                "value": "true"
+            },
+            {
+                "name": "ShowPolynomial",
+                "value": "true"
+            },
+            {
+                "name": "ShowSeilerTexture",
+                "value": "true"
             }
         ]
     }
