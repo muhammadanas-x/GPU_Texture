@@ -184,5 +184,8 @@
                 }
             ]
         }
-    ]
+    ],
+    "PrimaryOutput": {
+        "name": "Output"
+    }
 }
