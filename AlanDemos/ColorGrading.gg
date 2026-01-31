@@ -1,0 +1,557 @@
+{
+    "$schema": "gigischema.json",
+    "version": "1.01",
+    "variables": [
+        {
+            "name": "CurveType",
+            "type": "Int",
+            "visibility": "User",
+            "Enum": "CurveTypes"
+        },
+        {
+            "name": "CurveOrder",
+            "type": "Int",
+            "dflt": "Quintic",
+            "visibility": "User",
+            "Enum": "CurveOrders"
+        },
+        {
+            "name": "CP1",
+            "type": "Float3",
+            "dflt": "0.0, 0.0, 0.0",
+            "visibility": "User",
+            "UISettings": {
+                "UIHint": "Color"
+            }
+        },
+        {
+            "name": "CP2",
+            "type": "Float3",
+            "dflt": "0.2, 0.2, 0.2",
+            "visibility": "User",
+            "UISettings": {
+                "UIHint": "Color"
+            }
+        },
+        {
+            "name": "CP3",
+            "type": "Float3",
+            "dflt": "0.4, 0.4, 0.4",
+            "visibility": "User",
+            "UISettings": {
+                "UIHint": "Color"
+            }
+        },
+        {
+            "name": "CP4",
+            "type": "Float3",
+            "dflt": "0.6, 0.6, 0.6",
+            "visibility": "User",
+            "UISettings": {
+                "UIHint": "Color"
+            }
+        },
+        {
+            "name": "CP5",
+            "type": "Float3",
+            "dflt": "0.8, 0.8, 0.8",
+            "visibility": "User",
+            "UISettings": {
+                "UIHint": "Color"
+            }
+        },
+        {
+            "name": "CP6",
+            "type": "Float3",
+            "dflt": "1.0, 1.0, 1.0",
+            "visibility": "User",
+            "UISettings": {
+                "UIHint": "Color"
+            }
+        },
+        {
+            "name": "NumCPsMinus1Float",
+            "type": "Float"
+        },
+        {
+            "name": "NormalizedCPs",
+            "comment": "When clicked, makes a linear no-op curve out of the control points",
+            "type": "Bool",
+            "visibility": "User",
+            "UISettings": {
+                "UIHint": "Button"
+            }
+        }
+    ],
+    "shaders": [
+        {
+            "name": "Transform",
+            "fileName": "ColorGrading_Transform.hlsl",
+            "resources": [
+                {
+                    "name": "Input",
+                    "access": "SRV",
+                    "type": "Texture"
+                },
+                {
+                    "name": "Output",
+                    "access": "UAV",
+                    "type": "Texture"
+                }
+            ]
+        }
+    ],
+    "fileCopies": [
+        {
+            "fileName": "sRGB.hlsli",
+            "type": "Shader"
+        },
+        {
+            "fileName": "Bezier.hlsli",
+            "type": "Shader"
+        },
+        {
+            "fileName": "MountainsSmall.png",
+            "type": "Asset",
+            "binary": true
+        }
+    ],
+    "nodes": [
+        {
+            "resourceTexture": {
+                "name": "Input",
+                "editorPos": [
+                    -37.0,
+                    2.0
+                ],
+                "visibility": "Imported"
+            }
+        },
+        {
+            "resourceTexture": {
+                "name": "Output",
+                "editorPos": [
+                    -37.0,
+                    50.0
+                ],
+                "format": {
+                    "node": {
+                        "name": "Input"
+                    }
+                },
+                "size": {
+                    "node": {
+                        "name": "Input"
+                    }
+                }
+            }
+        },
+        {
+            "actionComputeShader": {
+                "name": "Transform",
+                "editorPos": [
+                    110.0,
+                    18.0
+                ],
+                "linkProperties": [
+                    {},
+                    {}
+                ],
+                "connections": [
+                    {
+                        "srcPin": "Input",
+                        "dstNode": "Input",
+                        "dstPin": "resource"
+                    },
+                    {
+                        "srcPin": "Output",
+                        "dstNode": "Output",
+                        "dstPin": "resource"
+                    }
+                ],
+                "shader": {
+                    "name": "Transform"
+                },
+                "dispatchSize": {
+                    "node": {
+                        "name": "Input"
+                    }
+                }
+            }
+        }
+    ],
+    "enums": [
+        {
+            "name": "CurveOrders",
+            "items": [
+                {
+                    "label": "Linear"
+                },
+                {
+                    "label": "Quadratic"
+                },
+                {
+                    "label": "Cubic"
+                },
+                {
+                    "label": "Quartic"
+                },
+                {
+                    "label": "Quintic"
+                }
+            ]
+        },
+        {
+            "name": "CurveTypes",
+            "items": [
+                {
+                    "label": "Polynomial"
+                },
+                {
+                    "label": "TextureDeCasteljau"
+                },
+                {
+                    "label": "TextureSeiler"
+                }
+            ]
+        }
+    ],
+    "setVars": [
+        {
+            "destination": {
+                "name": "NumCPsMinus1Float"
+            },
+            "ALiteral": "1",
+            "op": "Noop",
+            "condition": {
+                "variable1": "CurveOrder",
+                "comparison": "Equals",
+                "value2": "Linear"
+            }
+        },
+        {
+            "destination": {
+                "name": "NumCPsMinus1Float"
+            },
+            "ALiteral": "2",
+            "op": "Noop",
+            "condition": {
+                "variable1": "CurveOrder",
+                "comparison": "Equals",
+                "value2": "Quadratic"
+            }
+        },
+        {
+            "destination": {
+                "name": "NumCPsMinus1Float"
+            },
+            "ALiteral": "3",
+            "op": "Noop",
+            "condition": {
+                "variable1": "CurveOrder",
+                "comparison": "Equals",
+                "value2": "Cubic"
+            }
+        },
+        {
+            "destination": {
+                "name": "NumCPsMinus1Float"
+            },
+            "ALiteral": "4",
+            "op": "Noop",
+            "condition": {
+                "variable1": "CurveOrder",
+                "comparison": "Equals",
+                "value2": "Quartic"
+            }
+        },
+        {
+            "destination": {
+                "name": "NumCPsMinus1Float"
+            },
+            "ALiteral": "5",
+            "op": "Noop",
+            "condition": {
+                "variable1": "CurveOrder",
+                "comparison": "Equals",
+                "value2": "Quintic"
+            }
+        },
+        {
+            "destination": {
+                "name": "CP1"
+            },
+            "destinationIndex": 0,
+            "ALiteral": "0.0",
+            "op": "Divide",
+            "BVar": {
+                "name": "NumCPsMinus1Float"
+            },
+            "condition": {
+                "variable1": "NormalizedCPs",
+                "comparison": "IsTrue"
+            }
+        },
+        {
+            "destination": {
+                "name": "CP1"
+            },
+            "destinationIndex": 1,
+            "ALiteral": "0.0",
+            "op": "Divide",
+            "BVar": {
+                "name": "NumCPsMinus1Float"
+            },
+            "condition": {
+                "variable1": "NormalizedCPs",
+                "comparison": "IsTrue"
+            }
+        },
+        {
+            "destination": {
+                "name": "CP1"
+            },
+            "destinationIndex": 2,
+            "ALiteral": "0.0",
+            "op": "Divide",
+            "BVar": {
+                "name": "NumCPsMinus1Float"
+            },
+            "condition": {
+                "variable1": "NormalizedCPs",
+                "comparison": "IsTrue"
+            }
+        },
+        {
+            "destination": {
+                "name": "CP2"
+            },
+            "destinationIndex": 0,
+            "ALiteral": "1.0",
+            "op": "Divide",
+            "BVar": {
+                "name": "NumCPsMinus1Float"
+            },
+            "condition": {
+                "variable1": "NormalizedCPs",
+                "comparison": "IsTrue"
+            }
+        },
+        {
+            "destination": {
+                "name": "CP2"
+            },
+            "destinationIndex": 1,
+            "ALiteral": "1.0",
+            "op": "Divide",
+            "BVar": {
+                "name": "NumCPsMinus1Float"
+            },
+            "condition": {
+                "variable1": "NormalizedCPs",
+                "comparison": "IsTrue"
+            }
+        },
+        {
+            "destination": {
+                "name": "CP2"
+            },
+            "destinationIndex": 2,
+            "ALiteral": "1.0",
+            "op": "Divide",
+            "BVar": {
+                "name": "NumCPsMinus1Float"
+            },
+            "condition": {
+                "variable1": "NormalizedCPs",
+                "comparison": "IsTrue"
+            }
+        },
+        {
+            "destination": {
+                "name": "CP3"
+            },
+            "destinationIndex": 0,
+            "ALiteral": "2.0",
+            "op": "Divide",
+            "BVar": {
+                "name": "NumCPsMinus1Float"
+            },
+            "condition": {
+                "variable1": "NormalizedCPs",
+                "comparison": "IsTrue"
+            }
+        },
+        {
+            "destination": {
+                "name": "CP3"
+            },
+            "destinationIndex": 1,
+            "ALiteral": "2.0",
+            "op": "Divide",
+            "BVar": {
+                "name": "NumCPsMinus1Float"
+            },
+            "condition": {
+                "variable1": "NormalizedCPs",
+                "comparison": "IsTrue"
+            }
+        },
+        {
+            "destination": {
+                "name": "CP3"
+            },
+            "destinationIndex": 2,
+            "ALiteral": "2.0",
+            "op": "Divide",
+            "BVar": {
+                "name": "NumCPsMinus1Float"
+            },
+            "condition": {
+                "variable1": "NormalizedCPs",
+                "comparison": "IsTrue"
+            }
+        },
+        {
+            "destination": {
+                "name": "CP4"
+            },
+            "destinationIndex": 0,
+            "ALiteral": "3.0",
+            "op": "Divide",
+            "BVar": {
+                "name": "NumCPsMinus1Float"
+            },
+            "condition": {
+                "variable1": "NormalizedCPs",
+                "comparison": "IsTrue"
+            }
+        },
+        {
+            "destination": {
+                "name": "CP4"
+            },
+            "destinationIndex": 1,
+            "ALiteral": "3.0",
+            "op": "Divide",
+            "BVar": {
+                "name": "NumCPsMinus1Float"
+            },
+            "condition": {
+                "variable1": "NormalizedCPs",
+                "comparison": "IsTrue"
+            }
+        },
+        {
+            "destination": {
+                "name": "CP4"
+            },
+            "destinationIndex": 2,
+            "ALiteral": "3.0",
+            "op": "Divide",
+            "BVar": {
+                "name": "NumCPsMinus1Float"
+            },
+            "condition": {
+                "variable1": "NormalizedCPs",
+                "comparison": "IsTrue"
+            }
+        },
+        {
+            "destination": {
+                "name": "CP5"
+            },
+            "destinationIndex": 0,
+            "ALiteral": "4.0",
+            "op": "Divide",
+            "BVar": {
+                "name": "NumCPsMinus1Float"
+            },
+            "condition": {
+                "variable1": "NormalizedCPs",
+                "comparison": "IsTrue"
+            }
+        },
+        {
+            "destination": {
+                "name": "CP5"
+            },
+            "destinationIndex": 1,
+            "ALiteral": "4.0",
+            "op": "Divide",
+            "BVar": {
+                "name": "NumCPsMinus1Float"
+            },
+            "condition": {
+                "variable1": "NormalizedCPs",
+                "comparison": "IsTrue"
+            }
+        },
+        {
+            "destination": {
+                "name": "CP5"
+            },
+            "destinationIndex": 2,
+            "ALiteral": "4.0",
+            "op": "Divide",
+            "BVar": {
+                "name": "NumCPsMinus1Float"
+            },
+            "condition": {
+                "variable1": "NormalizedCPs",
+                "comparison": "IsTrue"
+            }
+        },
+        {
+            "destination": {
+                "name": "CP6"
+            },
+            "destinationIndex": 0,
+            "ALiteral": "5.0",
+            "op": "Divide",
+            "BVar": {
+                "name": "NumCPsMinus1Float"
+            },
+            "condition": {
+                "variable1": "NormalizedCPs",
+                "comparison": "IsTrue"
+            }
+        },
+        {
+            "destination": {
+                "name": "CP6"
+            },
+            "destinationIndex": 1,
+            "ALiteral": "5.0",
+            "op": "Divide",
+            "BVar": {
+                "name": "NumCPsMinus1Float"
+            },
+            "condition": {
+                "variable1": "NormalizedCPs",
+                "comparison": "IsTrue"
+            }
+        },
+        {
+            "destination": {
+                "name": "CP6"
+            },
+            "destinationIndex": 2,
+            "ALiteral": "5.0",
+            "op": "Divide",
+            "BVar": {
+                "name": "NumCPsMinus1Float"
+            },
+            "condition": {
+                "variable1": "NormalizedCPs",
+                "comparison": "IsTrue"
+            }
+        }
+    ],
+    "buildSettings": {
+        "outWebGPU": "ColorGradingWebGPU"
+    },
+    "PrimaryOutput": {
+        "name": "Output"
+    }
+}
