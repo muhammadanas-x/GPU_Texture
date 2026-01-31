@@ -317,9 +317,9 @@
                     ViewCurves.variable_CP4 = 1.; // (Float)
                     ViewCurves.variable_CP5 = 0.; // (Float)
                     ViewCurves.variable_CP6 = 1.; // (Float)
-                    ViewCurves.variable_ShowDeCasteljauTexture = true; // (Bool)
-                    ViewCurves.variable_ShowPolynomial = true; // (Bool)
-                    ViewCurves.variable_ShowSeilerTexture = true; // (Bool)
+                    ViewCurves.variable_ShowDeCasteljauTexture = true; // (Bool) In Red Channel
+                    ViewCurves.variable_ShowPolynomial = true; // (Bool) In Green Channel
+                    ViewCurves.variable_ShowSeilerTexture = true; // (Bool) In Blue Channel
                     ViewCurves.variable_ShowControlPoints = true; // (Bool)
                     ViewCurves.variable_RenderSize = 512, 512; // (Uint2)
 
@@ -333,13 +333,7 @@
             */
 
             // Set variables to what they were saved as in the gguser file
-            ViewCurves.variable_CurveOrder = 2;
-            ViewCurves.variable_CP4 = 1.000000;
-            ViewCurves.variable_CP5 = 0.000000;
-            ViewCurves.variable_CP6 = 1.000000;
-            ViewCurves.variable_ShowDeCasteljauTexture = true;
-            ViewCurves.variable_ShowPolynomial = true;
-            ViewCurves.variable_ShowSeilerTexture = true;
+            ViewCurves.variable_CurveOrder = 3;
 
             // Make sure the UI shows the correct variable values
             SetUIToVariables();
@@ -376,9 +370,9 @@
                     ViewCurves.variable_CP4 = 1.; // (Float)
                     ViewCurves.variable_CP5 = 0.; // (Float)
                     ViewCurves.variable_CP6 = 1.; // (Float)
-                    ViewCurves.variable_ShowDeCasteljauTexture = true; // (Bool)
-                    ViewCurves.variable_ShowPolynomial = true; // (Bool)
-                    ViewCurves.variable_ShowSeilerTexture = true; // (Bool)
+                    ViewCurves.variable_ShowDeCasteljauTexture = true; // (Bool) In Red Channel
+                    ViewCurves.variable_ShowPolynomial = true; // (Bool) In Green Channel
+                    ViewCurves.variable_ShowSeilerTexture = true; // (Bool) In Blue Channel
                     ViewCurves.variable_ShowControlPoints = true; // (Bool)
                     ViewCurves.variable_RenderSize = 512, 512; // (Uint2)
 
@@ -619,19 +613,19 @@
                             </td>
                         </tr>
                         <tr>
-                            <td valign="top">ShowDeCasteljauTexture&nbsp;</td>
+                            <td valign="top"><div class="tooltip">ShowDeCasteljauTexture&nbsp;<span class="tooltiptext">In Red Channel</span></div></td>
                             <td>
                                 <input type="checkbox" id="inputBox_ShowDeCasteljauTexture">
                             </td>
                         </tr>
                         <tr>
-                            <td valign="top">ShowPolynomial&nbsp;</td>
+                            <td valign="top"><div class="tooltip">ShowPolynomial&nbsp;<span class="tooltiptext">In Green Channel</span></div></td>
                             <td>
                                 <input type="checkbox" id="inputBox_ShowPolynomial">
                             </td>
                         </tr>
                         <tr>
-                            <td valign="top">ShowSeilerTexture&nbsp;</td>
+                            <td valign="top"><div class="tooltip">ShowSeilerTexture&nbsp;<span class="tooltiptext">In Blue Channel</span></div></td>
                             <td>
                                 <input type="checkbox" id="inputBox_ShowSeilerTexture">
                             </td>

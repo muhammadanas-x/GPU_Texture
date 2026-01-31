@@ -77,18 +77,21 @@
         },
         {
             "name": "ShowDeCasteljauTexture",
+            "comment": "In Red Channel",
             "type": "Bool",
             "dflt": "true",
             "visibility": "User"
         },
         {
             "name": "ShowPolynomial",
+            "comment": "In Green Channel",
             "type": "Bool",
             "dflt": "true",
             "visibility": "User"
         },
         {
             "name": "ShowSeilerTexture",
+            "comment": "In Blue Channel",
             "type": "Bool",
             "dflt": "true",
             "visibility": "User"
@@ -317,7 +320,7 @@
                     "multiply": [
                         2,
                         2,
-                        2
+                        3
                     ]
                 },
                 "dimension": "Texture3D"

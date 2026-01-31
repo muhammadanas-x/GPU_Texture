@@ -28,9 +28,9 @@ provide imported resources or variable values to the technique:
                     ViewCurves.variable_CP4 = 1.; // (Float)
                     ViewCurves.variable_CP5 = 0.; // (Float)
                     ViewCurves.variable_CP6 = 1.; // (Float)
-                    ViewCurves.variable_ShowDeCasteljauTexture = true; // (Bool)
-                    ViewCurves.variable_ShowPolynomial = true; // (Bool)
-                    ViewCurves.variable_ShowSeilerTexture = true; // (Bool)
+                    ViewCurves.variable_ShowDeCasteljauTexture = true; // (Bool) In Red Channel
+                    ViewCurves.variable_ShowPolynomial = true; // (Bool) In Green Channel
+                    ViewCurves.variable_ShowSeilerTexture = true; // (Bool) In Blue Channel
                     ViewCurves.variable_ShowControlPoints = true; // (Bool)
                     ViewCurves.variable_RenderSize = 512, 512; // (Uint2)
 
