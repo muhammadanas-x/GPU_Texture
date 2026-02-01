@@ -349,6 +349,13 @@
 
             document.getElementById('ResetVariables').addEventListener('click',(event) => { ResetVariables(); SetUIToVariables(); });
 
+            // Load the imported texture
+            let Imported_Image = await Shared.CreateTextureWithPNG(device, "assets/MountainsSmall.png", ColorGrading.texture_Input_usageFlags);
+            ColorGrading.texture_Input_size = Imported_Image.size;
+            ColorGrading.texture_Input_format = Imported_Image.format;
+            ColorGrading.texture_Input = Imported_Image.texture;
+            document.getElementById("importedResourceURL_Input").value = "assets/MountainsSmall.png";
+
             /* TODO:
             provide imported resources or variable values to the technique that only need to be set once:
                     ColorGrading.texture_Input = null;
