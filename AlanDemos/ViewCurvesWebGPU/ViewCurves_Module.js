@@ -57,9 +57,9 @@ struct Struct_DrawCurves_0CB_std140_0
 };
 
 @binding(6) @group(0) var<uniform> _DrawCurves_0CB : Struct_DrawCurves_0CB_std140_0;
-@binding(7) @group(0) var LinearSampler : sampler;
-
 @binding(1) @group(0) var DCTexture2D : texture_2d<f32>;
+
+@binding(7) @group(0) var LinearSampler : sampler;
 
 @binding(2) @group(0) var DCTexture3D : texture_3d<f32>;
 
@@ -67,17 +67,17 @@ struct Struct_DrawCurves_0CB_std140_0
 
 @binding(4) @group(0) var SeilerTexture3D : texture_3d<f32>;
 
-fn EvaluateDeCasteljauTexture_Linear_0( tex_0 : texture_2d<f32>,  t_0 : f32) -> f32
+fn DeCasteljauTexture_Read_Linear_0( tex_0 : texture_2d<f32>,  t_0 : f32,  LinearSampler_0 : sampler) -> f32
 {
-    return (textureSampleLevel((tex_0), (LinearSampler), (mix(vec2<f32>(0.25f, 0.25f), vec2<f32>(0.75f, 0.25f), vec2<f32>(t_0))), (0.0f)).x);
+    return (textureSampleLevel((tex_0), (LinearSampler_0), (mix(vec2<f32>(0.25f, 0.25f), vec2<f32>(0.75f, 0.25f), vec2<f32>(t_0))), (0.0f)).x);
 }
 
-fn EvaluateDeCasteljauTexture_Quadratic_0( tex_1 : texture_2d<f32>,  t_1 : f32) -> f32
+fn DeCasteljauTexture_Read_Quadratic_0( tex_1 : texture_2d<f32>,  t_1 : f32,  LinearSampler_1 : sampler) -> f32
 {
-    return (textureSampleLevel((tex_1), (LinearSampler), (mix(vec2<f32>(0.25f, 0.25f), vec2<f32>(0.75f, 0.75f), vec2<f32>(t_1))), (0.0f)).x);
+    return (textureSampleLevel((tex_1), (LinearSampler_1), (mix(vec2<f32>(0.25f, 0.25f), vec2<f32>(0.75f, 0.75f), vec2<f32>(t_1))), (0.0f)).x);
 }
 
-fn EvaluateDeCasteljauTexture_Cubic_0( tex_2 : texture_3d<f32>,  t_2 : f32) -> f32
+fn DeCasteljauTexture_Read_Cubic_0( tex_2 : texture_3d<f32>,  t_2 : f32,  LinearSampler_2 : sampler) -> f32
 {
     var dims_0 : vec3<u32>;
     var _S1 : u32 = dims_0[i32(0)];
@@ -87,10 +87,10 @@ fn EvaluateDeCasteljauTexture_Cubic_0( tex_2 : texture_3d<f32>,  t_2 : f32) -> f
     dims_0[i32(0)] = _S1;
     dims_0[i32(1)] = _S2;
     dims_0[i32(2)] = _S3;
-    return (textureSampleLevel((tex_2), (LinearSampler), ((mix(vec3<f32>(0.0f, 0.0f, 0.0f), vec3<f32>(1.0f, 1.0f, 1.0f), vec3<f32>(t_2)) + vec3<f32>(0.5f, 0.5f, 0.5f)) / vec3<f32>(dims_0)), (0.0f)).x);
+    return (textureSampleLevel((tex_2), (LinearSampler_2), ((mix(vec3<f32>(0.0f, 0.0f, 0.0f), vec3<f32>(1.0f, 1.0f, 1.0f), vec3<f32>(t_2)) + vec3<f32>(0.5f, 0.5f, 0.5f)) / vec3<f32>(dims_0)), (0.0f)).x);
 }
 
-fn EvaluateDeCasteljauTexture_Quartic_0( tex_3 : texture_3d<f32>,  t_3 : f32) -> f32
+fn DeCasteljauTexture_Read_Quartic_0( tex_3 : texture_3d<f32>,  t_3 : f32,  LinearSampler_3 : sampler) -> f32
 {
     var dims_1 : vec3<u32>;
     var _S4 : u32 = dims_1[i32(0)];
@@ -102,10 +102,10 @@ fn EvaluateDeCasteljauTexture_Quartic_0( tex_3 : texture_3d<f32>,  t_3 : f32) ->
     dims_1[i32(2)] = _S6;
     var _S7 : vec3<f32> = vec3<f32>(t_3);
     const _S8 : vec3<f32> = vec3<f32>(0.5f, 0.5f, 0.5f);
-    return mix((textureSampleLevel((tex_3), (LinearSampler), ((mix(vec3<f32>(0.0f, 0.0f, 0.0f), vec3<f32>(1.0f, 1.0f, 1.0f), _S7) + _S8) / vec3<f32>(dims_1)), (0.0f)).x), (textureSampleLevel((tex_3), (LinearSampler), ((mix(vec3<f32>(0.0f, 0.0f, 1.0f), vec3<f32>(1.0f, 1.0f, 2.0f), _S7) + _S8) / vec3<f32>(dims_1)), (0.0f)).x), t_3);
+    return mix((textureSampleLevel((tex_3), (LinearSampler_3), ((mix(vec3<f32>(0.0f, 0.0f, 0.0f), vec3<f32>(1.0f, 1.0f, 1.0f), _S7) + _S8) / vec3<f32>(dims_1)), (0.0f)).x), (textureSampleLevel((tex_3), (LinearSampler_3), ((mix(vec3<f32>(0.0f, 0.0f, 1.0f), vec3<f32>(1.0f, 1.0f, 2.0f), _S7) + _S8) / vec3<f32>(dims_1)), (0.0f)).x), t_3);
 }
 
-fn EvaluateDeCasteljauTexture_Quintic_0( tex_4 : texture_3d<f32>,  t_4 : f32) -> f32
+fn DeCasteljauTexture_Read_Quintic_0( tex_4 : texture_3d<f32>,  t_4 : f32,  LinearSampler_4 : sampler) -> f32
 {
     var dims_2 : vec3<u32>;
     var _S9 : u32 = dims_2[i32(0)];
@@ -118,7 +118,7 @@ fn EvaluateDeCasteljauTexture_Quintic_0( tex_4 : texture_3d<f32>,  t_4 : f32) ->
     var _S12 : vec3<f32> = vec3<f32>(t_4);
     const _S13 : vec3<f32> = vec3<f32>(0.5f, 0.5f, 0.5f);
     var s_0 : f32 = 1.0f - t_4;
-    return (textureSampleLevel((tex_4), (LinearSampler), ((mix(vec3<f32>(0.0f, 0.0f, 0.0f), vec3<f32>(1.0f, 1.0f, 1.0f), _S12) + _S13) / vec3<f32>(dims_2)), (0.0f)).x) * s_0 * s_0 + 2.0f * (textureSampleLevel((tex_4), (LinearSampler), ((mix(vec3<f32>(0.0f, 0.0f, 1.0f), vec3<f32>(1.0f, 1.0f, 2.0f), _S12) + _S13) / vec3<f32>(dims_2)), (0.0f)).x) * s_0 * t_4 + (textureSampleLevel((tex_4), (LinearSampler), ((mix(vec3<f32>(0.0f, 0.0f, 2.0f), vec3<f32>(1.0f, 1.0f, 3.0f), _S12) + _S13) / vec3<f32>(dims_2)), (0.0f)).x) * t_4 * t_4;
+    return (textureSampleLevel((tex_4), (LinearSampler_4), ((mix(vec3<f32>(0.0f, 0.0f, 0.0f), vec3<f32>(1.0f, 1.0f, 1.0f), _S12) + _S13) / vec3<f32>(dims_2)), (0.0f)).x) * s_0 * s_0 + 2.0f * (textureSampleLevel((tex_4), (LinearSampler_4), ((mix(vec3<f32>(0.0f, 0.0f, 1.0f), vec3<f32>(1.0f, 1.0f, 2.0f), _S12) + _S13) / vec3<f32>(dims_2)), (0.0f)).x) * s_0 * t_4 + (textureSampleLevel((tex_4), (LinearSampler_4), ((mix(vec3<f32>(0.0f, 0.0f, 2.0f), vec3<f32>(1.0f, 1.0f, 3.0f), _S12) + _S13) / vec3<f32>(dims_2)), (0.0f)).x) * t_4 * t_4;
 }
 
 fn EvaluateDeCasteljauTexture_0( t_5 : f32) -> f32
@@ -127,23 +127,23 @@ fn EvaluateDeCasteljauTexture_0( t_5 : f32) -> f32
     {
     case i32(0), :
         {
-            return EvaluateDeCasteljauTexture_Linear_0(DCTexture2D, t_5);
+            return DeCasteljauTexture_Read_Linear_0(DCTexture2D, t_5, LinearSampler);
         }
     case i32(1), :
         {
-            return EvaluateDeCasteljauTexture_Quadratic_0(DCTexture2D, t_5);
+            return DeCasteljauTexture_Read_Quadratic_0(DCTexture2D, t_5, LinearSampler);
         }
     case i32(2), :
         {
-            return EvaluateDeCasteljauTexture_Cubic_0(DCTexture3D, t_5);
+            return DeCasteljauTexture_Read_Cubic_0(DCTexture3D, t_5, LinearSampler);
         }
     case i32(3), :
         {
-            return EvaluateDeCasteljauTexture_Quartic_0(DCTexture3D, t_5);
+            return DeCasteljauTexture_Read_Quartic_0(DCTexture3D, t_5, LinearSampler);
         }
     case i32(4), :
         {
-            return EvaluateDeCasteljauTexture_Quintic_0(DCTexture3D, t_5);
+            return DeCasteljauTexture_Read_Quintic_0(DCTexture3D, t_5, LinearSampler);
         }
     case default, :
         {
@@ -214,22 +214,22 @@ fn EvaluateBezierPolynomial_0( t_11 : f32) -> f32
     return 0.0f;
 }
 
-fn EvaluateSeilerTexture_Linear_0( tex_5 : texture_2d<f32>,  t_12 : f32) -> f32
+fn SeilerTexture_Read_Linear_0( tex_5 : texture_2d<f32>,  t_12 : f32,  LinearSampler_5 : sampler) -> f32
 {
-    return (textureSampleLevel((tex_5), (LinearSampler), (mix(vec2<f32>(0.25f, 0.25f), vec2<f32>(0.75f, 0.75f), vec2<f32>(t_12, 0.0f))), (0.0f)).x);
+    return (textureSampleLevel((tex_5), (LinearSampler_5), (mix(vec2<f32>(0.25f, 0.25f), vec2<f32>(0.75f, 0.75f), vec2<f32>(t_12, 0.0f))), (0.0f)).x);
 }
 
-fn EvaluateSeilerTexture_Quadratic_0( tex_6 : texture_2d<f32>,  t_13 : f32) -> f32
+fn SeilerTexture_Read_Quadratic_0( tex_6 : texture_2d<f32>,  t_13 : f32,  LinearSampler_6 : sampler) -> f32
 {
-    return (textureSampleLevel((tex_6), (LinearSampler), (mix(vec2<f32>(0.25f, 0.25f), vec2<f32>(0.75f, 0.75f), vec2<f32>(t_13, (1.0f - t_13) * t_13))), (0.0f)).x);
+    return (textureSampleLevel((tex_6), (LinearSampler_6), (mix(vec2<f32>(0.25f, 0.25f), vec2<f32>(0.75f, 0.75f), vec2<f32>(t_13, (1.0f - t_13) * t_13))), (0.0f)).x);
 }
 
-fn EvaluateSeilerTexture_Cubic_0( tex_7 : texture_2d<f32>,  t_14 : f32) -> f32
+fn SeilerTexture_Read_Cubic_0( tex_7 : texture_2d<f32>,  t_14 : f32,  LinearSampler_7 : sampler) -> f32
 {
-    return (textureSampleLevel((tex_7), (LinearSampler), (mix(vec2<f32>(0.25f, 0.25f), vec2<f32>(0.75f, 0.75f), vec2<f32>(t_14, (1.0f - t_14) * t_14))), (0.0f)).x);
+    return (textureSampleLevel((tex_7), (LinearSampler_7), (mix(vec2<f32>(0.25f, 0.25f), vec2<f32>(0.75f, 0.75f), vec2<f32>(t_14, (1.0f - t_14) * t_14))), (0.0f)).x);
 }
 
-fn EvaluateSeilerTexture_Quartic_0( tex_8 : texture_3d<f32>,  t_15 : f32) -> f32
+fn SeilerTexture_Read_Quartic_0( tex_8 : texture_3d<f32>,  t_15 : f32,  LinearSampler_8 : sampler) -> f32
 {
     var dims_3 : vec3<u32>;
     var _S14 : u32 = dims_3[i32(0)];
@@ -240,10 +240,10 @@ fn EvaluateSeilerTexture_Quartic_0( tex_8 : texture_3d<f32>,  t_15 : f32) -> f32
     dims_3[i32(1)] = _S15;
     dims_3[i32(2)] = _S16;
     var _S17 : f32 = (1.0f - t_15) * t_15;
-    return (textureSampleLevel((tex_8), (LinearSampler), ((mix(vec3<f32>(0.0f, 0.0f, 0.0f), vec3<f32>(1.0f, 1.0f, 1.0f), vec3<f32>(t_15, _S17, _S17)) + vec3<f32>(0.5f, 0.5f, 0.5f)) / vec3<f32>(dims_3)), (0.0f)).x);
+    return (textureSampleLevel((tex_8), (LinearSampler_8), ((mix(vec3<f32>(0.0f, 0.0f, 0.0f), vec3<f32>(1.0f, 1.0f, 1.0f), vec3<f32>(t_15, _S17, _S17)) + vec3<f32>(0.5f, 0.5f, 0.5f)) / vec3<f32>(dims_3)), (0.0f)).x);
 }
 
-fn EvaluateSeilerTexture_Quintic_0( tex_9 : texture_3d<f32>,  t_16 : f32) -> f32
+fn SeilerTexture_Read_Quintic_0( tex_9 : texture_3d<f32>,  t_16 : f32,  LinearSampler_9 : sampler) -> f32
 {
     var dims_4 : vec3<u32>;
     var _S18 : u32 = dims_4[i32(0)];
@@ -254,7 +254,7 @@ fn EvaluateSeilerTexture_Quintic_0( tex_9 : texture_3d<f32>,  t_16 : f32) -> f32
     dims_4[i32(1)] = _S19;
     dims_4[i32(2)] = _S20;
     var _S21 : f32 = (1.0f - t_16) * t_16;
-    return (textureSampleLevel((tex_9), (LinearSampler), ((mix(vec3<f32>(0.0f, 0.0f, 0.0f), vec3<f32>(1.0f, 1.0f, 1.0f), vec3<f32>(t_16, _S21, _S21)) + vec3<f32>(0.5f, 0.5f, 0.5f)) / vec3<f32>(dims_4)), (0.0f)).x);
+    return (textureSampleLevel((tex_9), (LinearSampler_9), ((mix(vec3<f32>(0.0f, 0.0f, 0.0f), vec3<f32>(1.0f, 1.0f, 1.0f), vec3<f32>(t_16, _S21, _S21)) + vec3<f32>(0.5f, 0.5f, 0.5f)) / vec3<f32>(dims_4)), (0.0f)).x);
 }
 
 fn EvaluateSeilerTexture_0( t_17 : f32) -> f32
@@ -263,23 +263,23 @@ fn EvaluateSeilerTexture_0( t_17 : f32) -> f32
     {
     case i32(0), :
         {
-            return EvaluateSeilerTexture_Linear_0(SeilerTexture2D, t_17);
+            return SeilerTexture_Read_Linear_0(SeilerTexture2D, t_17, LinearSampler);
         }
     case i32(1), :
         {
-            return EvaluateSeilerTexture_Quadratic_0(SeilerTexture2D, t_17);
+            return SeilerTexture_Read_Quadratic_0(SeilerTexture2D, t_17, LinearSampler);
         }
     case i32(2), :
         {
-            return EvaluateSeilerTexture_Cubic_0(SeilerTexture2D, t_17);
+            return SeilerTexture_Read_Cubic_0(SeilerTexture2D, t_17, LinearSampler);
         }
     case i32(3), :
         {
-            return EvaluateSeilerTexture_Quartic_0(SeilerTexture3D, t_17);
+            return SeilerTexture_Read_Quartic_0(SeilerTexture3D, t_17, LinearSampler);
         }
     case i32(4), :
         {
-            return EvaluateSeilerTexture_Quintic_0(SeilerTexture3D, t_17);
+            return SeilerTexture_Read_Quintic_0(SeilerTexture3D, t_17, LinearSampler);
         }
     case default, :
         {
@@ -456,144 +456,174 @@ struct Struct_MakeCurveTextures_0CB_std140_0
 
 @binding(3) @group(0) var SeilerTexture3D : texture_storage_3d</*(SeilerTexture3D_format)*/, write>;
 
+fn DeCasteljauTexture_Write_Linear_0( _S1 : f32,  _S2 : f32)
+{
+    textureStore((DCTexture2D), (vec2<u32>(u32(0), u32(0))), vec4<f32>((_S1), 0, 0, 1));
+    textureStore((DCTexture2D), (vec2<u32>(u32(1), u32(0))), vec4<f32>((_S2), 0, 0, 1));
+    return;
+}
+
+fn SeilerTexture_Write_Linear_0( _S3 : f32,  _S4 : f32)
+{
+    textureStore((SeilerTexture2D), (vec2<u32>(u32(0), u32(0))), vec4<f32>((_S3), 0, 0, 1));
+    textureStore((SeilerTexture2D), (vec2<u32>(u32(1), u32(0))), vec4<f32>((_S4), 0, 0, 1));
+    return;
+}
+
 fn MakeLinear_0()
 {
-    const _S1 : vec2<u32> = vec2<u32>(u32(0), u32(0));
-    textureStore((DCTexture2D), (_S1), vec4<f32>((_MakeCurveTextures_0CB.CP1_0), 0, 0, 1));
-    const _S2 : vec2<u32> = vec2<u32>(u32(1), u32(0));
-    textureStore((DCTexture2D), (_S2), vec4<f32>((_MakeCurveTextures_0CB.CP2_0), 0, 0, 1));
-    textureStore((SeilerTexture2D), (_S1), vec4<f32>((_MakeCurveTextures_0CB.CP1_0), 0, 0, 1));
-    textureStore((SeilerTexture2D), (_S2), vec4<f32>((_MakeCurveTextures_0CB.CP2_0), 0, 0, 1));
+    DeCasteljauTexture_Write_Linear_0(_MakeCurveTextures_0CB.CP1_0, _MakeCurveTextures_0CB.CP2_0);
+    SeilerTexture_Write_Linear_0(_MakeCurveTextures_0CB.CP1_0, _MakeCurveTextures_0CB.CP2_0);
+    return;
+}
+
+fn DeCasteljauTexture_Write_Quadratic_0( _S5 : f32,  _S6 : f32,  _S7 : f32)
+{
+    textureStore((DCTexture2D), (vec2<u32>(u32(0), u32(0))), vec4<f32>((_S5), 0, 0, 1));
+    textureStore((DCTexture2D), (vec2<u32>(u32(1), u32(0))), vec4<f32>((_S6), 0, 0, 1));
+    textureStore((DCTexture2D), (vec2<u32>(u32(0), u32(1))), vec4<f32>((_S6), 0, 0, 1));
+    textureStore((DCTexture2D), (vec2<u32>(u32(1), u32(1))), vec4<f32>((_S7), 0, 0, 1));
+    return;
+}
+
+fn SeilerTexture_Write_Quadratic_0( _S8 : f32,  _S9 : f32,  _S10 : f32)
+{
+    var d1_0 : f32 = 2.0f * (_S9 - _S8) - (_S10 - _S8);
+    textureStore((SeilerTexture2D), (vec2<u32>(u32(0), u32(0))), vec4<f32>((_S8), 0, 0, 1));
+    textureStore((SeilerTexture2D), (vec2<u32>(u32(1), u32(0))), vec4<f32>((_S10), 0, 0, 1));
+    textureStore((SeilerTexture2D), (vec2<u32>(u32(0), u32(1))), vec4<f32>((_S8 + d1_0), 0, 0, 1));
+    textureStore((SeilerTexture2D), (vec2<u32>(u32(1), u32(1))), vec4<f32>((_S10 + d1_0), 0, 0, 1));
     return;
 }
 
 fn MakeQuadratic_0()
 {
-    const _S3 : vec2<u32> = vec2<u32>(u32(0), u32(0));
-    textureStore((DCTexture2D), (_S3), vec4<f32>((_MakeCurveTextures_0CB.CP1_0), 0, 0, 1));
-    const _S4 : vec2<u32> = vec2<u32>(u32(1), u32(0));
-    textureStore((DCTexture2D), (_S4), vec4<f32>((_MakeCurveTextures_0CB.CP2_0), 0, 0, 1));
-    const _S5 : vec2<u32> = vec2<u32>(u32(0), u32(1));
-    textureStore((DCTexture2D), (_S5), vec4<f32>((_MakeCurveTextures_0CB.CP2_0), 0, 0, 1));
-    const _S6 : vec2<u32> = vec2<u32>(u32(1), u32(1));
-    textureStore((DCTexture2D), (_S6), vec4<f32>((_MakeCurveTextures_0CB.CP3_0), 0, 0, 1));
-    var b0_0 : f32 = _MakeCurveTextures_0CB.CP1_0;
-    var b2_0 : f32 = _MakeCurveTextures_0CB.CP3_0;
-    var d1_0 : f32 = 2.0f * (_MakeCurveTextures_0CB.CP2_0 - _MakeCurveTextures_0CB.CP1_0) - (_MakeCurveTextures_0CB.CP3_0 - _MakeCurveTextures_0CB.CP1_0);
-    textureStore((SeilerTexture2D), (_S3), vec4<f32>((_MakeCurveTextures_0CB.CP1_0), 0, 0, 1));
-    textureStore((SeilerTexture2D), (_S4), vec4<f32>((b2_0), 0, 0, 1));
-    textureStore((SeilerTexture2D), (_S5), vec4<f32>((b0_0 + d1_0), 0, 0, 1));
-    textureStore((SeilerTexture2D), (_S6), vec4<f32>((b2_0 + d1_0), 0, 0, 1));
+    DeCasteljauTexture_Write_Quadratic_0(_MakeCurveTextures_0CB.CP1_0, _MakeCurveTextures_0CB.CP2_0, _MakeCurveTextures_0CB.CP3_0);
+    SeilerTexture_Write_Quadratic_0(_MakeCurveTextures_0CB.CP1_0, _MakeCurveTextures_0CB.CP2_0, _MakeCurveTextures_0CB.CP3_0);
+    return;
+}
+
+fn DeCasteljauTexture_Write_Cubic_0( _S11 : f32,  _S12 : f32,  _S13 : f32,  _S14 : f32)
+{
+    textureStore((DCTexture3D), (vec3<u32>(u32(0), u32(0), u32(0))), vec4<f32>((_S11), 0, 0, 1));
+    textureStore((DCTexture3D), (vec3<u32>(u32(1), u32(0), u32(0))), vec4<f32>((_S12), 0, 0, 1));
+    textureStore((DCTexture3D), (vec3<u32>(u32(0), u32(1), u32(0))), vec4<f32>((_S12), 0, 0, 1));
+    textureStore((DCTexture3D), (vec3<u32>(u32(1), u32(1), u32(0))), vec4<f32>((_S13), 0, 0, 1));
+    textureStore((DCTexture3D), (vec3<u32>(u32(0), u32(0), u32(1))), vec4<f32>((_S12), 0, 0, 1));
+    textureStore((DCTexture3D), (vec3<u32>(u32(1), u32(0), u32(1))), vec4<f32>((_S13), 0, 0, 1));
+    textureStore((DCTexture3D), (vec3<u32>(u32(0), u32(1), u32(1))), vec4<f32>((_S13), 0, 0, 1));
+    textureStore((DCTexture3D), (vec3<u32>(u32(1), u32(1), u32(1))), vec4<f32>((_S14), 0, 0, 1));
+    return;
+}
+
+fn SeilerTexture_Write_Cubic_0( _S15 : f32,  _S16 : f32,  _S17 : f32,  _S18 : f32)
+{
+    var d1_1 : f32 = 3.0f * (_S16 - _S15) - (_S18 - _S15);
+    var d2_0 : f32 = 3.0f * (_S17 - _S18) - (_S15 - _S18);
+    textureStore((SeilerTexture2D), (vec2<u32>(u32(0), u32(0))), vec4<f32>((_S15), 0, 0, 1));
+    textureStore((SeilerTexture2D), (vec2<u32>(u32(1), u32(0))), vec4<f32>((_S18), 0, 0, 1));
+    textureStore((SeilerTexture2D), (vec2<u32>(u32(0), u32(1))), vec4<f32>((_S15 + d1_1), 0, 0, 1));
+    textureStore((SeilerTexture2D), (vec2<u32>(u32(1), u32(1))), vec4<f32>((_S18 + d2_0), 0, 0, 1));
     return;
 }
 
 fn MakeCubic_0()
 {
-    textureStore((DCTexture3D), (vec3<u32>(u32(0), u32(0), u32(0))), vec4<f32>((_MakeCurveTextures_0CB.CP1_0), 0, 0, 1));
-    textureStore((DCTexture3D), (vec3<u32>(u32(1), u32(0), u32(0))), vec4<f32>((_MakeCurveTextures_0CB.CP2_0), 0, 0, 1));
-    textureStore((DCTexture3D), (vec3<u32>(u32(0), u32(1), u32(0))), vec4<f32>((_MakeCurveTextures_0CB.CP2_0), 0, 0, 1));
-    textureStore((DCTexture3D), (vec3<u32>(u32(1), u32(1), u32(0))), vec4<f32>((_MakeCurveTextures_0CB.CP3_0), 0, 0, 1));
-    textureStore((DCTexture3D), (vec3<u32>(u32(0), u32(0), u32(1))), vec4<f32>((_MakeCurveTextures_0CB.CP2_0), 0, 0, 1));
-    textureStore((DCTexture3D), (vec3<u32>(u32(1), u32(0), u32(1))), vec4<f32>((_MakeCurveTextures_0CB.CP3_0), 0, 0, 1));
-    textureStore((DCTexture3D), (vec3<u32>(u32(0), u32(1), u32(1))), vec4<f32>((_MakeCurveTextures_0CB.CP3_0), 0, 0, 1));
-    textureStore((DCTexture3D), (vec3<u32>(u32(1), u32(1), u32(1))), vec4<f32>((_MakeCurveTextures_0CB.CP4_0), 0, 0, 1));
-    var b0_1 : f32 = _MakeCurveTextures_0CB.CP1_0;
-    var b3_0 : f32 = _MakeCurveTextures_0CB.CP4_0;
-    var d1_1 : f32 = 3.0f * (_MakeCurveTextures_0CB.CP2_0 - _MakeCurveTextures_0CB.CP1_0) - (_MakeCurveTextures_0CB.CP4_0 - _MakeCurveTextures_0CB.CP1_0);
-    var d2_0 : f32 = 3.0f * (_MakeCurveTextures_0CB.CP3_0 - _MakeCurveTextures_0CB.CP4_0) - (_MakeCurveTextures_0CB.CP1_0 - _MakeCurveTextures_0CB.CP4_0);
-    textureStore((SeilerTexture2D), (vec2<u32>(u32(0), u32(0))), vec4<f32>((_MakeCurveTextures_0CB.CP1_0), 0, 0, 1));
-    textureStore((SeilerTexture2D), (vec2<u32>(u32(1), u32(0))), vec4<f32>((b3_0), 0, 0, 1));
-    textureStore((SeilerTexture2D), (vec2<u32>(u32(0), u32(1))), vec4<f32>((b0_1 + d1_1), 0, 0, 1));
-    textureStore((SeilerTexture2D), (vec2<u32>(u32(1), u32(1))), vec4<f32>((b3_0 + d2_0), 0, 0, 1));
+    DeCasteljauTexture_Write_Cubic_0(_MakeCurveTextures_0CB.CP1_0, _MakeCurveTextures_0CB.CP2_0, _MakeCurveTextures_0CB.CP3_0, _MakeCurveTextures_0CB.CP4_0);
+    SeilerTexture_Write_Cubic_0(_MakeCurveTextures_0CB.CP1_0, _MakeCurveTextures_0CB.CP2_0, _MakeCurveTextures_0CB.CP3_0, _MakeCurveTextures_0CB.CP4_0);
+    return;
+}
+
+fn DeCasteljauTexture_Write_Quartic_0( _S19 : f32,  _S20 : f32,  _S21 : f32,  _S22 : f32,  _S23 : f32)
+{
+    textureStore((DCTexture3D), (vec3<u32>(u32(0), u32(0), u32(0))), vec4<f32>((_S19), 0, 0, 1));
+    textureStore((DCTexture3D), (vec3<u32>(u32(1), u32(0), u32(0))), vec4<f32>((_S20), 0, 0, 1));
+    textureStore((DCTexture3D), (vec3<u32>(u32(0), u32(1), u32(0))), vec4<f32>((_S20), 0, 0, 1));
+    textureStore((DCTexture3D), (vec3<u32>(u32(1), u32(1), u32(0))), vec4<f32>((_S21), 0, 0, 1));
+    textureStore((DCTexture3D), (vec3<u32>(u32(0), u32(0), u32(1))), vec4<f32>((_S20), 0, 0, 1));
+    textureStore((DCTexture3D), (vec3<u32>(u32(1), u32(0), u32(1))), vec4<f32>((_S21), 0, 0, 1));
+    textureStore((DCTexture3D), (vec3<u32>(u32(0), u32(1), u32(1))), vec4<f32>((_S21), 0, 0, 1));
+    textureStore((DCTexture3D), (vec3<u32>(u32(1), u32(1), u32(1))), vec4<f32>((_S22), 0, 0, 1));
+    textureStore((DCTexture3D), (vec3<u32>(u32(0), u32(0), u32(2))), vec4<f32>((_S21), 0, 0, 1));
+    textureStore((DCTexture3D), (vec3<u32>(u32(1), u32(0), u32(2))), vec4<f32>((_S22), 0, 0, 1));
+    textureStore((DCTexture3D), (vec3<u32>(u32(0), u32(1), u32(2))), vec4<f32>((_S22), 0, 0, 1));
+    textureStore((DCTexture3D), (vec3<u32>(u32(1), u32(1), u32(2))), vec4<f32>((_S23), 0, 0, 1));
+    return;
+}
+
+fn SeilerTexture_Write_Quartic_0( _S24 : f32,  _S25 : f32,  _S26 : f32,  _S27 : f32,  _S28 : f32)
+{
+    var _S29 : f32 = _S25 - _S24;
+    var d1_2 : f32 = 4.0f * _S29 - (_S28 - _S24);
+    var _S30 : f32 = _S27 - _S28;
+    var d3_0 : f32 = 4.0f * _S30 - (_S24 - _S28);
+    var d2_1 : f32 = 6.0f * (_S26 - _S25) - _S29 - _S30 - 3.0f * (_S27 - _S25);
+    textureStore((SeilerTexture3D), (vec3<u32>(u32(0), u32(0), u32(0))), vec4<f32>((_S24), 0, 0, 1));
+    textureStore((SeilerTexture3D), (vec3<u32>(u32(1), u32(0), u32(0))), vec4<f32>((_S28), 0, 0, 1));
+    textureStore((SeilerTexture3D), (vec3<u32>(u32(0), u32(1), u32(0))), vec4<f32>((_S24), 0, 0, 1));
+    textureStore((SeilerTexture3D), (vec3<u32>(u32(1), u32(1), u32(0))), vec4<f32>((_S28), 0, 0, 1));
+    var _S31 : f32 = _S24 + d1_2;
+    textureStore((SeilerTexture3D), (vec3<u32>(u32(0), u32(0), u32(1))), vec4<f32>((_S31), 0, 0, 1));
+    var _S32 : f32 = _S28 + d3_0;
+    textureStore((SeilerTexture3D), (vec3<u32>(u32(1), u32(0), u32(1))), vec4<f32>((_S32), 0, 0, 1));
+    textureStore((SeilerTexture3D), (vec3<u32>(u32(0), u32(1), u32(1))), vec4<f32>((_S31 + d2_1), 0, 0, 1));
+    textureStore((SeilerTexture3D), (vec3<u32>(u32(1), u32(1), u32(1))), vec4<f32>((_S32 + d2_1), 0, 0, 1));
     return;
 }
 
 fn MakeQuartic_0()
 {
-    const _S7 : vec3<u32> = vec3<u32>(u32(0), u32(0), u32(0));
-    textureStore((DCTexture3D), (_S7), vec4<f32>((_MakeCurveTextures_0CB.CP1_0), 0, 0, 1));
-    const _S8 : vec3<u32> = vec3<u32>(u32(1), u32(0), u32(0));
-    textureStore((DCTexture3D), (_S8), vec4<f32>((_MakeCurveTextures_0CB.CP2_0), 0, 0, 1));
-    const _S9 : vec3<u32> = vec3<u32>(u32(0), u32(1), u32(0));
-    textureStore((DCTexture3D), (_S9), vec4<f32>((_MakeCurveTextures_0CB.CP2_0), 0, 0, 1));
-    const _S10 : vec3<u32> = vec3<u32>(u32(1), u32(1), u32(0));
-    textureStore((DCTexture3D), (_S10), vec4<f32>((_MakeCurveTextures_0CB.CP3_0), 0, 0, 1));
-    const _S11 : vec3<u32> = vec3<u32>(u32(0), u32(0), u32(1));
-    textureStore((DCTexture3D), (_S11), vec4<f32>((_MakeCurveTextures_0CB.CP2_0), 0, 0, 1));
-    const _S12 : vec3<u32> = vec3<u32>(u32(1), u32(0), u32(1));
-    textureStore((DCTexture3D), (_S12), vec4<f32>((_MakeCurveTextures_0CB.CP3_0), 0, 0, 1));
-    const _S13 : vec3<u32> = vec3<u32>(u32(0), u32(1), u32(1));
-    textureStore((DCTexture3D), (_S13), vec4<f32>((_MakeCurveTextures_0CB.CP3_0), 0, 0, 1));
-    const _S14 : vec3<u32> = vec3<u32>(u32(1), u32(1), u32(1));
-    textureStore((DCTexture3D), (_S14), vec4<f32>((_MakeCurveTextures_0CB.CP4_0), 0, 0, 1));
-    textureStore((DCTexture3D), (vec3<u32>(u32(0), u32(0), u32(2))), vec4<f32>((_MakeCurveTextures_0CB.CP3_0), 0, 0, 1));
-    textureStore((DCTexture3D), (vec3<u32>(u32(1), u32(0), u32(2))), vec4<f32>((_MakeCurveTextures_0CB.CP4_0), 0, 0, 1));
-    textureStore((DCTexture3D), (vec3<u32>(u32(0), u32(1), u32(2))), vec4<f32>((_MakeCurveTextures_0CB.CP4_0), 0, 0, 1));
-    textureStore((DCTexture3D), (vec3<u32>(u32(1), u32(1), u32(2))), vec4<f32>((_MakeCurveTextures_0CB.CP5_0), 0, 0, 1));
-    var b0_2 : f32 = _MakeCurveTextures_0CB.CP1_0;
-    var b4_0 : f32 = _MakeCurveTextures_0CB.CP5_0;
-    var _S15 : f32 = _MakeCurveTextures_0CB.CP2_0 - _MakeCurveTextures_0CB.CP1_0;
-    var d1_2 : f32 = 4.0f * _S15 - (_MakeCurveTextures_0CB.CP5_0 - _MakeCurveTextures_0CB.CP1_0);
-    var _S16 : f32 = _MakeCurveTextures_0CB.CP4_0 - _MakeCurveTextures_0CB.CP5_0;
-    var d3_0 : f32 = 4.0f * _S16 - (_MakeCurveTextures_0CB.CP1_0 - _MakeCurveTextures_0CB.CP5_0);
-    var d2_1 : f32 = 6.0f * (_MakeCurveTextures_0CB.CP3_0 - _MakeCurveTextures_0CB.CP2_0) - _S15 - _S16 - 3.0f * (_MakeCurveTextures_0CB.CP4_0 - _MakeCurveTextures_0CB.CP2_0);
-    textureStore((SeilerTexture3D), (_S7), vec4<f32>((_MakeCurveTextures_0CB.CP1_0), 0, 0, 1));
-    textureStore((SeilerTexture3D), (_S8), vec4<f32>((b4_0), 0, 0, 1));
-    textureStore((SeilerTexture3D), (_S9), vec4<f32>((b0_2), 0, 0, 1));
-    textureStore((SeilerTexture3D), (_S10), vec4<f32>((b4_0), 0, 0, 1));
-    var _S17 : f32 = b0_2 + d1_2;
-    textureStore((SeilerTexture3D), (_S11), vec4<f32>((_S17), 0, 0, 1));
-    var _S18 : f32 = b4_0 + d3_0;
-    textureStore((SeilerTexture3D), (_S12), vec4<f32>((_S18), 0, 0, 1));
-    textureStore((SeilerTexture3D), (_S13), vec4<f32>((_S17 + d2_1), 0, 0, 1));
-    textureStore((SeilerTexture3D), (_S14), vec4<f32>((_S18 + d2_1), 0, 0, 1));
+    DeCasteljauTexture_Write_Quartic_0(_MakeCurveTextures_0CB.CP1_0, _MakeCurveTextures_0CB.CP2_0, _MakeCurveTextures_0CB.CP3_0, _MakeCurveTextures_0CB.CP4_0, _MakeCurveTextures_0CB.CP5_0);
+    SeilerTexture_Write_Quartic_0(_MakeCurveTextures_0CB.CP1_0, _MakeCurveTextures_0CB.CP2_0, _MakeCurveTextures_0CB.CP3_0, _MakeCurveTextures_0CB.CP4_0, _MakeCurveTextures_0CB.CP5_0);
+    return;
+}
+
+fn DeCasteljauTexture_Write_Quintic_0( _S33 : f32,  _S34 : f32,  _S35 : f32,  _S36 : f32,  _S37 : f32,  _S38 : f32)
+{
+    textureStore((DCTexture3D), (vec3<u32>(u32(0), u32(0), u32(0))), vec4<f32>((_S33), 0, 0, 1));
+    textureStore((DCTexture3D), (vec3<u32>(u32(1), u32(0), u32(0))), vec4<f32>((_S34), 0, 0, 1));
+    textureStore((DCTexture3D), (vec3<u32>(u32(0), u32(1), u32(0))), vec4<f32>((_S34), 0, 0, 1));
+    textureStore((DCTexture3D), (vec3<u32>(u32(1), u32(1), u32(0))), vec4<f32>((_S35), 0, 0, 1));
+    textureStore((DCTexture3D), (vec3<u32>(u32(0), u32(0), u32(1))), vec4<f32>((_S34), 0, 0, 1));
+    textureStore((DCTexture3D), (vec3<u32>(u32(1), u32(0), u32(1))), vec4<f32>((_S35), 0, 0, 1));
+    textureStore((DCTexture3D), (vec3<u32>(u32(0), u32(1), u32(1))), vec4<f32>((_S35), 0, 0, 1));
+    textureStore((DCTexture3D), (vec3<u32>(u32(1), u32(1), u32(1))), vec4<f32>((_S36), 0, 0, 1));
+    textureStore((DCTexture3D), (vec3<u32>(u32(0), u32(0), u32(2))), vec4<f32>((_S35), 0, 0, 1));
+    textureStore((DCTexture3D), (vec3<u32>(u32(1), u32(0), u32(2))), vec4<f32>((_S36), 0, 0, 1));
+    textureStore((DCTexture3D), (vec3<u32>(u32(0), u32(1), u32(2))), vec4<f32>((_S36), 0, 0, 1));
+    textureStore((DCTexture3D), (vec3<u32>(u32(1), u32(1), u32(2))), vec4<f32>((_S37), 0, 0, 1));
+    textureStore((DCTexture3D), (vec3<u32>(u32(0), u32(0), u32(3))), vec4<f32>((_S36), 0, 0, 1));
+    textureStore((DCTexture3D), (vec3<u32>(u32(1), u32(0), u32(3))), vec4<f32>((_S37), 0, 0, 1));
+    textureStore((DCTexture3D), (vec3<u32>(u32(0), u32(1), u32(3))), vec4<f32>((_S37), 0, 0, 1));
+    textureStore((DCTexture3D), (vec3<u32>(u32(1), u32(1), u32(3))), vec4<f32>((_S38), 0, 0, 1));
+    return;
+}
+
+fn SeilerTexture_Write_Quintic_0( _S39 : f32,  _S40 : f32,  _S41 : f32,  _S42 : f32,  _S43 : f32,  _S44 : f32)
+{
+    var _S45 : f32 = _S40 - _S39;
+    var d1_3 : f32 = 5.0f * _S45 - (_S44 - _S39);
+    var _S46 : f32 = _S43 - _S44;
+    var d4_0 : f32 = 5.0f * _S46 - (_S39 - _S44);
+    var d2_2 : f32 = 10.0f * (_S41 - _S40) - 3.0f * _S45 - 2.0f * _S46 - 3.0f * (_S43 - _S40);
+    var d3_1 : f32 = 10.0f * (_S42 - _S43) - 3.0f * _S46 - 2.0f * _S45 - 3.0f * (_S40 - _S43);
+    textureStore((SeilerTexture3D), (vec3<u32>(u32(0), u32(0), u32(0))), vec4<f32>((_S39), 0, 0, 1));
+    textureStore((SeilerTexture3D), (vec3<u32>(u32(1), u32(0), u32(0))), vec4<f32>((_S44), 0, 0, 1));
+    textureStore((SeilerTexture3D), (vec3<u32>(u32(0), u32(1), u32(0))), vec4<f32>((_S39), 0, 0, 1));
+    textureStore((SeilerTexture3D), (vec3<u32>(u32(1), u32(1), u32(0))), vec4<f32>((_S44), 0, 0, 1));
+    var _S47 : f32 = _S39 + d1_3;
+    textureStore((SeilerTexture3D), (vec3<u32>(u32(0), u32(0), u32(1))), vec4<f32>((_S47), 0, 0, 1));
+    var _S48 : f32 = _S44 + d4_0;
+    textureStore((SeilerTexture3D), (vec3<u32>(u32(1), u32(0), u32(1))), vec4<f32>((_S48), 0, 0, 1));
+    textureStore((SeilerTexture3D), (vec3<u32>(u32(0), u32(1), u32(1))), vec4<f32>((_S47 + d2_2), 0, 0, 1));
+    textureStore((SeilerTexture3D), (vec3<u32>(u32(1), u32(1), u32(1))), vec4<f32>((_S48 + d3_1), 0, 0, 1));
     return;
 }
 
 fn MakeQuintic_0()
 {
-    const _S19 : vec3<u32> = vec3<u32>(u32(0), u32(0), u32(0));
-    textureStore((DCTexture3D), (_S19), vec4<f32>((_MakeCurveTextures_0CB.CP1_0), 0, 0, 1));
-    const _S20 : vec3<u32> = vec3<u32>(u32(1), u32(0), u32(0));
-    textureStore((DCTexture3D), (_S20), vec4<f32>((_MakeCurveTextures_0CB.CP2_0), 0, 0, 1));
-    const _S21 : vec3<u32> = vec3<u32>(u32(0), u32(1), u32(0));
-    textureStore((DCTexture3D), (_S21), vec4<f32>((_MakeCurveTextures_0CB.CP2_0), 0, 0, 1));
-    const _S22 : vec3<u32> = vec3<u32>(u32(1), u32(1), u32(0));
-    textureStore((DCTexture3D), (_S22), vec4<f32>((_MakeCurveTextures_0CB.CP3_0), 0, 0, 1));
-    const _S23 : vec3<u32> = vec3<u32>(u32(0), u32(0), u32(1));
-    textureStore((DCTexture3D), (_S23), vec4<f32>((_MakeCurveTextures_0CB.CP2_0), 0, 0, 1));
-    const _S24 : vec3<u32> = vec3<u32>(u32(1), u32(0), u32(1));
-    textureStore((DCTexture3D), (_S24), vec4<f32>((_MakeCurveTextures_0CB.CP3_0), 0, 0, 1));
-    const _S25 : vec3<u32> = vec3<u32>(u32(0), u32(1), u32(1));
-    textureStore((DCTexture3D), (_S25), vec4<f32>((_MakeCurveTextures_0CB.CP3_0), 0, 0, 1));
-    const _S26 : vec3<u32> = vec3<u32>(u32(1), u32(1), u32(1));
-    textureStore((DCTexture3D), (_S26), vec4<f32>((_MakeCurveTextures_0CB.CP4_0), 0, 0, 1));
-    textureStore((DCTexture3D), (vec3<u32>(u32(0), u32(0), u32(2))), vec4<f32>((_MakeCurveTextures_0CB.CP3_0), 0, 0, 1));
-    textureStore((DCTexture3D), (vec3<u32>(u32(1), u32(0), u32(2))), vec4<f32>((_MakeCurveTextures_0CB.CP4_0), 0, 0, 1));
-    textureStore((DCTexture3D), (vec3<u32>(u32(0), u32(1), u32(2))), vec4<f32>((_MakeCurveTextures_0CB.CP4_0), 0, 0, 1));
-    textureStore((DCTexture3D), (vec3<u32>(u32(1), u32(1), u32(2))), vec4<f32>((_MakeCurveTextures_0CB.CP5_0), 0, 0, 1));
-    textureStore((DCTexture3D), (vec3<u32>(u32(0), u32(0), u32(3))), vec4<f32>((_MakeCurveTextures_0CB.CP4_0), 0, 0, 1));
-    textureStore((DCTexture3D), (vec3<u32>(u32(1), u32(0), u32(3))), vec4<f32>((_MakeCurveTextures_0CB.CP5_0), 0, 0, 1));
-    textureStore((DCTexture3D), (vec3<u32>(u32(0), u32(1), u32(3))), vec4<f32>((_MakeCurveTextures_0CB.CP5_0), 0, 0, 1));
-    textureStore((DCTexture3D), (vec3<u32>(u32(1), u32(1), u32(3))), vec4<f32>((_MakeCurveTextures_0CB.CP6_0), 0, 0, 1));
-    var b0_3 : f32 = _MakeCurveTextures_0CB.CP1_0;
-    var b5_0 : f32 = _MakeCurveTextures_0CB.CP6_0;
-    var _S27 : f32 = _MakeCurveTextures_0CB.CP2_0 - _MakeCurveTextures_0CB.CP1_0;
-    var d1_3 : f32 = 5.0f * _S27 - (_MakeCurveTextures_0CB.CP6_0 - _MakeCurveTextures_0CB.CP1_0);
-    var _S28 : f32 = _MakeCurveTextures_0CB.CP5_0 - _MakeCurveTextures_0CB.CP6_0;
-    var d4_0 : f32 = 5.0f * _S28 - (_MakeCurveTextures_0CB.CP1_0 - _MakeCurveTextures_0CB.CP6_0);
-    var d2_2 : f32 = 10.0f * (_MakeCurveTextures_0CB.CP3_0 - _MakeCurveTextures_0CB.CP2_0) - 3.0f * _S27 - 2.0f * _S28 - 3.0f * (_MakeCurveTextures_0CB.CP5_0 - _MakeCurveTextures_0CB.CP2_0);
-    var d3_1 : f32 = 10.0f * (_MakeCurveTextures_0CB.CP4_0 - _MakeCurveTextures_0CB.CP5_0) - 3.0f * _S28 - 2.0f * _S27 - 3.0f * (_MakeCurveTextures_0CB.CP2_0 - _MakeCurveTextures_0CB.CP5_0);
-    textureStore((SeilerTexture3D), (_S19), vec4<f32>((_MakeCurveTextures_0CB.CP1_0), 0, 0, 1));
-    textureStore((SeilerTexture3D), (_S20), vec4<f32>((b5_0), 0, 0, 1));
-    textureStore((SeilerTexture3D), (_S21), vec4<f32>((b0_3), 0, 0, 1));
-    textureStore((SeilerTexture3D), (_S22), vec4<f32>((b5_0), 0, 0, 1));
-    var _S29 : f32 = b0_3 + d1_3;
-    textureStore((SeilerTexture3D), (_S23), vec4<f32>((_S29), 0, 0, 1));
-    var _S30 : f32 = b5_0 + d4_0;
-    textureStore((SeilerTexture3D), (_S24), vec4<f32>((_S30), 0, 0, 1));
-    textureStore((SeilerTexture3D), (_S25), vec4<f32>((_S29 + d2_2), 0, 0, 1));
-    textureStore((SeilerTexture3D), (_S26), vec4<f32>((_S30 + d3_1), 0, 0, 1));
+    DeCasteljauTexture_Write_Quintic_0(_MakeCurveTextures_0CB.CP1_0, _MakeCurveTextures_0CB.CP2_0, _MakeCurveTextures_0CB.CP3_0, _MakeCurveTextures_0CB.CP4_0, _MakeCurveTextures_0CB.CP5_0, _MakeCurveTextures_0CB.CP6_0);
+    SeilerTexture_Write_Quintic_0(_MakeCurveTextures_0CB.CP1_0, _MakeCurveTextures_0CB.CP2_0, _MakeCurveTextures_0CB.CP3_0, _MakeCurveTextures_0CB.CP4_0, _MakeCurveTextures_0CB.CP5_0, _MakeCurveTextures_0CB.CP6_0);
     return;
 }
 
@@ -601,24 +631,24 @@ fn MakeQuintic_0()
 @workgroup_size(1, 1, 1)
 fn main(@builtin(global_invocation_id) DTid_0 : vec3<u32>)
 {
-    var _S31 : bool;
+    var _S49 : bool;
     if((DTid_0.x) > u32(0))
     {
-        _S31 = true;
+        _S49 = true;
     }
     else
     {
-        _S31 = (DTid_0.y) > u32(0);
+        _S49 = (DTid_0.y) > u32(0);
     }
-    if(_S31)
+    if(_S49)
     {
-        _S31 = true;
+        _S49 = true;
     }
     else
     {
-        _S31 = (DTid_0.z) > u32(0);
+        _S49 = (DTid_0.z) > u32(0);
     }
-    if(_S31)
+    if(_S49)
     {
         return;
     }

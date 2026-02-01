@@ -215,6 +215,14 @@
         {
             "fileName": "Bezier.hlsli",
             "type": "Shader"
+        },
+        {
+            "fileName": "DeCasteljauTexture.hlsli",
+            "type": "Shader"
+        },
+        {
+            "fileName": "SeilerTexture.hlsli",
+            "type": "Shader"
         }
     ],
     "nodes": [
