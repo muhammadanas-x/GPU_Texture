@@ -137,76 +137,98 @@ format, leading to unavoidable quantization errors \cite{CUDA_PG}.  If this is a
 \AW{Show jaggies from X.8 interpolation in one of the diagrams}
 
 \section{Extending to Seiler interpolation}
-Seiler interpolation introduces a more efficient formulation for evaluating cubic Bézier curves, requiring only three linear interpolations, compared to the six required by the classical De Casteljau method. This reduction is achieved through the use of difference terms.
+Seiler interpolation provides a more efficient method for evaluating cubic Bézier curves, requiring only \textbf{three linear interpolations} instead of the six needed by the classical De Casteljau algorithm. This efficiency is achieved through the introduction of \textbf{difference terms}.
 
-Given a cubic polynomial curve $C(t)$ defined by control points $b_0,b_1,b_2,b_3$, two difference vectors are constructed as
+For a cubic curve $C(t)$ defined by control points $b_0, b_1, b_2, b_3$, two difference vectors are defined as:
 \[
-d_1=3(b_1-b_0)-(b_3-b_0), \quad d_2=3(b_2-b_3)-(b_0-b_3).
+d_1 = 3(b_1 - b_0) - (b_3 - b_0), \quad 
+d_2 = 3(b_2 - b_3) - (b_0 - b_3).
 \]
 
-From these, two auxiliary Seiler points are defined as
+From these, two auxiliary \textbf{Seiler points} are constructed:
 \[
-s_1=b_0+d_1, \quad s_2=b_3+d_2.
+s_1 = b_0 + d_1, \quad s_2 = b_3 + d_2.
 \]
 
-Curve evaluation then proceeds via three linear interpolations:
+The curve is then evaluated using three linear interpolations:
 \[
-b_{03}=L(b_0,b_3,t), \quad s_{12}=L(s_1,s_2,t),
+b_{03} = L(b_0, b_3, t), \quad 
+s_{12} = L(s_1, s_2, t), \quad 
+C(t) = L(b_{03}, s_{12}, (1-t)t),
 \]
-followed by the final interpolation
+where $L(A,B,t)$ denotes linear interpolation between $A$ and $B$ with parameter $t$.
+
+\subsection*{Generalization to Higher-Degree Curves}
+
+For curves of degree less than $6$, this approach can be extended to an $n$-dimensional hypercube with $2^n$ pixels ($n>1$), allowing the construction of a $(N-1)$-degree curve using $N$ control points.
+
+\paragraph{Second- and Third-Degree Polynomials}
+
+For second- and third-degree polynomials, a $2\times2$ texture can be used. Sampling is performed at
 \[
-C(t)=L(b_{03},s_{12},(1-t)t).
+uv = (t, s t), \quad \text{where } s = 1-t.
 \]
 
-So if we were to generalize this for curves of degree $<6$, we can say that for $n$-dimensional hypercube having $2^n$ pixels where $n>1$, we can construct $(N-1)$-degree curve with $N$ control points. For $2$nd and $3$rd degree order polynomials $u$ would store as
+For a quadratic (2nd-degree):
 \[
-\begin{array}{cc}
+\begin{bmatrix}
 B_0 & B_2 \\
 B_0 + d_1 & B_2 + d_1
-\end{array}
+\end{bmatrix}
 \]
-and
+
+For a cubic (3rd-degree):
 \[
-\begin{array}{cc}
+\begin{bmatrix}
 B_0 & B_3 \\
 B_0 + d_1 & B_3 + d_2
-\end{array}
+\end{bmatrix}
 \]
-respectively, whereas for $4$th and $5$th degree polynomial you would store as
 
-For quartic:
+\paragraph{Fourth- and Fifth-Degree Polynomials}
+
+For fourth- and fifth-degree polynomials, a $2 \times 2 \times 2$ volume texture is used, with sampling at
+\[
+uvw = (t, s t, s t), \quad s = 1-t.
+\]
+
+For a quartic (4th-degree):
 \[
 \begin{array}{c|c}
-z=0 & \begin{array}{cc}
-b_0 + d_1 & b_4 + d_3 \\
-b_0 + d_1 + d_2 & b_4 + d_3 + d_2
-\end{array} \\
+z=0 & 
+\begin{bmatrix}
+B_0 + d_1 & B_4 + d_3 \\
+B_0 + d_1 + d_2 & B_4 + d_3 + d_2
+\end{bmatrix} \\
 \hline
-z=1 & \begin{array}{cc}
+z=1 & 
+\begin{bmatrix}
 B_0 & B_4 \\
 B_0 & B_4
-\end{array}
+\end{bmatrix}
 \end{array}
 \]
 
-And for quintic:
+For a quintic (5th-degree):
 \[
 \begin{array}{c|c}
-z=0 & \begin{array}{cc}
+z=0 & 
+\begin{bmatrix}
 B_0 + d_1 & B_5 + d_4 \\
 B_0 + d_1 + d_2 & B_5 + d_4 + d_3
-\end{array} \\
+\end{bmatrix} \\
 \hline
-z=1 & \begin{array}{cc}
+z=1 & 
+\begin{bmatrix}
 B_0 & B_5 \\
 B_0 & B_5
-\end{array}
+\end{bmatrix}
 \end{array}
 \]
-respectively.
 
-Since Seiler curves have not yet been extended to higher order $d>5$ polynomials we cannot produce a generalized result. Though it may be noted that there is redundant storage as you see in the quartic and quintic texture, if the new difference rules do appear we might be able to put a higher degree order polynomial curve there!
+\subsection*{Notes}
 
+Seiler interpolation has not yet been extended beyond degree $5$, so a fully generalized formula for higher-degree polynomials does not exist. Note the \textbf{redundant storage} in the quartic and quintic textures; if new difference rules are discovered, higher-degree curves could potentially be encoded efficiently using this approach.
 \section{Results}
 
 \AW{Muhammad to fill this in?}
