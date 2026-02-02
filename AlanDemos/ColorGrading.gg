@@ -101,35 +101,27 @@
                 {
                     "name": "DCTexture2D",
                     "access": "SRV",
-                    "type": "Texture",
-                    "texture": {
-                        "viewType": "Float"
-                    }
+                    "type": "Texture"
                 },
                 {
                     "name": "DCTexture3D",
                     "access": "SRV",
                     "type": "Texture",
                     "texture": {
-                        "dimension": "Texture3D",
-                        "viewType": "Float"
+                        "dimension": "Texture3D"
                     }
                 },
                 {
                     "name": "SeilerTexture2D",
                     "access": "SRV",
-                    "type": "Texture",
-                    "texture": {
-                        "viewType": "Float"
-                    }
+                    "type": "Texture"
                 },
                 {
                     "name": "SeilerTexture3D",
                     "access": "SRV",
                     "type": "Texture",
                     "texture": {
-                        "dimension": "Texture3D",
-                        "viewType": "Float"
+                        "dimension": "Texture3D"
                     }
                 }
             ],
@@ -141,7 +133,7 @@
         },
         {
             "name": "MakeCurveTextures",
-            "fileName": "ViewCurves_MakeCurveTextures.hlsl",
+            "fileName": "ColorGrading_MakeCurveTextures.hlsl",
             "NumThreads": [
                 1,
                 1,
@@ -151,35 +143,27 @@
                 {
                     "name": "DCTexture2D",
                     "access": "UAV",
-                    "type": "Texture",
-                    "texture": {
-                        "viewType": "Float"
-                    }
+                    "type": "Texture"
                 },
                 {
                     "name": "DCTexture3D",
                     "access": "UAV",
                     "type": "Texture",
                     "texture": {
-                        "dimension": "Texture3D",
-                        "viewType": "Float"
+                        "dimension": "Texture3D"
                     }
                 },
                 {
                     "name": "SeilerTexture2D",
                     "access": "UAV",
-                    "type": "Texture",
-                    "texture": {
-                        "viewType": "Float"
-                    }
+                    "type": "Texture"
                 },
                 {
                     "name": "SeilerTexture3D",
                     "access": "UAV",
                     "type": "Texture",
                     "texture": {
-                        "dimension": "Texture3D",
-                        "viewType": "Float"
+                        "dimension": "Texture3D"
                     }
                 }
             ]
@@ -303,7 +287,7 @@
                     130.0
                 ],
                 "format": {
-                    "format": "R32_Float"
+                    "format": "RGBA32_Float"
                 },
                 "size": {
                     "multiply": [
