@@ -227,8 +227,8 @@
             }
 
             const device = await adapter.requestDevice({
-                requiredLimits: {  },
-                requiredFeatures: [  ],
+                requiredLimits: { maxStorageTexturesPerShaderStage: 8 },
+                requiredFeatures: [ 'float32-filterable' ],
             });
 
             const context = canvas.getContext("webgpu");
@@ -652,7 +652,15 @@
                         <option value="">----- Imported Textures -----</option><br/>
                         <option value="Input">Input</option><br/>
                         <option value="">----- Internal Textures -----</option><br/>
+                        <option value="DCTexture2D">DCTexture2D</option><br/>
+                        <option value="DCTexture3D">DCTexture3D</option><br/>
+                        <option value="MakeCurveTextures_DCTexture2D_ReadOnly">MakeCurveTextures_DCTexture2D_ReadOnly</option><br/>
+                        <option value="MakeCurveTextures_DCTexture3D_ReadOnly">MakeCurveTextures_DCTexture3D_ReadOnly</option><br/>
+                        <option value="MakeCurveTextures_SeilerTexture2D_ReadOnly">MakeCurveTextures_SeilerTexture2D_ReadOnly</option><br/>
+                        <option value="MakeCurveTextures_SeilerTexture3D_ReadOnly">MakeCurveTextures_SeilerTexture3D_ReadOnly</option><br/>
                         <option value="Output">Output</option><br/>
+                        <option value="SeilerTexture2D">SeilerTexture2D</option><br/>
+                        <option value="SeilerTexture3D">SeilerTexture3D</option><br/>
                         <option value="Transform_Output_ReadOnly">Transform_Output_ReadOnly</option><br/>
                     </select>
                 </td>

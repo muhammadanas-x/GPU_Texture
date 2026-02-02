@@ -3,6 +3,8 @@
 
 #include "sRGB.hlsli"
 #include "Bezier.hlsli"
+#include "SeilerTexture.hlsli"
+#include "DeCasteljauTexture.hlsli"
 
 float3 EvaluateBezier_Linear_float3(float3 t, float3 CP1, float3 CP2)
 {
@@ -49,7 +51,7 @@ float3 EvaluateBezier_Quintic_float3(float3 t, float3 CP1, float3 CP2, float3 CP
     );
 }
 
-float3 EvaluateBezierPolynomial(float3 t)
+float3 EvaluatePolynomial(float3 t)
 {
     switch (/*$(Variable:CurveOrder)*/)
     {
@@ -62,6 +64,122 @@ float3 EvaluateBezierPolynomial(float3 t)
     return 0.0f;
 }
 
+float3 DeCasteljauTexture_Read_Linear_float3(float3 t)
+{
+    return float3(
+        DeCasteljauTexture_Read_Linear(DCTexture2D, t.x, LinearSampler),
+        DeCasteljauTexture_Read_Linear(DCTexture2D, t.y, LinearSampler),
+        DeCasteljauTexture_Read_Linear(DCTexture2D, t.z, LinearSampler)
+    );
+}
+
+float3 DeCasteljauTexture_Read_Quadratic_float3(float3 t)
+{
+    return float3(
+        DeCasteljauTexture_Read_Quadratic(DCTexture2D, t.x, LinearSampler),
+        DeCasteljauTexture_Read_Quadratic(DCTexture2D, t.y, LinearSampler),
+        DeCasteljauTexture_Read_Quadratic(DCTexture2D, t.z, LinearSampler)
+    );
+}
+
+float3 DeCasteljauTexture_Read_Cubic_float3(float3 t)
+{
+    return float3(
+        DeCasteljauTexture_Read_Cubic(DCTexture3D, t.x, LinearSampler),
+        DeCasteljauTexture_Read_Cubic(DCTexture3D, t.y, LinearSampler),
+        DeCasteljauTexture_Read_Cubic(DCTexture3D, t.z, LinearSampler)
+    );
+}
+
+float3 DeCasteljauTexture_Read_Quartic_float3(float3 t)
+{
+    return float3(
+        DeCasteljauTexture_Read_Quartic(DCTexture3D, t.x, LinearSampler),
+        DeCasteljauTexture_Read_Quartic(DCTexture3D, t.y, LinearSampler),
+        DeCasteljauTexture_Read_Quartic(DCTexture3D, t.z, LinearSampler)
+    );
+}
+
+float3 DeCasteljauTexture_Read_Quintic_float3(float3 t)
+{
+    return float3(
+        DeCasteljauTexture_Read_Quintic(DCTexture3D, t.x, LinearSampler),
+        DeCasteljauTexture_Read_Quintic(DCTexture3D, t.y, LinearSampler),
+        DeCasteljauTexture_Read_Quintic(DCTexture3D, t.z, LinearSampler)
+    );
+}
+
+float3 EvaluateTextureDeCasteljau(float3 t)
+{
+    switch (/*$(Variable:CurveOrder)*/)
+    {
+        case CurveOrders::Linear: return DeCasteljauTexture_Read_Linear_float3(t);
+        case CurveOrders::Quadratic: return DeCasteljauTexture_Read_Quadratic_float3(t);
+        case CurveOrders::Cubic: return DeCasteljauTexture_Read_Cubic_float3(t);
+        case CurveOrders::Quartic: return DeCasteljauTexture_Read_Quartic_float3(t);
+        case CurveOrders::Quintic: return DeCasteljauTexture_Read_Quintic_float3(t);
+    }
+    return 0.0f;
+}
+
+float3 SeilerTexture_Read_Linear_float3(float3 t)
+{
+    return float3(
+        SeilerTexture_Read_Linear(SeilerTexture2D, t.x, LinearSampler),
+        SeilerTexture_Read_Linear(SeilerTexture2D, t.y, LinearSampler),
+        SeilerTexture_Read_Linear(SeilerTexture2D, t.z, LinearSampler)
+    );
+}
+
+float3 SeilerTexture_Read_Quadratic_float3(float3 t)
+{
+    return float3(
+        SeilerTexture_Read_Quadratic(SeilerTexture2D, t.x, LinearSampler),
+        SeilerTexture_Read_Quadratic(SeilerTexture2D, t.y, LinearSampler),
+        SeilerTexture_Read_Quadratic(SeilerTexture2D, t.z, LinearSampler)
+    );
+}
+
+float3 SeilerTexture_Read_Cubic_float3(float3 t)
+{
+    return float3(
+        SeilerTexture_Read_Cubic(SeilerTexture2D, t.x, LinearSampler),
+        SeilerTexture_Read_Cubic(SeilerTexture2D, t.y, LinearSampler),
+        SeilerTexture_Read_Cubic(SeilerTexture2D, t.z, LinearSampler)
+    );
+}
+
+float3 SeilerTexture_Read_Quartic_float3(float3 t)
+{
+    return float3(
+        SeilerTexture_Read_Quartic(SeilerTexture3D, t.x, LinearSampler),
+        SeilerTexture_Read_Quartic(SeilerTexture3D, t.y, LinearSampler),
+        SeilerTexture_Read_Quartic(SeilerTexture3D, t.z, LinearSampler)
+    );
+}
+
+float3 SeilerTexture_Read_Quintic_float3(float3 t)
+{
+    return float3(
+        SeilerTexture_Read_Quintic(SeilerTexture3D, t.x, LinearSampler),
+        SeilerTexture_Read_Quintic(SeilerTexture3D, t.y, LinearSampler),
+        SeilerTexture_Read_Quintic(SeilerTexture3D, t.z, LinearSampler)
+    );
+}
+
+float3 EvaluateTextureSeiler(float3 t)
+{
+    switch (/*$(Variable:CurveOrder)*/)
+    {
+        case CurveOrders::Linear: return SeilerTexture_Read_Linear_float3(t);
+        case CurveOrders::Quadratic: return SeilerTexture_Read_Quadratic_float3(t);
+        case CurveOrders::Cubic: return SeilerTexture_Read_Cubic_float3(t);
+        case CurveOrders::Quartic: return SeilerTexture_Read_Quartic_float3(t);
+        case CurveOrders::Quintic: return SeilerTexture_Read_Quintic_float3(t);
+    }
+    return 0.0f;
+}
+
 /*$(_compute:main)*/(uint3 DTid : SV_DispatchThreadID)
 {
     uint2 px = DTid.xy;
@@ -69,16 +187,21 @@ float3 EvaluateBezierPolynomial(float3 t)
 
     switch (/*$(Variable:CurveType)*/)
     {
-        case CurveTypes::Polynomial: color = EvaluateBezierPolynomial(color); break;
+        case CurveTypes::Polynomial: color = EvaluatePolynomial(color); break;
+        case CurveTypes::TextureDeCasteljau: color = EvaluateTextureDeCasteljau(color); break;
+        case CurveTypes::TextureSeiler: color = EvaluateTextureSeiler(color); break;
+        default: color = float3(1.0f, 0.0f, 1.0f); break;
     }
-
-    // TODO: continue!
 
     Output[px] = float4(LinearToSRGB(color), 1.0f);
 }
 
 /*
 Shader Resources:
-	Texture Input (as SRV)
-	Texture Output (as UAV)
+    Texture Input (as SRV)
+    Texture Output (as UAV)
+    Texture DCTexture2D (as SRV)
+    Texture DCTexture3D (as SRV)
+    Texture SeilerTexture2D (as SRV)
+    Texture SeilerTexture3D (as SRV)
 */
