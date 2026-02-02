@@ -190,6 +190,11 @@
         {
             "fileName": "SeilerTexture.hlsli",
             "type": "Shader"
+        },
+        {
+            "fileName": "Mountains.jpg",
+            "type": "Asset",
+            "binary": true
         }
     ],
     "nodes": [
