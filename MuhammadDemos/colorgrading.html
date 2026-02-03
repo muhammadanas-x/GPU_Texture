@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Volumetric Color Grading with 3D Texture | Three.js</title>
+    <title>Volumetric Color Grading with Raymarching | Three.js</title>
     <style>
         * {
             margin: 0;
@@ -197,48 +197,27 @@
         </div>
 
         <div class="control-section">
-            <h3>Curve Adjustment (Cubic Bézier)</h3>
+            <h3>Curve Adjustment</h3>
             <div class="slider-group">
                 <div class="slider-label">
-                    <span>Red Curve P1</span>
-                    <span id="red-p1-value">0.33</span>
+                    <span>Red Curve</span>
+                    <span id="red-value">0.50</span>
                 </div>
-                <input type="range" id="red-p1" min="0" max="1" step="0.01" value="0.33">
+                <input type="range" id="red-curve" min="0" max="1" step="0.01" value="0.5">
             </div>
             <div class="slider-group">
                 <div class="slider-label">
-                    <span>Red Curve P2</span>
-                    <span id="red-p2-value">0.67</span>
+                    <span>Green Curve</span>
+                    <span id="green-value">0.50</span>
                 </div>
-                <input type="range" id="red-p2" min="0" max="1" step="0.01" value="0.67">
+                <input type="range" id="green-curve" min="0" max="1" step="0.01" value="0.5">
             </div>
             <div class="slider-group">
                 <div class="slider-label">
-                    <span>Green Curve P1</span>
-                    <span id="green-p1-value">0.33</span>
+                    <span>Blue Curve</span>
+                    <span id="blue-value">0.50</span>
                 </div>
-                <input type="range" id="green-p1" min="0" max="1" step="0.01" value="0.33">
-            </div>
-            <div class="slider-group">
-                <div class="slider-label">
-                    <span>Green Curve P2</span>
-                    <span id="green-p2-value">0.67</span>
-                </div>
-                <input type="range" id="green-p2" min="0" max="1" step="0.01" value="0.67">
-            </div>
-            <div class="slider-group">
-                <div class="slider-label">
-                    <span>Blue Curve P1</span>
-                    <span id="blue-p1-value">0.33</span>
-                </div>
-                <input type="range" id="blue-p1" min="0" max="1" step="0.01" value="0.33">
-            </div>
-            <div class="slider-group">
-                <div class="slider-label">
-                    <span>Blue Curve P2</span>
-                    <span id="blue-p2-value">0.67</span>
-                </div>
-                <input type="range" id="blue-p2" min="0" max="1" step="0.01" value="0.67">
+                <input type="range" id="blue-curve" min="0" max="1" step="0.01" value="0.5">
             </div>
         </div>
 
@@ -258,12 +237,11 @@
     </div>
 
     <div class="info">
-        <h2>Volumetric Color Grading with 3D Texture LUT</h2>
-        <p>This demo uses a <strong>single 3D texture (2x2x2)</strong> to encode cubic Bézier curves for RGB color grading, as described in the GPU-Based Parametric Curves paper.</p>
-        <p>Each color channel (R, G, B) is stored as a cubic curve with control points P0, P1, P2, P3. The GPU's <code>trilinear interpolation</code> evaluates the cubic Bézier curve in a single texture lookup!</p>
-        <p><strong>Key Innovation:</strong> Color grading happens at <code>every raymarch iteration</code>, creating volumetric fog with depth-dependent color transformations.</p>
-        <p>The 3D texture stores 3 piecewise cubic curves (one per RGB channel) in a (6, 2, 2) texture, decoded via trilinear sampling.</p>
-        <p>Adjust the Bézier control points P1 and P2 for each channel to shape the color response curves. P0 is fixed at 0, P3 is fixed at 1.</p>
+        <h2>Volumetric Color Grading</h2>
+        <p>This demo applies color grading <strong>inside the raymarching loop</strong>, creating volumetric fog effects with custom color transformations.</p>
+        <p>Each raymarch step accumulates color through the grading LUT, allowing for atmospheric effects like colored fog, depth-based color shifts, and volumetric tinting.</p>
+        <p><strong>Key difference:</strong> Color grading happens at <code>every raymarch iteration</code>, not just at the final surface hit. This creates depth-dependent color effects.</p>
+        <p>Adjust fog density and start distance to control the volumetric effect intensity. Use mouse to orbit the camera.</p>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -373,90 +351,66 @@
 
         const controls = new OrbitControls(camera, renderer.domElement);
 
-        // Color grading state - Cubic Bézier control points
+        // Color grading state
+        const LUT_SIZE = 256;
         let curveData = {
-            red: { p1: 0.33, p2: 0.67 },    // P0=0, P3=1 are implicit
-            green: { p1: 0.33, p2: 0.67 },
-            blue: { p1: 0.33, p2: 0.67 }
+            red: 0.5,
+            green: 0.5,
+            blue: 0.5
         };
         let currentScene = 0;
         let fogDensity = 0.08;
         let fogStart = 2.0;
 
-        // Create 3D texture for color curves as 2D texture (6x4 layout)
-        // We encode a (6, 2, 2) 3D texture as a 2D texture where:
-        // - Width = 6 (3 curves * 2 pixels each)
-        // - Height = 4 (2 layers * 2 rows)
-        // Layout: Top 2 rows = z=0, Bottom 2 rows = z=1
-        const TEXTURE_WIDTH = 6;  // 2 pixels per curve * 3 curves
-        const TEXTURE_HEIGHT = 4;  // 2 layers * 2 rows
-        const TEXTURE_DEPTH = 2;
-        
-        const lut3DData = new Uint8Array(TEXTURE_WIDTH * TEXTURE_HEIGHT * 4);
-        const lut3DTexture = new THREE.DataTexture(lut3DData, TEXTURE_WIDTH, TEXTURE_HEIGHT, THREE.RGBAFormat);
-        lut3DTexture.minFilter = THREE.LinearFilter;
-        lut3DTexture.magFilter = THREE.LinearFilter;
-        lut3DTexture.wrapS = THREE.ClampToEdgeWrapping;
-        lut3DTexture.wrapT = THREE.ClampToEdgeWrapping;
-        lut3DTexture.needsUpdate = true;
+        // Create data texture for color curves (256x3 texture: R, G, B channels in rows)
+        const lutData = new Uint8Array(LUT_SIZE * 3 * 4); // 256 samples x 3 channels x RGBA
+        const lutTexture = new THREE.DataTexture(lutData, LUT_SIZE, 3, THREE.RGBAFormat);
+        lutTexture.magFilter = THREE.LinearFilter;
+        lutTexture.minFilter = THREE.LinearFilter;
+        lutTexture.needsUpdate = true;
 
-        // Encode cubic Bézier curves in 2D texture (simulating 3D)
-        // Layout: Top 2 rows = z=0 layer, Bottom 2 rows = z=1 layer
-        // For a cubic curve with control points P0, P1, P2, P3:
-        // Front layer (z=0): quadratic curve P0, P1, P2
-        // Back layer (z=1): quadratic curve P1, P2, P3
-        function update3DColorTexture() {
+        // Cubic Bezier evaluation
+        function cubicBezier(t, p0, p1, p2, p3) {
+            const u = 1 - t;
+            return u * u * u * p0 + 3 * u * u * t * p1 + 3 * u * t * t * p2 + t * t * t * p3;
+        }
+
+        // Generate curve in CPU and store in texture
+        function updateColorCurveTexture() {
+            // For each channel (R, G, B), generate a curve
             const channels = ['red', 'green', 'blue'];
             
             for (let ch = 0; ch < 3; ch++) {
-                const curve = curveData[channels[ch]];
-                const p0 = 0.0;
-                const p1 = curve.p1;
-                const p2 = curve.p2;
-                const p3 = 1.0;
+                const curveValue = curveData[channels[ch]];
                 
-                // Each curve occupies 2 pixels in width (x-axis)
-                const xOffset = ch * 2;
+                // Define control points for cubic Bezier curve
+                const p0y = 0;
+                const p1y = curveValue;
+                const p2y = 1 - curveValue;
+                const p3y = 1;
                 
-                // Encode the cubic curve in a 2x2x2 block
-                // Front layer (z=0, rows 0-1): quadratic P0, P1, P2
-                // Back layer (z=1, rows 2-3): quadratic P1, P2, P3
-                
-                // z=0, y=0, x=0: P0
-                setTexel(xOffset + 0, 0, p0);
-                // z=0, y=0, x=1: P1
-                setTexel(xOffset + 1, 0, p1);
-                // z=0, y=1, x=0: P1
-                setTexel(xOffset + 0, 1, p1);
-                // z=0, y=1, x=1: P2
-                setTexel(xOffset + 1, 1, p2);
-                
-                // z=1, y=0, x=0: P1 (row 2)
-                setTexel(xOffset + 0, 2, p1);
-                // z=1, y=0, x=1: P2 (row 2)
-                setTexel(xOffset + 1, 2, p2);
-                // z=1, y=1, x=0: P2 (row 3)
-                setTexel(xOffset + 0, 3, p2);
-                // z=1, y=1, x=1: P3 (row 3)
-                setTexel(xOffset + 1, 3, p3);
+                // Generate 256 samples
+                for (let i = 0; i < LUT_SIZE; i++) {
+                    const t = i / (LUT_SIZE - 1);
+                    const value = cubicBezier(t, p0y, p1y, p2y, p3y);
+                    const clamped = Math.max(0, Math.min(1, value));
+                    
+                    // Store in texture (row = channel, column = input value)
+                    const index = (ch * LUT_SIZE + i) * 4;
+                    lutData[index] = clamped * 255;
+                    lutData[index + 1] = clamped * 255;
+                    lutData[index + 2] = clamped * 255;
+                    lutData[index + 3] = 255;
+                }
             }
             
-            lut3DTexture.needsUpdate = true;
+            lutTexture.needsUpdate = true;
         }
 
-        function setTexel(x, y, value) {
-            const index = (y * TEXTURE_WIDTH + x) * 4;
-            const byteValue = Math.max(0, Math.min(255, Math.floor(value * 255)));
-            lut3DData[index] = byteValue;
-            lut3DData[index + 1] = byteValue;
-            lut3DData[index + 2] = byteValue;
-            lut3DData[index + 3] = 255;
-        }
+        // Initial curve generation
+        updateColorCurveTexture();
 
-        // Initial texture generation
-        update3DColorTexture();
-
-        // Raymarching shader with VOLUMETRIC color grading using 3D texture
+        // Raymarching shader with VOLUMETRIC color grading
         const vertexShader = `
             varying vec2 vUv;
             void main() {
@@ -469,12 +423,10 @@
             uniform float iTime;
             uniform vec2 iResolution;
             uniform int iScene;
-            uniform sampler2D uColorLUT3D;
+            uniform sampler2D uColorLUT;
             uniform float uFogDensity;
             uniform float uFogStart;
             varying vec2 vUv;
-
-            const vec2 textureSize = vec2(6.0, 4.0);
 
             // SDF primitives
             float sdSphere(vec3 p, float r) {
@@ -569,49 +521,12 @@
                                k.xxx * map(p + k.xxx * h));
             }
 
-            // Manual trilinear interpolation for cubic Bézier evaluation
-            // Samples a 2x2x2 block from 2D texture laid out as:
-            // Top 2 rows (y: 0-1) = z=0, Bottom 2 rows (y: 2-3) = z=1
-            float sampleCubicCurve(float t, float channelOffset) {
-                // Convert to 3D texture coordinates
-                vec3 uvw = vec3(t, t, t);
-                
-                // Sample all 8 corners of the 2x2x2 cube
-                // Layer z=0 (top 2 rows)
-                float v000 = texture2D(uColorLUT3D, vec2((channelOffset + 0.0) / textureSize.x, 0.0 / textureSize.y)).r;
-                float v100 = texture2D(uColorLUT3D, vec2((channelOffset + 1.0) / textureSize.x, 0.0 / textureSize.y)).r;
-                float v010 = texture2D(uColorLUT3D, vec2((channelOffset + 0.0) / textureSize.x, 1.0 / textureSize.y)).r;
-                float v110 = texture2D(uColorLUT3D, vec2((channelOffset + 1.0) / textureSize.x, 1.0 / textureSize.y)).r;
-                
-                // Layer z=1 (bottom 2 rows)
-                float v001 = texture2D(uColorLUT3D, vec2((channelOffset + 0.0) / textureSize.x, 2.0 / textureSize.y)).r;
-                float v101 = texture2D(uColorLUT3D, vec2((channelOffset + 1.0) / textureSize.x, 2.0 / textureSize.y)).r;
-                float v011 = texture2D(uColorLUT3D, vec2((channelOffset + 0.0) / textureSize.x, 3.0 / textureSize.y)).r;
-                float v111 = texture2D(uColorLUT3D, vec2((channelOffset + 1.0) / textureSize.x, 3.0 / textureSize.y)).r;
-                
-                // Trilinear interpolation
-                float v00 = mix(v000, v100, uvw.x);
-                float v01 = mix(v001, v101, uvw.x);
-                float v10 = mix(v010, v110, uvw.x);
-                float v11 = mix(v011, v111, uvw.x);
-                
-                float v0 = mix(v00, v10, uvw.y);
-                float v1 = mix(v01, v11, uvw.y);
-                
-                return mix(v0, v1, uvw.z);
-            }
-
-            // Apply color grading using 3D texture with trilinear interpolation
+            // Apply color grading using LUT texture
             vec3 applyColorGrading(vec3 color) {
-                // Sample each channel's cubic curve
-                // Red channel: x offset 0
-                // Green channel: x offset 2
-                // Blue channel: x offset 4
-                
-                float r = sampleCubicCurve(color.r, 0.5);
-                float g = sampleCubicCurve(color.g, 2.5);
-                float b = sampleCubicCurve(color.b, 4.5);
-                
+                // Fetch from data texture: row 0 = red curve, row 1 = green curve, row 2 = blue curve
+                float r = texture2D(uColorLUT, vec2(color.r, 0.16667)).r;
+                float g = texture2D(uColorLUT, vec2(color.g, 0.5)).r;
+                float b = texture2D(uColorLUT, vec2(color.b, 0.83333)).r;
                 return vec3(r, g, b);
             }
 
@@ -641,7 +556,7 @@
                             0.6 + 0.3 * sin(p.z * 0.5 + iTime * 0.4)
                         );
                         
-                        // Apply color grading to the fog using 3D texture
+                        // Apply color grading to the fog
                         vec3 gradedFog = applyColorGrading(fogColor);
                         
                         // Accumulate with density falloff
@@ -697,7 +612,7 @@
                 iTime: { value: 0 },
                 iResolution: { value: new THREE.Vector2(container.clientWidth, container.clientHeight) },
                 iScene: { value: currentScene },
-                uColorLUT3D: { value: lut3DTexture },
+                uColorLUT: { value: lutTexture },
                 uFogDensity: { value: fogDensity },
                 uFogStart: { value: fogStart }
             }
@@ -716,48 +631,16 @@
         }
         animate();
 
-        // Presets - now with P1 and P2 control points
+        // Presets
         const presets = {
-            neutral: { 
-                red: { p1: 0.33, p2: 0.67 }, 
-                green: { p1: 0.33, p2: 0.67 }, 
-                blue: { p1: 0.33, p2: 0.67 } 
-            },
-            cool: { 
-                red: { p1: 0.2, p2: 0.5 }, 
-                green: { p1: 0.33, p2: 0.67 }, 
-                blue: { p1: 0.5, p2: 0.8 } 
-            },
-            warm: { 
-                red: { p1: 0.5, p2: 0.8 }, 
-                green: { p1: 0.33, p2: 0.67 }, 
-                blue: { p1: 0.2, p2: 0.5 } 
-            },
-            contrast: { 
-                red: { p1: 0.1, p2: 0.9 }, 
-                green: { p1: 0.1, p2: 0.9 }, 
-                blue: { p1: 0.1, p2: 0.9 } 
-            },
-            cinematic: { 
-                red: { p1: 0.4, p2: 0.7 }, 
-                green: { p1: 0.25, p2: 0.6 }, 
-                blue: { p1: 0.3, p2: 0.65 } 
-            },
-            vibrant: { 
-                red: { p1: 0.45, p2: 0.75 }, 
-                green: { p1: 0.5, p2: 0.8 }, 
-                blue: { p1: 0.45, p2: 0.75 } 
-            },
-            foggy: { 
-                red: { p1: 0.15, p2: 0.4 }, 
-                green: { p1: 0.25, p2: 0.55 }, 
-                blue: { p1: 0.6, p2: 0.9 } 
-            },
-            sunset: { 
-                red: { p1: 0.7, p2: 0.95 }, 
-                green: { p1: 0.4, p2: 0.7 }, 
-                blue: { p1: 0.1, p2: 0.3 } 
-            }
+            neutral: { red: 0.5, green: 0.5, blue: 0.5 },
+            cool: { red: 0.3, green: 0.5, blue: 0.7 },
+            warm: { red: 0.7, green: 0.5, blue: 0.3 },
+            contrast: { red: 0.8, green: 0.8, blue: 0.8 },
+            cinematic: { red: 0.6, green: 0.4, blue: 0.5 },
+            vibrant: { red: 0.65, green: 0.7, blue: 0.65 },
+            foggy: { red: 0.2, green: 0.4, blue: 0.8 },
+            sunset: { red: 0.9, green: 0.6, blue: 0.2 }
         };
 
         // Event listeners
@@ -767,9 +650,9 @@
                 btn.classList.add('active');
                 
                 const preset = presets[btn.dataset.preset];
-                curveData = JSON.parse(JSON.stringify(preset)); // Deep copy
+                curveData = { ...preset };
                 updateSliders();
-                update3DColorTexture();
+                updateColorCurveTexture();
             });
         });
 
@@ -782,28 +665,29 @@
             });
         });
 
-        // Slider event listeners
-        const sliders = {
-            'red-p1': (v) => { curveData.red.p1 = v; },
-            'red-p2': (v) => { curveData.red.p2 = v; },
-            'green-p1': (v) => { curveData.green.p1 = v; },
-            'green-p2': (v) => { curveData.green.p2 = v; },
-            'blue-p1': (v) => { curveData.blue.p1 = v; },
-            'blue-p2': (v) => { curveData.blue.p2 = v; }
-        };
-
-        Object.keys(sliders).forEach(id => {
-            const slider = document.getElementById(id);
-            slider.addEventListener('input', (e) => {
-                const value = parseFloat(e.target.value);
-                sliders[id](value);
-                document.getElementById(`${id}-value`).textContent = value.toFixed(2);
-                update3DColorTexture();
-            });
-        });
-
+        const redSlider = document.getElementById('red-curve');
+        const greenSlider = document.getElementById('green-curve');
+        const blueSlider = document.getElementById('blue-curve');
         const fogDensitySlider = document.getElementById('fog-density');
         const fogStartSlider = document.getElementById('fog-start');
+
+        redSlider.addEventListener('input', (e) => {
+            curveData.red = parseFloat(e.target.value);
+            document.getElementById('red-value').textContent = curveData.red.toFixed(2);
+            updateColorCurveTexture();
+        });
+
+        greenSlider.addEventListener('input', (e) => {
+            curveData.green = parseFloat(e.target.value);
+            document.getElementById('green-value').textContent = curveData.green.toFixed(2);
+            updateColorCurveTexture();
+        });
+
+        blueSlider.addEventListener('input', (e) => {
+            curveData.blue = parseFloat(e.target.value);
+            document.getElementById('blue-value').textContent = curveData.blue.toFixed(2);
+            updateColorCurveTexture();
+        });
 
         fogDensitySlider.addEventListener('input', (e) => {
             fogDensity = parseFloat(e.target.value);
@@ -818,39 +702,25 @@
         });
 
         function updateSliders() {
-            document.getElementById('red-p1').value = curveData.red.p1;
-            document.getElementById('red-p2').value = curveData.red.p2;
-            document.getElementById('green-p1').value = curveData.green.p1;
-            document.getElementById('green-p2').value = curveData.green.p2;
-            document.getElementById('blue-p1').value = curveData.blue.p1;
-            document.getElementById('blue-p2').value = curveData.blue.p2;
-            
-            document.getElementById('red-p1-value').textContent = curveData.red.p1.toFixed(2);
-            document.getElementById('red-p2-value').textContent = curveData.red.p2.toFixed(2);
-            document.getElementById('green-p1-value').textContent = curveData.green.p1.toFixed(2);
-            document.getElementById('green-p2-value').textContent = curveData.green.p2.toFixed(2);
-            document.getElementById('blue-p1-value').textContent = curveData.blue.p1.toFixed(2);
-            document.getElementById('blue-p2-value').textContent = curveData.blue.p2.toFixed(2);
+            redSlider.value = curveData.red;
+            greenSlider.value = curveData.green;
+            blueSlider.value = curveData.blue;
+            document.getElementById('red-value').textContent = curveData.red.toFixed(2);
+            document.getElementById('green-value').textContent = curveData.green.toFixed(2);
+            document.getElementById('blue-value').textContent = curveData.blue.toFixed(2);
         }
 
         document.getElementById('randomize').addEventListener('click', () => {
-            curveData.red.p1 = Math.random();
-            curveData.red.p2 = Math.random();
-            curveData.green.p1 = Math.random();
-            curveData.green.p2 = Math.random();
-            curveData.blue.p1 = Math.random();
-            curveData.blue.p2 = Math.random();
+            curveData.red = Math.random();
+            curveData.green = Math.random();
+            curveData.blue = Math.random();
             updateSliders();
-            update3DColorTexture();
+            updateColorCurveTexture();
             document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
         });
 
         document.getElementById('reset').addEventListener('click', () => {
-            curveData = {
-                red: { p1: 0.33, p2: 0.67 },
-                green: { p1: 0.33, p2: 0.67 },
-                blue: { p1: 0.33, p2: 0.67 }
-            };
+            curveData = { red: 0.5, green: 0.5, blue: 0.5 };
             fogDensity = 0.08;
             fogStart = 2.0;
             updateSliders();
@@ -860,7 +730,7 @@
             document.getElementById('fog-start-value').textContent = fogStart.toFixed(2);
             material.uniforms.uFogDensity.value = fogDensity;
             material.uniforms.uFogStart.value = fogStart;
-            update3DColorTexture();
+            updateColorCurveTexture();
             document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
             document.querySelector('[data-preset="neutral"]').classList.add('active');
         });
