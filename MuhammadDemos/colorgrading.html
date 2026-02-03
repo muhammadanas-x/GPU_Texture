@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Volumetric Color Grading with Raymarching | Three.js</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0a0a0a;
+            color: #fff;
+            overflow-x: hidden;
+        }
+        #canvas-container {
+            width: 100%;
+            height: 70vh;
+            position: relative;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+        }
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+        .controls {
+            padding: 2rem;
+            background: #1a1a1a;
+            border-top: 2px solid #333;
+        }
+        .control-section {
+            margin-bottom: 2rem;
+        }
+        .control-section h3 {
+            margin-bottom: 1rem;
+            color: #64b5f6;
+            font-size: 1.1rem;
+        }
+        .preset-buttons {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-bottom: 1.5rem;
+        }
+        .preset-btn {
+            padding: 0.6rem 1.2rem;
+            background: #2c2c2c;
+            border: 1px solid #444;
+            color: #fff;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.2s;
+            font-size: 0.9rem;
+        }
+        .preset-btn:hover {
+            background: #3c3c3c;
+            border-color: #64b5f6;
+        }
+        .preset-btn.active {
+            background: #64b5f6;
+            border-color: #64b5f6;
+        }
+        .slider-group {
+            margin-bottom: 1rem;
+        }
+        .slider-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.3rem;
+            font-size: 0.9rem;
+        }
+        input[type="range"] {
+            width: 100%;
+            height: 6px;
+            background: #2c2c2c;
+            outline: none;
+            border-radius: 3px;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            background: #64b5f6;
+            cursor: pointer;
+            border-radius: 50%;
+        }
+        input[type="range"]::-moz-range-thumb {
+            width: 16px;
+            height: 16px;
+            background: #64b5f6;
+            cursor: pointer;
+            border-radius: 50%;
+            border: none;
+        }
+        .scene-selector {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+        .scene-btn {
+            padding: 0.6rem 1.2rem;
+            background: #2c2c2c;
+            border: 1px solid #444;
+            color: #fff;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.2s;
+            font-size: 0.9rem;
+        }
+        .scene-btn:hover {
+            background: #3c3c3c;
+            border-color: #81c784;
+        }
+        .scene-btn.active {
+            background: #81c784;
+            border-color: #81c784;
+        }
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+        .action-btn {
+            padding: 0.7rem 1.5rem;
+            background: #424242;
+            border: 1px solid #555;
+            color: #fff;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.2s;
+            font-size: 0.95rem;
+        }
+        .action-btn:hover {
+            background: #525252;
+        }
+        .info {
+            background: #1a1a1a;
+            padding: 2rem;
+            border-top: 2px solid #333;
+        }
+        .info h2 {
+            color: #64b5f6;
+            margin-bottom: 1rem;
+        }
+        .info p {
+            line-height: 1.6;
+            color: #ccc;
+            margin-bottom: 0.5rem;
+        }
+        .info code {
+            background: #2c2c2c;
+            padding: 2px 6px;
+            border-radius: 3px;
+            color: #81c784;
+        }
+    </style>
+</head>
+<body>
+    <div id="canvas-container"></div>
+    
+    <div class="controls">
+        <div class="control-section">
+            <h3>Color Grading Preset</h3>
+            <div class="preset-buttons">
+                <button class="preset-btn active" data-preset="neutral">Neutral</button>
+                <button class="preset-btn" data-preset="cool">Cool Tone</button>
+                <button class="preset-btn" data-preset="warm">Warm Tone</button>
+                <button class="preset-btn" data-preset="contrast">High Contrast</button>
+                <button class="preset-btn" data-preset="cinematic">Cinematic</button>
+                <button class="preset-btn" data-preset="vibrant">Vibrant</button>
+                <button class="preset-btn" data-preset="foggy">Foggy Blue</button>
+                <button class="preset-btn" data-preset="sunset">Sunset</button>
+            </div>
+        </div>
+
+        <div class="control-section">
+            <h3>Volumetric Settings</h3>
+            <div class="slider-group">
+                <div class="slider-label">
+                    <span>Fog Density</span>
+                    <span id="fog-value">0.08</span>
+                </div>
+                <input type="range" id="fog-density" min="0" max="0.3" step="0.01" value="0.08">
+            </div>
+            <div class="slider-group">
+                <div class="slider-label">
+                    <span>Fog Start Distance</span>
+                    <span id="fog-start-value">2.00</span>
+                </div>
+                <input type="range" id="fog-start" min="0" max="10" step="0.1" value="2">
+            </div>
+        </div>
+
+        <div class="control-section">
+            <h3>Curve Adjustment</h3>
+            <div class="slider-group">
+                <div class="slider-label">
+                    <span>Red Curve</span>
+                    <span id="red-value">0.50</span>
+                </div>
+                <input type="range" id="red-curve" min="0" max="1" step="0.01" value="0.5">
+            </div>
+            <div class="slider-group">
+                <div class="slider-label">
+                    <span>Green Curve</span>
+                    <span id="green-value">0.50</span>
+                </div>
+                <input type="range" id="green-curve" min="0" max="1" step="0.01" value="0.5">
+            </div>
+            <div class="slider-group">
+                <div class="slider-label">
+                    <span>Blue Curve</span>
+                    <span id="blue-value">0.50</span>
+                </div>
+                <input type="range" id="blue-curve" min="0" max="1" step="0.01" value="0.5">
+            </div>
+        </div>
+
+        <div class="control-section">
+            <h3>Raymarching Scene</h3>
+            <div class="scene-selector">
+                <button class="scene-btn active" data-scene="0">Floating Spheres</button>
+                <button class="scene-btn" data-scene="1">Torus & Boxes</button>
+                <button class="scene-btn" data-scene="2">Menger Sponge</button>
+            </div>
+        </div>
+
+        <div class="action-buttons">
+            <button class="action-btn" id="randomize">Randomize Colors</button>
+            <button class="action-btn" id="reset">Reset Settings</button>
+        </div>
+    </div>
+
+    <div class="info">
+        <h2>Volumetric Color Grading</h2>
+        <p>This demo applies color grading <strong>inside the raymarching loop</strong>, creating volumetric fog effects with custom color transformations.</p>
+        <p>Each raymarch step accumulates color through the grading LUT, allowing for atmospheric effects like colored fog, depth-based color shifts, and volumetric tinting.</p>
+        <p><strong>Key difference:</strong> Color grading happens at <code>every raymarch iteration</code>, not just at the final surface hit. This creates depth-dependent color effects.</p>
+        <p>Adjust fog density and start distance to control the volumetric effect intensity. Use mouse to orbit the camera.</p>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+        // Scene setup
+        const container = document.getElementById('canvas-container');
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);
+        camera.position.z = 5;
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(container.clientWidth, container.clientHeight);
+        container.appendChild(renderer.domElement);
+
+        // Orbit Controls
+        class OrbitControls {
+            constructor(camera, domElement) {
+                this.camera = camera;
+                this.domElement = domElement;
+                this.target = new THREE.Vector3();
+                this.isRotating = false;
+                this.rotateStart = new THREE.Vector2();
+                this.rotateEnd = new THREE.Vector2();
+                this.rotateDelta = new THREE.Vector2();
+                this.spherical = new THREE.Spherical();
+                this.sphericalDelta = new THREE.Spherical();
+                this.scale = 1;
+                this.panOffset = new THREE.Vector3();
+                this.zoomChanged = false;
+
+                this.rotateSpeed = 1.0;
+                this.zoomSpeed = 1.0;
+
+                this.domElement.addEventListener('mousedown', this.onMouseDown.bind(this));
+                this.domElement.addEventListener('wheel', this.onMouseWheel.bind(this));
+                this.domElement.addEventListener('contextmenu', (e) => e.preventDefault());
+            }
+
+            onMouseDown(event) {
+                event.preventDefault();
+                this.isRotating = true;
+                this.rotateStart.set(event.clientX, event.clientY);
+
+                document.addEventListener('mousemove', this.onMouseMove.bind(this));
+                document.addEventListener('mouseup', this.onMouseUp.bind(this));
+            }
+
+            onMouseMove(event) {
+                if (!this.isRotating) return;
+                this.rotateEnd.set(event.clientX, event.clientY);
+                this.rotateDelta.subVectors(this.rotateEnd, this.rotateStart).multiplyScalar(this.rotateSpeed);
+
+                const element = this.domElement;
+                this.sphericalDelta.theta = -2 * Math.PI * this.rotateDelta.x / element.clientHeight;
+                this.sphericalDelta.phi = -2 * Math.PI * this.rotateDelta.y / element.clientHeight;
+
+                this.rotateStart.copy(this.rotateEnd);
+                this.update();
+            }
+
+            onMouseUp() {
+                this.isRotating = false;
+                document.removeEventListener('mousemove', this.onMouseMove);
+                document.removeEventListener('mouseup', this.onMouseUp);
+            }
+
+            onMouseWheel(event) {
+                event.preventDefault();
+                if (event.deltaY < 0) {
+                    this.scale /= 0.95;
+                } else {
+                    this.scale *= 0.95;
+                }
+                this.zoomChanged = true;
+                this.update();
+            }
+
+            update() {
+                const offset = new THREE.Vector3();
+                const quat = new THREE.Quaternion().setFromUnitVectors(this.camera.up, new THREE.Vector3(0, 1, 0));
+                const quatInverse = quat.clone().invert();
+
+                const lastPosition = new THREE.Vector3();
+                lastPosition.copy(this.camera.position);
+
+                offset.copy(this.camera.position).sub(this.target);
+                offset.applyQuaternion(quat);
+
+                this.spherical.setFromVector3(offset);
+                this.spherical.theta += this.sphericalDelta.theta;
+                this.spherical.phi += this.sphericalDelta.phi;
+                this.spherical.phi = Math.max(0.01, Math.min(Math.PI - 0.01, this.spherical.phi));
+                this.spherical.radius *= this.scale;
+                this.spherical.radius = Math.max(1, Math.min(50, this.spherical.radius));
+
+                offset.setFromSpherical(this.spherical);
+                offset.applyQuaternion(quatInverse);
+                this.camera.position.copy(this.target).add(offset);
+                this.camera.lookAt(this.target);
+
+                this.sphericalDelta.set(0, 0, 0);
+                this.scale = 1;
+
+                return true;
+            }
+        }
+
+        const controls = new OrbitControls(camera, renderer.domElement);
+
+        // Color grading state
+        const LUT_SIZE = 256;
+        let curveData = {
+            red: 0.5,
+            green: 0.5,
+            blue: 0.5
+        };
+        let currentScene = 0;
+        let fogDensity = 0.08;
+        let fogStart = 2.0;
+
+        // Create data texture for color curves (256x3 texture: R, G, B channels in rows)
+        const lutData = new Uint8Array(LUT_SIZE * 3 * 4); // 256 samples x 3 channels x RGBA
+        const lutTexture = new THREE.DataTexture(lutData, LUT_SIZE, 3, THREE.RGBAFormat);
+        lutTexture.magFilter = THREE.LinearFilter;
+        lutTexture.minFilter = THREE.LinearFilter;
+        lutTexture.needsUpdate = true;
+
+        // Cubic Bezier evaluation
+        function cubicBezier(t, p0, p1, p2, p3) {
+            const u = 1 - t;
+            return u * u * u * p0 + 3 * u * u * t * p1 + 3 * u * t * t * p2 + t * t * t * p3;
+        }
+
+        // Generate curve in CPU and store in texture
+        function updateColorCurveTexture() {
+            // For each channel (R, G, B), generate a curve
+            const channels = ['red', 'green', 'blue'];
+            
+            for (let ch = 0; ch < 3; ch++) {
+                const curveValue = curveData[channels[ch]];
+                
+                // Define control points for cubic Bezier curve
+                const p0y = 0;
+                const p1y = curveValue;
+                const p2y = 1 - curveValue;
+                const p3y = 1;
+                
+                // Generate 256 samples
+                for (let i = 0; i < LUT_SIZE; i++) {
+                    const t = i / (LUT_SIZE - 1);
+                    const value = cubicBezier(t, p0y, p1y, p2y, p3y);
+                    const clamped = Math.max(0, Math.min(1, value));
+                    
+                    // Store in texture (row = channel, column = input value)
+                    const index = (ch * LUT_SIZE + i) * 4;
+                    lutData[index] = clamped * 255;
+                    lutData[index + 1] = clamped * 255;
+                    lutData[index + 2] = clamped * 255;
+                    lutData[index + 3] = 255;
+                }
+            }
+            
+            lutTexture.needsUpdate = true;
+        }
+
+        // Initial curve generation
+        updateColorCurveTexture();
+
+        // Raymarching shader with VOLUMETRIC color grading
+        const vertexShader = `
+            varying vec2 vUv;
+            void main() {
+                vUv = uv;
+                gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+            }
+        `;
+
+        const fragmentShader = `
+            uniform float iTime;
+            uniform vec2 iResolution;
+            uniform int iScene;
+            uniform sampler2D uColorLUT;
+            uniform float uFogDensity;
+            uniform float uFogStart;
+            varying vec2 vUv;
+
+            // SDF primitives
+            float sdSphere(vec3 p, float r) {
+                return length(p) - r;
+            }
+
+            float sdBox(vec3 p, vec3 b) {
+                vec3 q = abs(p) - b;
+                return length(max(q, 0.0)) + min(max(q.x, max(q.y, q.z)), 0.0);
+            }
+
+            float sdTorus(vec3 p, vec2 t) {
+                vec2 q = vec2(length(p.xz) - t.x, p.y);
+                return length(q) - t.y;
+            }
+
+            // Rotation
+            mat2 rot(float a) {
+                float s = sin(a), c = cos(a);
+                return mat2(c, -s, s, c);
+            }
+
+            // Scene 0: Floating spheres
+            float scene0(vec3 p) {
+                float d = 1e10;
+                for (int i = 0; i < 5; i++) {
+                    float fi = float(i);
+                    vec3 offset = vec3(
+                        sin(iTime * 0.5 + fi) * 2.0,
+                        cos(iTime * 0.7 + fi * 1.3) * 1.5,
+                        sin(iTime * 0.3 + fi * 2.1) * 2.0
+                    );
+                    d = min(d, sdSphere(p - offset, 0.5));
+                }
+                return d;
+            }
+
+            // Scene 1: Torus and boxes
+            float scene1(vec3 p) {
+                vec3 p1 = p;
+                p1.xz *= rot(iTime * 0.5);
+                float torus = sdTorus(p1, vec2(1.5, 0.3));
+                
+                vec3 p2 = p;
+                p2.xy *= rot(iTime * 0.7);
+                p2.yz *= rot(iTime * 0.5);
+                float box = sdBox(p2, vec3(0.6));
+                
+                return min(torus, box);
+            }
+
+            // Scene 2: Menger sponge
+            float sdMenger(vec3 p) {
+                float d = sdBox(p, vec3(1.0));
+                float s = 1.0;
+                for (int i = 0; i < 3; i++) {
+                    vec3 a = mod(p * s, 2.0) - 1.0;
+                    s *= 3.0;
+                    vec3 r = abs(1.0 - 3.0 * abs(a));
+                    float da = max(r.x, r.y);
+                    float db = max(r.y, r.z);
+                    float dc = max(r.z, r.x);
+                    float c = (min(da, min(db, dc)) - 1.0) / s;
+                    d = min(d, c);
+                }
+                return d;
+            }
+
+            float scene2(vec3 p) {
+                vec3 p1 = p;
+                p1.xy *= rot(iTime * 0.3);
+                p1.yz *= rot(iTime * 0.2);
+                return sdMenger(p1);
+            }
+
+            float map(vec3 p) {
+                if (iScene == 0) {
+                    return scene0(p);
+                } else if (iScene == 1) {
+                    return scene1(p);
+                } else {
+                    return scene2(p);
+                }
+            }
+
+            vec3 calcNormal(vec3 p) {
+                const float h = 0.0001;
+                const vec2 k = vec2(1, -1);
+                return normalize(k.xyy * map(p + k.xyy * h) +
+                               k.yyx * map(p + k.yyx * h) +
+                               k.yxy * map(p + k.yxy * h) +
+                               k.xxx * map(p + k.xxx * h));
+            }
+
+            // Apply color grading using LUT texture
+            vec3 applyColorGrading(vec3 color) {
+                // Fetch from data texture: row 0 = red curve, row 1 = green curve, row 2 = blue curve
+                float r = texture2D(uColorLUT, vec2(color.r, 0.16667)).r;
+                float g = texture2D(uColorLUT, vec2(color.g, 0.5)).r;
+                float b = texture2D(uColorLUT, vec2(color.b, 0.83333)).r;
+                return vec3(r, g, b);
+            }
+
+            void main() {
+                vec2 uv = (vUv - 0.5) * 2.0;
+                uv.x *= iResolution.x / iResolution.y;
+
+                vec3 ro = vec3(0, 0, 5);
+                vec3 rd = normalize(vec3(uv, -1.5));
+
+                float t = 0.0;
+                vec3 col = vec3(0);
+                vec3 volumetricCol = vec3(0);
+                bool hit = false;
+
+                // VOLUMETRIC RAYMARCHING with color grading at each step
+                for (int i = 0; i < 80; i++) {
+                    vec3 p = ro + rd * t;
+                    float d = map(p);
+                    
+                    // Volumetric fog accumulation with color grading
+                    if (t > uFogStart) {
+                        // Sample volumetric color based on position
+                        vec3 fogColor = vec3(
+                            0.5 + 0.3 * sin(p.x * 0.5 + iTime * 0.3),
+                            0.5 + 0.3 * sin(p.y * 0.5 + iTime * 0.2),
+                            0.6 + 0.3 * sin(p.z * 0.5 + iTime * 0.4)
+                        );
+                        
+                        // Apply color grading to the fog
+                        vec3 gradedFog = applyColorGrading(fogColor);
+                        
+                        // Accumulate with density falloff
+                        float density = uFogDensity * exp(-0.1 * (t - uFogStart));
+                        volumetricCol += gradedFog * density;
+                    }
+                    
+                    if (d < 0.001) {
+                        vec3 n = calcNormal(p);
+                        vec3 light = normalize(vec3(1, 1, 1));
+                        float diff = max(dot(n, light), 0.0);
+                        float spec = pow(max(dot(reflect(-light, n), -rd), 0.0), 32.0);
+                        
+                        // Base color based on scene
+                        vec3 baseCol;
+                        if (iScene == 0) {
+                            baseCol = vec3(0.3 + 0.3 * sin(p.x * 2.0 + iTime), 
+                                          0.4 + 0.3 * cos(p.y * 2.0 + iTime), 
+                                          0.6 + 0.2 * sin(p.z * 2.0 + iTime));
+                        } else if (iScene == 1) {
+                            baseCol = vec3(0.8, 0.4, 0.2);
+                        } else {
+                            baseCol = vec3(0.2, 0.6, 0.8);
+                        }
+                        
+                        col = baseCol * (0.3 + 0.7 * diff) + vec3(spec);
+                        hit = true;
+                        break;
+                    }
+                    if (t > 20.0) break;
+                    t += d;
+                }
+
+                // Background gradient
+                if (!hit) {
+                    col = mix(vec3(0.1, 0.1, 0.2), vec3(0.0, 0.0, 0.05), uv.y * 0.5 + 0.5);
+                }
+
+                // Combine surface color with volumetric fog
+                col = col + volumetricCol;
+                
+                // Apply final color grading to the combined result
+                col = applyColorGrading(col);
+
+                gl_FragColor = vec4(col, 1.0);
+            }
+        `;
+
+        const material = new THREE.ShaderMaterial({
+            vertexShader,
+            fragmentShader,
+            uniforms: {
+                iTime: { value: 0 },
+                iResolution: { value: new THREE.Vector2(container.clientWidth, container.clientHeight) },
+                iScene: { value: currentScene },
+                uColorLUT: { value: lutTexture },
+                uFogDensity: { value: fogDensity },
+                uFogStart: { value: fogStart }
+            }
+        });
+
+        const geometry = new THREE.PlaneGeometry(2, 2);
+        const mesh = new THREE.Mesh(geometry, material);
+        scene.add(mesh);
+
+        // Animation
+        function animate() {
+            requestAnimationFrame(animate);
+            material.uniforms.iTime.value += 0.01;
+            controls.update();
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        // Presets
+        const presets = {
+            neutral: { red: 0.5, green: 0.5, blue: 0.5 },
+            cool: { red: 0.3, green: 0.5, blue: 0.7 },
+            warm: { red: 0.7, green: 0.5, blue: 0.3 },
+            contrast: { red: 0.8, green: 0.8, blue: 0.8 },
+            cinematic: { red: 0.6, green: 0.4, blue: 0.5 },
+            vibrant: { red: 0.65, green: 0.7, blue: 0.65 },
+            foggy: { red: 0.2, green: 0.4, blue: 0.8 },
+            sunset: { red: 0.9, green: 0.6, blue: 0.2 }
+        };
+
+        // Event listeners
+        document.querySelectorAll('.preset-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                
+                const preset = presets[btn.dataset.preset];
+                curveData = { ...preset };
+                updateSliders();
+                updateColorCurveTexture();
+            });
+        });
+
+        document.querySelectorAll('.scene-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.scene-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentScene = parseInt(btn.dataset.scene);
+                material.uniforms.iScene.value = currentScene;
+            });
+        });
+
+        const redSlider = document.getElementById('red-curve');
+        const greenSlider = document.getElementById('green-curve');
+        const blueSlider = document.getElementById('blue-curve');
+        const fogDensitySlider = document.getElementById('fog-density');
+        const fogStartSlider = document.getElementById('fog-start');
+
+        redSlider.addEventListener('input', (e) => {
+            curveData.red = parseFloat(e.target.value);
+            document.getElementById('red-value').textContent = curveData.red.toFixed(2);
+            updateColorCurveTexture();
+        });
+
+        greenSlider.addEventListener('input', (e) => {
+            curveData.green = parseFloat(e.target.value);
+            document.getElementById('green-value').textContent = curveData.green.toFixed(2);
+            updateColorCurveTexture();
+        });
+
+        blueSlider.addEventListener('input', (e) => {
+            curveData.blue = parseFloat(e.target.value);
+            document.getElementById('blue-value').textContent = curveData.blue.toFixed(2);
+            updateColorCurveTexture();
+        });
+
+        fogDensitySlider.addEventListener('input', (e) => {
+            fogDensity = parseFloat(e.target.value);
+            document.getElementById('fog-value').textContent = fogDensity.toFixed(2);
+            material.uniforms.uFogDensity.value = fogDensity;
+        });
+
+        fogStartSlider.addEventListener('input', (e) => {
+            fogStart = parseFloat(e.target.value);
+            document.getElementById('fog-start-value').textContent = fogStart.toFixed(2);
+            material.uniforms.uFogStart.value = fogStart;
+        });
+
+        function updateSliders() {
+            redSlider.value = curveData.red;
+            greenSlider.value = curveData.green;
+            blueSlider.value = curveData.blue;
+            document.getElementById('red-value').textContent = curveData.red.toFixed(2);
+            document.getElementById('green-value').textContent = curveData.green.toFixed(2);
+            document.getElementById('blue-value').textContent = curveData.blue.toFixed(2);
+        }
+
+        document.getElementById('randomize').addEventListener('click', () => {
+            curveData.red = Math.random();
+            curveData.green = Math.random();
+            curveData.blue = Math.random();
+            updateSliders();
+            updateColorCurveTexture();
+            document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+        });
+
+        document.getElementById('reset').addEventListener('click', () => {
+            curveData = { red: 0.5, green: 0.5, blue: 0.5 };
+            fogDensity = 0.08;
+            fogStart = 2.0;
+            updateSliders();
+            fogDensitySlider.value = fogDensity;
+            fogStartSlider.value = fogStart;
+            document.getElementById('fog-value').textContent = fogDensity.toFixed(2);
+            document.getElementById('fog-start-value').textContent = fogStart.toFixed(2);
+            material.uniforms.uFogDensity.value = fogDensity;
+            material.uniforms.uFogStart.value = fogStart;
+            updateColorCurveTexture();
+            document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+            document.querySelector('[data-preset="neutral"]').classList.add('active');
+        });
+
+        // Handle resize
+        window.addEventListener('resize', () => {
+            const width = container.clientWidth;
+            const height = container.clientHeight;
+            camera.aspect = width / height;
+            camera.updateProjectionMatrix();
+            renderer.setSize(width, height);
+            material.uniforms.iResolution.value.set(width, height);
+        });
+    </script>
+</body>
+</html>
