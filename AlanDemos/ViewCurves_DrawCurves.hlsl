@@ -3,6 +3,8 @@
 
 #include "sRGB.hlsli"
 #include "Bezier.hlsli"
+#include "DeCasteljauTexture.hlsli"
+#include "SeilerTexture.hlsli"
 
 float EvaluateBezierPolynomial(float t)
 {
@@ -17,165 +19,28 @@ float EvaluateBezierPolynomial(float t)
     return 0.0f;
 }
 
-float EvaluateSeilerTexture_Linear(in Texture2D<float> tex, float t)
-{
-    // change percentage into uv
-    float2 uv = lerp(float2(0.25f, 0.25f), float2(0.75f, 0.75f), float2(t, 0.0f));
-    return tex.SampleLevel(LinearSampler, uv, 0);
-}
-
-float EvaluateSeilerTexture_Quadratic(in Texture2D<float> tex, float t)
-{
-    // change percentage into uv
-    float s = 1.0f - t;
-    float2 uv = lerp(float2(0.25f, 0.25f), float2(0.75f, 0.75f), float2(t, s*t));
-    return tex.SampleLevel(LinearSampler, uv, 0);
-}
-
-float EvaluateSeilerTexture_Cubic(in Texture2D<float> tex, float t)
-{
-    // change percentage into uv
-    float s = 1.0f - t;
-    float2 uv = lerp(float2(0.25f, 0.25f), float2(0.75f, 0.75f), float2(t, s * t));
-    return tex.SampleLevel(LinearSampler, uv, 0);
-}
-
-float EvaluateSeilerTexture_Quartic(in Texture3D<float> tex, float t)
-{
-    uint3 dims;
-    tex.GetDimensions(dims.x, dims.y, dims.z);
-
-    // change percentage into uv
-    float s = 1.0f - t;
-    float3 samplePosPx = lerp(float3(0.0f, 0.0f, 0.0f), float3(1.0f, 1.0f, 1.0f), float3(t, s * t, s * t));
-    float3 uvw = (samplePosPx + float3(0.5f, 0.5f, 0.5f)) / float3(dims);
-    return tex.SampleLevel(LinearSampler, uvw, 0);
-}
-
-float EvaluateSeilerTexture_Quintic(in Texture3D<float> tex, float t)
-{
-    uint3 dims;
-    tex.GetDimensions(dims.x, dims.y, dims.z);
-
-    // change percentage into uv
-    float s = 1.0f - t;
-    float3 samplePosPx = lerp(float3(0.0f, 0.0f, 0.0f), float3(1.0f, 1.0f, 1.0f), float3(t, s * t, s * t));
-    float3 uvw = (samplePosPx + float3(0.5f, 0.5f, 0.5f)) / float3(dims);
-    return tex.SampleLevel(LinearSampler, uvw, 0);
-}
-
 float EvaluateSeilerTexture(float t)
 {
     switch (/*$(Variable:CurveOrder)*/)
     {
-        case CurveOrders::Linear: return EvaluateSeilerTexture_Linear(SeilerTexture2D, t);
-        case CurveOrders::Quadratic: return EvaluateSeilerTexture_Quadratic(SeilerTexture2D, t);
-        case CurveOrders::Cubic: return EvaluateSeilerTexture_Cubic(SeilerTexture2D, t);
-        case CurveOrders::Quartic: return EvaluateSeilerTexture_Quartic(SeilerTexture3D, t);
-        case CurveOrders::Quintic: return EvaluateSeilerTexture_Quintic(SeilerTexture3D, t);
+        case CurveOrders::Linear: return SeilerTexture_Read_Linear(SeilerTexture2D, t, LinearSampler);
+        case CurveOrders::Quadratic: return SeilerTexture_Read_Quadratic(SeilerTexture2D, t, LinearSampler);
+        case CurveOrders::Cubic: return SeilerTexture_Read_Cubic(SeilerTexture2D, t, LinearSampler);
+        case CurveOrders::Quartic: return SeilerTexture_Read_Quartic(SeilerTexture3D, t, LinearSampler);
+        case CurveOrders::Quintic: return SeilerTexture_Read_Quintic(SeilerTexture3D, t, LinearSampler);
     }
     return 0.0f;
-}
-
-float EvaluateDeCasteljauTexture_Linear(in Texture2D<float> tex, float t)
-{
-    // change percentage into uv
-    float2 uv = lerp(float2(0.25f, 0.25f), float2(0.75f, 0.25f), t);
-    return tex.SampleLevel(LinearSampler, uv, 0);
-}
-
-float EvaluateDeCasteljauTexture_Quadratic(in Texture2D<float> tex, float t)
-{
-    // change percentage into uv
-    float2 uv = lerp(float2(0.25f, 0.25f), float2(0.75f, 0.75f), t);
-    return tex.SampleLevel(LinearSampler, uv, 0);
-}
-
-float EvaluateDeCasteljauTexture_Cubic(in Texture3D<float> tex, float t)
-{
-    uint3 dims;
-    tex.GetDimensions(dims.x, dims.y, dims.z);
-
-    // change percentage into uv
-    float3 samplePosPx = lerp(float3(0.0f, 0.0f, 0.0f), float3(1.0f, 1.0f, 1.0f), t);
-    float3 uvw = (samplePosPx + float3(0.5f, 0.5f, 0.5f)) / float3(dims);
-    return tex.SampleLevel(LinearSampler, uvw, 0);
-}
-
-float EvaluateDeCasteljauTexture_Quartic(in Texture3D<float> tex, float t)
-{
-    uint3 dims;
-    tex.GetDimensions(dims.x, dims.y, dims.z);
-
-    // Get the first cubic curve
-    float A;
-    {
-        // change percentage into uv
-        float3 samplePosPx = lerp(float3(0.0f, 0.0f, 0.0f), float3(1.0f, 1.0f, 1.0f), t);
-        float3 uvw = (samplePosPx + float3(0.5f, 0.5f, 0.5f)) / float3(dims);
-        A = tex.SampleLevel(LinearSampler, uvw, 0);
-    }
-
-    // Get the second cubic curve
-    float B;
-    {
-        // change percentage into uv
-        float3 samplePosPx = lerp(float3(0.0f, 0.0f, 1.0f), float3(1.0f, 1.0f, 2.0f), t);
-        float3 uvw = (samplePosPx + float3(0.5f, 0.5f, 0.5f)) / float3(dims);
-        B = tex.SampleLevel(LinearSampler, uvw, 0);
-    }
-
-    // lerp in shaders to make a quartic from these 2 cubics.
-    return lerp(A, B, t);
-}
-
-float EvaluateDeCasteljauTexture_Quintic(in Texture3D<float> tex, float t)
-{
-    uint3 dims;
-    tex.GetDimensions(dims.x, dims.y, dims.z);
-
-    // Get the first cubic curve
-    float A;
-    {
-        // change percentage into uv
-        float3 samplePosPx = lerp(float3(0.0f, 0.0f, 0.0f), float3(1.0f, 1.0f, 1.0f), t);
-        float3 uvw = (samplePosPx + float3(0.5f, 0.5f, 0.5f)) / float3(dims);
-        A = tex.SampleLevel(LinearSampler, uvw, 0);
-    }
-
-    // Get the second cubic curve
-    float B;
-    {
-        // change percentage into uv
-        float3 samplePosPx = lerp(float3(0.0f, 0.0f, 1.0f), float3(1.0f, 1.0f, 2.0f), t);
-        float3 uvw = (samplePosPx + float3(0.5f, 0.5f, 0.5f)) / float3(dims);
-        B = tex.SampleLevel(LinearSampler, uvw, 0);
-    }
-
-    // Get the third cubic curve
-    float C;
-    {
-        // change percentage into uv
-        float3 samplePosPx = lerp(float3(0.0f, 0.0f, 2.0f), float3(1.0f, 1.0f, 3.0f), t);
-        float3 uvw = (samplePosPx + float3(0.5f, 0.5f, 0.5f)) / float3(dims);
-        C = tex.SampleLevel(LinearSampler, uvw, 0);
-    }
-
-    // Use the quadratic bezier formulate in shaders, to make a quintic from these 3 cubics.
-    // We could also do a lerp of 2 lerps instead.
-    float s = 1.0f - t;
-    return A * s * s + 2.0f * B * s * t + C * t * t;
 }
 
 float EvaluateDeCasteljauTexture(float t)
 {
     switch (/*$(Variable:CurveOrder)*/)
     {
-        case CurveOrders::Linear: return EvaluateDeCasteljauTexture_Linear(DCTexture2D, t);
-        case CurveOrders::Quadratic: return EvaluateDeCasteljauTexture_Quadratic(DCTexture2D, t);
-        case CurveOrders::Cubic: return EvaluateDeCasteljauTexture_Cubic(DCTexture3D, t);
-        case CurveOrders::Quartic: return EvaluateDeCasteljauTexture_Quartic(DCTexture3D, t);
-        case CurveOrders::Quintic: return EvaluateDeCasteljauTexture_Quintic(DCTexture3D, t);
+        case CurveOrders::Linear: return DeCasteljauTexture_Read_Linear(DCTexture2D, t, LinearSampler);
+        case CurveOrders::Quadratic: return DeCasteljauTexture_Read_Quadratic(DCTexture2D, t, LinearSampler);
+        case CurveOrders::Cubic: return DeCasteljauTexture_Read_Cubic(DCTexture3D, t, LinearSampler);
+        case CurveOrders::Quartic: return DeCasteljauTexture_Read_Quartic(DCTexture3D, t, LinearSampler);
+        case CurveOrders::Quintic: return DeCasteljauTexture_Read_Quintic(DCTexture3D, t, LinearSampler);
     }
     return 0.0f;
 }
