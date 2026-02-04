@@ -6,6 +6,81 @@
 #include "SeilerTexture.hlsli"
 #include "DeCasteljauTexture.hlsli"
 
+#include "DemofoxNeonDesert_common.hlsl"
+
+float3 RenderScene(uint2 px)
+{
+    static const int c_numBounces = 4;
+    static const float c_apertureRadius = 0.4f;
+    static const float c_focalPlaneDistance = 80.0f;
+    static const bool c_reset = false;
+    static const uint c_rayMarchSteps = 256;
+    static const float c_minStepDistance = 0.1f;
+    static const int c_raysPerFrame = 16;
+
+    // initialize a random number state based on frag coord and frame
+    uint rngState = uint(uint(px.x) * uint(1973) + uint(px.y) * uint(9277) + uint(/*$(Variable:iFrame)*/) * uint(26699)) | uint(1);
+
+    float3 color = float3(0.0f, 0.0f, 0.0f);
+    for (int rayIndex = 0; rayIndex < c_raysPerFrame; ++rayIndex)
+    {
+        // add sub pixel jitter for anti aliasing
+        float2 fragCoordJittered = float2(px) + (float2(RandomFloat01(rngState), RandomFloat01(rngState)) - 0.5f);
+
+        // get the camera vectors
+        float3 rayOrigin;
+        float3 rayDirection;
+        {
+            uint w, h;
+            Accumulation.GetDimensions(w, h);
+            float2 dimensions = float2(w, h);
+
+            float2 screenPos = fragCoordJittered / dimensions * 2.0 - 1.0;
+            screenPos.y = -screenPos.y;
+
+            float4 world = mul(float4(screenPos, 0.0f, 1), /*$(Variable:InvViewProjMtx)*/);
+            world.xyz /= world.w;
+
+            rayOrigin = /*$(Variable:CameraPos)*/;
+            rayDirection = normalize(world.xyz - rayOrigin);
+        }
+
+        // simulate a thin lens (depth of field and circular bokeh)
+        if (c_apertureRadius > 0.0f)
+        {
+            float3 cameraRight = mul(float4(1.0f, 0.0f, 0.0f, 0.0f), /*$(Variable:InvViewMtx)*/).xyz;
+            float3 cameraUp = mul(float4(0.0f, 1.0f, 0.0f, 0.0f), /*$(Variable:InvViewMtx)*/).xyz;
+
+            // calculate point on the focal plane
+            float3 focalPlanePoint = rayOrigin + rayDirection * c_focalPlaneDistance;
+
+            // calculate a random point on the aperture
+            float angle = RandomFloat01(rngState) * 2.0f * c_pi;
+            float radius = sqrt(RandomFloat01(rngState)) * c_apertureRadius;
+            float2 offset = float2(cos(angle), sin(angle)) * radius;
+
+            // update the camera pos
+            rayOrigin += offset.x * cameraRight + offset.y * cameraUp;
+
+            // update the ray direction
+            rayDirection = normalize(focalPlanePoint - rayOrigin);
+        }
+
+        // get the linear color of the ray
+        color = lerp(color, GetColorForRay(rayOrigin, rayDirection, rngState, c_numBounces, c_rayMarchSteps, c_minStepDistance), 1.0f / float(rayIndex + 1));
+    }
+
+    // average the frames together
+    float4 lastFrameColor = /*$(RWTextureR:Accumulation)*/[px];
+    float blend = (/*$(Variable:iFrame)*/ < 2 || c_reset || lastFrameColor.a == 0.0f || /*$(Variable:CameraChanged)*/) ? 1.0f : 1.0f / (1.0f + (1.0f / lastFrameColor.a));
+    color = lerp(lastFrameColor.rgb, color, blend);
+
+    // accumulate the result
+    Accumulation[px] = float4(color, blend);
+
+    return ACESFilm(color / 0.6f);
+}
+
 float3 EvaluatePolynomial(float3 t)
 {
     switch (/*$(Variable:CurveOrder)*/)
@@ -50,6 +125,11 @@ float3 EvaluateTextureSeiler(float3 t)
     uint2 px = DTid.xy;
     float3 color = Input[px].rgb;
 
+    if (/*$(Variable:RenderScene)*/)
+    {
+        color = RenderScene(px);
+    }
+
     switch (/*$(Variable:CurveType)*/)
     {
         case CurveTypes::Polynomial: color = EvaluatePolynomial(color); break;
@@ -69,4 +149,5 @@ Shader Resources:
     Texture DCTexture3D (as SRV)
     Texture SeilerTexture2D (as SRV)
     Texture SeilerTexture3D (as SRV)
+    Texture Accumulation (as UAV)
 */
