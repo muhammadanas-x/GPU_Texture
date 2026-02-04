@@ -1,8 +1,32 @@
 {
     "version": "2.0",
+    "syncInterval": 0,
+    "systemVars": {
+        "camera": {
+            "startingCameraPos": [
+                39.46192932128906,
+                31.250621795654298,
+                -92.67166900634766
+            ],
+            "startingCameraAltitudeAzimuth": [
+                -0.36584043502807619,
+                0.578302800655365
+            ]
+        },
+        "ProjMtx_textureName": "Input"
+    },
     "snapshot": {
         "resourceViewNodeIndex": 2,
-        "resourceViewResourceIndex": 7,
+        "resourceViewResourceIndex": 8,
+        "cameraPos": [
+            39.46192932128906,
+            31.250621795654298,
+            -92.67166900634766
+        ],
+        "cameraAltitudeAzimuth": [
+            -0.36584043502807619,
+            0.578302800655365
+        ],
         "importedResources": [
             {
                 "nodeName": "Input",
