@@ -1,0 +1,15 @@
+ColorGrading.dir/
+ColorGrading.exe
+ColorGrading.exp
+ColorGrading.lib
+ColorGrading.pdb
+*.vcxproj.user
+Debug/
+MinSizeRel/
+Release/
+RelWithDebInfo/
+.vs/
+*.vcxproj
+*.vcxproj.filters
+*.sln
+imgui.ini

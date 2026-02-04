@@ -16,7 +16,7 @@ float3 RenderScene(uint2 px)
     static const bool c_reset = false;
     static const uint c_rayMarchSteps = 256;
     static const float c_minStepDistance = 0.1f;
-    static const int c_raysPerFrame = 16;
+    static const int c_raysPerFrame = /*$(Variable:RaysPerPixelPerFrame)*/;
 
     // initialize a random number state based on frag coord and frame
     uint rngState = uint(uint(px.x) * uint(1973) + uint(px.y) * uint(9277) + uint(/*$(Variable:iFrame)*/) * uint(26699)) | uint(1);

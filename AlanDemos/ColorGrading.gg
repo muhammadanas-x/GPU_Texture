@@ -97,6 +97,13 @@
             }
         },
         {
+            "name": "RaysPerPixelPerFrame",
+            "comment": "Rays per pixel per frame when rendering the scene",
+            "type": "Int",
+            "dflt": "16",
+            "visibility": "User"
+        },
+        {
             "name": "NumCPsMinus1Float",
             "type": "Float"
         },
@@ -111,23 +118,28 @@
         },
         {
             "name": "CameraPos",
-            "type": "Float3"
+            "type": "Float3",
+            "visibility": "Host"
         },
         {
             "name": "InvViewProjMtx",
-            "type": "Float4x4"
+            "type": "Float4x4",
+            "visibility": "Host"
         },
         {
             "name": "InvViewMtx",
-            "type": "Float4x4"
+            "type": "Float4x4",
+            "visibility": "Host"
         },
         {
             "name": "CameraChanged",
-            "type": "Bool"
+            "type": "Bool",
+            "visibility": "Host"
         },
         {
             "name": "iFrame",
-            "type": "Int"
+            "type": "Int",
+            "visibility": "Host"
         },
         {
             "name": "ResetAccum",
@@ -240,11 +252,6 @@
             "type": "Shader"
         },
         {
-            "fileName": "MountainsSmall.png",
-            "type": "Asset",
-            "binary": true
-        },
-        {
             "fileName": "DeCasteljauTexture.hlsli",
             "type": "Shader"
         },
@@ -253,13 +260,23 @@
             "type": "Shader"
         },
         {
+            "fileName": "DemofoxNeonDesert_common.hlsl",
+            "type": "Shader"
+        },
+        {
+            "fileName": "MountainsSmall.png",
+            "type": "Asset",
+            "binary": true
+        },
+        {
             "fileName": "Mountains.jpg",
             "type": "Asset",
             "binary": true
         },
         {
-            "fileName": "DemofoxNeonDesert_common.hlsl",
-            "type": "Shader"
+            "fileName": "1080pRainbow.png",
+            "type": "Asset",
+            "binary": true
         }
     ],
     "nodes": [
@@ -897,6 +914,7 @@
         }
     },
     "buildSettings": {
+        "outDX12": "ColorGradingDX12",
         "outWebGPU": "ColorGradingWebGPU"
     },
     "PrimaryOutput": {
