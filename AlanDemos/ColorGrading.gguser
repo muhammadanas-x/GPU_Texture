@@ -26,15 +26,6 @@
         "cameraAltitudeAzimuth": [
             -0.36584043502807619,
             0.578302800655365
-        ],
-        "importedResources": [
-            {
-                "nodeName": "Input",
-                "texture": {
-                    "fileName": "MountainsSmall.png",
-                    "binaryFormat": "Any"
-                }
-            }
         ]
     }
 }

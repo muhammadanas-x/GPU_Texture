@@ -37,6 +37,12 @@ namespace ColorGrading
         TextureSeiler,
     };
 
+    enum class ColorGradeTimings: int
+    {
+        EveryRay,
+        OncePerFrame,
+    };
+
     inline const char* EnumToString(CurveOrders value, bool displayString = false)
     {
         switch(value)
@@ -57,6 +63,16 @@ namespace ColorGrading
             case CurveTypes::Polynomial: return displayString ? "Polynomial" : "Polynomial";
             case CurveTypes::TextureDeCasteljau: return displayString ? "TextureDeCasteljau" : "TextureDeCasteljau";
             case CurveTypes::TextureSeiler: return displayString ? "TextureSeiler" : "TextureSeiler";
+            default: return nullptr;
+        }
+    }
+
+    inline const char* EnumToString(ColorGradeTimings value, bool displayString = false)
+    {
+        switch(value)
+        {
+            case ColorGradeTimings::EveryRay: return displayString ? "EveryRay" : "EveryRay";
+            case ColorGradeTimings::OncePerFrame: return displayString ? "OncePerFrame" : "OncePerFrame";
             default: return nullptr;
         }
     }
@@ -83,13 +99,14 @@ namespace ColorGrading
             float3 CP6 = {1.f, 1.f, 1.f};
             unsigned int CameraChanged = false;
             float3 CameraPos = {0.f, 0.f, 0.f};
+            int ColorGrade = (int)ColorGradeTimings::EveryRay;  // Should the color grading happen once per frame, or with every ray?
             int CurveOrder = (int)CurveOrders::Quintic;
             int CurveType = (int)CurveTypes::Polynomial;
-            float3 _padding5 = {0.f, 0.f, 0.f};  // Padding
+            float2 _padding5 = {0.f, 0.f};  // Padding
             float4x4 InvViewMtx = {0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f};
             float4x4 InvViewProjMtx = {0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f};
             int RaysPerPixelPerFrame = 16;  // Rays per pixel per frame when rendering the scene
-            unsigned int RenderScene = false;  // If true, renders a scene instead of showing an image
+            unsigned int ResetAccumulation = false;
             int iFrame = 0;
             float _padding6 = 0.f;  // Padding
         };
@@ -112,8 +129,14 @@ namespace ColorGrading
 
         // Variables
         float variable_NumCPsMinus1Float = 0.f;
-        bool variable_ResetAccum = false;
         bool variable_MakeCurveTexture = true;
+
+        ID3D12Resource* texture_Input = nullptr;
+        unsigned int texture_Input_size[3] = { 0, 0, 0 };
+        unsigned int texture_Input_numMips = 0;
+        DXGI_FORMAT texture_Input_format = DXGI_FORMAT_UNKNOWN;
+        static const D3D12_RESOURCE_FLAGS texture_Input_flags =  D3D12_RESOURCE_FLAG_NONE;
+        const D3D12_RESOURCE_STATES c_texture_Input_endingState = D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE;
 
         ID3D12Resource* texture_Output = nullptr;
         unsigned int texture_Output_size[3] = { 0, 0, 0 };

@@ -3,13 +3,10 @@
     "version": "1.01",
     "variables": [
         {
-            "name": "RenderScene",
-            "comment": "If true, renders a scene instead of showing an image",
-            "type": "Bool",
-            "visibility": "User",
-            "onUserChange": {
-                "name": "ResetAccum"
-            }
+            "name": "RenderSize",
+            "type": "Uint2",
+            "dflt": "1920, 1080",
+            "visibility": "User"
         },
         {
             "name": "CurveType",
@@ -108,6 +105,13 @@
             "type": "Float"
         },
         {
+            "name": "ColorGrade",
+            "comment": "Should the color grading happen once per frame, or with every ray?",
+            "type": "Int",
+            "visibility": "User",
+            "Enum": "ColorGradeTimings"
+        },
+        {
             "name": "NormalizedCPs",
             "comment": "When clicked, makes a linear no-op curve out of the control points",
             "type": "Bool",
@@ -117,18 +121,21 @@
             }
         },
         {
-            "name": "CameraPos",
-            "type": "Float3",
-            "visibility": "Host"
+            "name": "ResetAccumulation",
+            "type": "Bool",
+            "visibility": "User",
+            "UISettings": {
+                "UIHint": "Button"
+            }
         },
         {
-            "name": "InvViewProjMtx",
-            "type": "Float4x4",
-            "visibility": "Host"
+            "name": "MakeCurveTexture",
+            "type": "Bool",
+            "dflt": "true"
         },
         {
-            "name": "InvViewMtx",
-            "type": "Float4x4",
+            "name": "iFrame",
+            "type": "Int",
             "visibility": "Host"
         },
         {
@@ -137,18 +144,19 @@
             "visibility": "Host"
         },
         {
-            "name": "iFrame",
-            "type": "Int",
+            "name": "InvViewMtx",
+            "type": "Float4x4",
             "visibility": "Host"
         },
         {
-            "name": "ResetAccum",
-            "type": "Bool"
+            "name": "InvViewProjMtx",
+            "type": "Float4x4",
+            "visibility": "Host"
         },
         {
-            "name": "MakeCurveTexture",
-            "type": "Bool",
-            "dflt": "true"
+            "name": "CameraPos",
+            "type": "Float3",
+            "visibility": "Host"
         }
     ],
     "shaders": [
@@ -258,25 +266,6 @@
         {
             "fileName": "SeilerTexture.hlsli",
             "type": "Shader"
-        },
-        {
-            "fileName": "DemofoxNeonDesert_common.hlsl",
-            "type": "Shader"
-        },
-        {
-            "fileName": "MountainsSmall.png",
-            "type": "Asset",
-            "binary": true
-        },
-        {
-            "fileName": "Mountains.jpg",
-            "type": "Asset",
-            "binary": true
-        },
-        {
-            "fileName": "1080pRainbow.png",
-            "type": "Asset",
-            "binary": true
         }
     ],
     "nodes": [
@@ -287,7 +276,14 @@
                     162.0,
                     63.0
                 ],
-                "visibility": "Imported"
+                "format": {
+                    "format": "RGBA8_Unorm"
+                },
+                "size": {
+                    "variable": {
+                        "name": "RenderSize"
+                    }
+                }
             }
         },
         {
@@ -555,6 +551,17 @@
                 },
                 {
                     "label": "TextureSeiler"
+                }
+            ]
+        },
+        {
+            "name": "ColorGradeTimings",
+            "items": [
+                {
+                    "label": "EveryRay"
+                },
+                {
+                    "label": "OncePerFrame"
                 }
             ]
         }

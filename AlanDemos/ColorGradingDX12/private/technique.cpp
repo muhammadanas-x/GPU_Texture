@@ -838,6 +838,12 @@ namespace ColorGrading
             m_internal.m_TimestampReadbackBuffer = nullptr;
         }
 
+        if(m_internal.texture_Input)
+        {
+            s_delayedRelease.Add(m_internal.texture_Input);
+            m_internal.texture_Input = nullptr;
+        }
+
         if(m_internal.texture_Output)
         {
             s_delayedRelease.Add(m_internal.texture_Output);
@@ -965,12 +971,6 @@ namespace ColorGrading
         if(context->m_input.variable_iFrame < 10)
             context->m_internal.variable_MakeCurveTexture = true;
 
-        if (!context->m_input.texture_Input)
-        {
-            Context::LogFn(LogLevel::Error, "ColorGrading: Imported texture \"Input\" is null.\n");
-            return;
-        }
-
         // Make sure internally owned resources are created and are the right size and format
         context->EnsureResourcesCreated(device, commandList);
 
@@ -980,26 +980,6 @@ namespace ColorGrading
             s_srvHeap.m_heap,
         };
         commandList->SetDescriptorHeaps(_countof(heaps), heaps);
-
-        // Make sure imported resources are in the correct state
-        {
-            int barrierCount = 0;
-            D3D12_RESOURCE_BARRIER barriers[1];
-
-            if(context->m_input.texture_Input_state != D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE)
-            {
-                barriers[barrierCount].Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-                barriers[barrierCount].Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-                barriers[barrierCount].Transition.pResource = context->m_input.texture_Input;
-                barriers[barrierCount].Transition.StateBefore = context->m_input.texture_Input_state;
-                barriers[barrierCount].Transition.StateAfter = D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE;
-                barriers[barrierCount].Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
-                barrierCount++;
-            }
-
-            if(barrierCount > 0)
-                commandList->ResourceBarrier(barrierCount, barriers);
-        }
 
         // Shader Constants: _Transform_0CB
         {
@@ -1011,12 +991,13 @@ namespace ColorGrading
             context->m_internal.constantBuffer__Transform_0CB_cpu.CP6 = context->m_input.variable_CP6;
             context->m_internal.constantBuffer__Transform_0CB_cpu.CameraChanged = context->m_input.variable_CameraChanged;
             context->m_internal.constantBuffer__Transform_0CB_cpu.CameraPos = context->m_input.variable_CameraPos;
+            context->m_internal.constantBuffer__Transform_0CB_cpu.ColorGrade = (int)context->m_input.variable_ColorGrade;
             context->m_internal.constantBuffer__Transform_0CB_cpu.CurveOrder = (int)context->m_input.variable_CurveOrder;
             context->m_internal.constantBuffer__Transform_0CB_cpu.CurveType = (int)context->m_input.variable_CurveType;
             context->m_internal.constantBuffer__Transform_0CB_cpu.InvViewMtx = context->m_input.variable_InvViewMtx;
             context->m_internal.constantBuffer__Transform_0CB_cpu.InvViewProjMtx = context->m_input.variable_InvViewProjMtx;
             context->m_internal.constantBuffer__Transform_0CB_cpu.RaysPerPixelPerFrame = context->m_input.variable_RaysPerPixelPerFrame;
-            context->m_internal.constantBuffer__Transform_0CB_cpu.RenderScene = context->m_input.variable_RenderScene;
+            context->m_internal.constantBuffer__Transform_0CB_cpu.ResetAccumulation = context->m_input.variable_ResetAccumulation;
             context->m_internal.constantBuffer__Transform_0CB_cpu.iFrame = context->m_input.variable_iFrame;
             DX12Utils::CopyConstantsCPUToGPU(s_ubTracker, device, commandList, context->m_internal.constantBuffer__Transform_0CB, context->m_internal.constantBuffer__Transform_0CB_cpu, Context::LogFn);
         }
@@ -1168,7 +1149,7 @@ namespace ColorGrading
             commandList->SetPipelineState(ContextInternal::computeShader_Transform_pso);
 
             DX12Utils::ResourceDescriptor descriptors[] = {
-                { context->m_input.texture_Input, context->m_input.texture_Input_format, DX12Utils::AccessType::SRV, DX12Utils::ResourceType::Texture2D, false, 0, 0, 0, 0, 0, false },
+                { context->m_internal.texture_Input, context->m_internal.texture_Input_format, DX12Utils::AccessType::SRV, DX12Utils::ResourceType::Texture2D, false, 0, 0, 0, 0, 0, false },
                 { context->m_internal.texture_Output, context->m_internal.texture_Output_format, DX12Utils::AccessType::UAV, DX12Utils::ResourceType::Texture2D, false, 0, 0, 0, 0, 0, false },
                 { context->m_internal.texture_DCTexture2D, context->m_internal.texture_DCTexture2D_format, DX12Utils::AccessType::SRV, DX12Utils::ResourceType::Texture2D, false, 0, 0, 0, 0, 0, false },
                 { context->m_internal.texture_DCTexture3D, context->m_internal.texture_DCTexture3D_format, DX12Utils::AccessType::SRV, DX12Utils::ResourceType::Texture3D, false, 0, context->m_internal.texture_DCTexture3D_size[2], 0, 0, 0, false },
@@ -1182,9 +1163,9 @@ namespace ColorGrading
             commandList->SetComputeRootDescriptorTable(0, descriptorTable);
 
             unsigned int baseDispatchSize[3] = {
-                context->m_input.texture_Input_size[0],
-                context->m_input.texture_Input_size[1],
-                context->m_input.texture_Input_size[2]
+                context->m_internal.texture_Input_size[0],
+                context->m_internal.texture_Input_size[1],
+                context->m_internal.texture_Input_size[2]
             };
 
             unsigned int dispatchSize[3] = {
@@ -1203,26 +1184,6 @@ namespace ColorGrading
             }
         }
 
-        // Make sure imported resources are put back in the state they were given to us in
-        {
-            int barrierCount = 0;
-            D3D12_RESOURCE_BARRIER barriers[1];
-
-            if(context->m_input.texture_Input_state != D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE)
-            {
-                barriers[barrierCount].Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-                barriers[barrierCount].Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-                barriers[barrierCount].Transition.pResource = context->m_input.texture_Input;
-                barriers[barrierCount].Transition.StateBefore = D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE;
-                barriers[barrierCount].Transition.StateAfter = context->m_input.texture_Input_state;
-                barriers[barrierCount].Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
-                barrierCount++;
-            }
-
-            if(barrierCount > 0)
-                commandList->ResourceBarrier(barrierCount, barriers);
-        }
-
         if(context->m_profile)
         {
             context->m_profileData[(s_timerIndex-1)/2].m_label = "Total";
@@ -1236,12 +1197,47 @@ namespace ColorGrading
     {
         bool dirty = false;
 
+        // Input
+        {
+
+            unsigned int baseSize[3] = { (unsigned int)m_input.variable_RenderSize[0], (unsigned int)m_input.variable_RenderSize[1], 1 };
+
+            unsigned int desiredSize[3] = {
+                ((baseSize[0] + 0) * 1) / 1 + 0,
+                ((baseSize[1] + 0) * 1) / 1 + 0,
+                ((baseSize[2] + 0) * 1) / 1 + 0
+            };
+
+            static const unsigned int desiredNumMips = 1;
+
+            DXGI_FORMAT desiredFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
+
+            if(!m_internal.texture_Input ||
+               m_internal.texture_Input_size[0] != desiredSize[0] ||
+               m_internal.texture_Input_size[1] != desiredSize[1] ||
+               m_internal.texture_Input_size[2] != desiredSize[2] ||
+               m_internal.texture_Input_numMips != desiredNumMips ||
+               m_internal.texture_Input_format != desiredFormat)
+            {
+                dirty = true;
+                if(m_internal.texture_Input)
+                    s_delayedRelease.Add(m_internal.texture_Input);
+
+                m_internal.texture_Input = DX12Utils::CreateTexture(device, desiredSize, desiredNumMips, desiredFormat, m_internal.texture_Input_flags, D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE, DX12Utils::ResourceType::Texture2D, (c_debugNames ? L"Input" : nullptr), Context::LogFn);
+                m_internal.texture_Input_size[0] = desiredSize[0];
+                m_internal.texture_Input_size[1] = desiredSize[1];
+                m_internal.texture_Input_size[2] = desiredSize[2];
+                m_internal.texture_Input_numMips = desiredNumMips;
+                m_internal.texture_Input_format = desiredFormat;
+            }
+        }
+
         // Output
         {
             unsigned int baseSize[3] = {
-                m_input.texture_Input_size[0],
-                m_input.texture_Input_size[1],
-                m_input.texture_Input_size[2]
+                m_internal.texture_Input_size[0],
+                m_internal.texture_Input_size[1],
+                m_internal.texture_Input_size[2]
             };
 
             unsigned int desiredSize[3] = {
@@ -1252,7 +1248,7 @@ namespace ColorGrading
 
             static const unsigned int desiredNumMips = 1;
 
-            DXGI_FORMAT desiredFormat = m_input.texture_Input_format;
+            DXGI_FORMAT desiredFormat = m_internal.texture_Input_format;
 
             if(!m_internal.texture_Output ||
                m_internal.texture_Output_size[0] != desiredSize[0] ||
@@ -1413,9 +1409,9 @@ namespace ColorGrading
         // Accumulation
         {
             unsigned int baseSize[3] = {
-                m_input.texture_Input_size[0],
-                m_input.texture_Input_size[1],
-                m_input.texture_Input_size[2]
+                m_internal.texture_Input_size[0],
+                m_internal.texture_Input_size[1],
+                m_internal.texture_Input_size[2]
             };
 
             unsigned int desiredSize[3] = {

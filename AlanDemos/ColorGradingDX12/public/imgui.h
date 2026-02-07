@@ -21,8 +21,22 @@ namespace ColorGrading
     {
         ImGui::PushID("gigi_ColorGrading");
 
-        ImGui::Checkbox("RenderScene", &context->m_input.variable_RenderScene);
-        ShowToolTip("If true, renders a scene instead of showing an image");
+        {
+            float width = ImGui::GetContentRegionAvail().x / 4.0f;
+            ImGui::PushID("RenderSize");
+            ImGui::PushItemWidth(width);
+            int localVarX = (int)context->m_input.variable_RenderSize[0];
+            if(ImGui::InputInt("##X", &localVarX, 0))
+                context->m_input.variable_RenderSize[0] = (unsigned int)localVarX;
+            ImGui::SameLine();
+            int localVarY = (int)context->m_input.variable_RenderSize[1];
+            if(ImGui::InputInt("##Y", &localVarY, 0))
+                context->m_input.variable_RenderSize[1] = (unsigned int)localVarY;
+            ImGui::SameLine();
+            ImGui::Text("RenderSize");
+            ImGui::PopItemWidth();
+            ImGui::PopID();
+        }
         {
             static const char* labels[] = {
                 "Polynomial",
@@ -49,8 +63,17 @@ namespace ColorGrading
         ImGui::ColorEdit3("CP6", &context->m_input.variable_CP6[0]);
         ImGui::InputInt("RaysPerPixelPerFrame", &context->m_input.variable_RaysPerPixelPerFrame, 0);
         ShowToolTip("Rays per pixel per frame when rendering the scene");
+        {
+            static const char* labels[] = {
+                "EveryRay",
+                "OncePerFrame",
+            };
+            ImGui::Combo("ColorGrade", (int*)&context->m_input.variable_ColorGrade, labels, 2);
+            ShowToolTip("Should the color grading happen once per frame, or with every ray?");
+        }
         context->m_input.variable_NormalizedCPs = ImGui::Button("NormalizedCPs");
         ShowToolTip("When clicked, makes a linear no-op curve out of the control points");
+        context->m_input.variable_ResetAccumulation = ImGui::Button("ResetAccumulation");
 
         ImGui::Checkbox("Profile", &context->m_profile);
         if (context->m_profile)

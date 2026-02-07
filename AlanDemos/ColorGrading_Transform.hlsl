@@ -6,7 +6,57 @@
 #include "SeilerTexture.hlsli"
 #include "DeCasteljauTexture.hlsli"
 
-#include "DemofoxNeonDesert_common.hlsl"
+float3 EvaluatePolynomial(float3 t)
+{
+    switch (/*$(Variable:CurveOrder)*/)
+    {
+        case CurveOrders::Linear: return EvaluateBezier_Linear(t, /*$(Variable:CP1)*/, /*$(Variable:CP2)*/);
+        case CurveOrders::Quadratic: return EvaluateBezier_Quadratic(t, /*$(Variable:CP1)*/, /*$(Variable:CP2)*/, /*$(Variable:CP3)*/);
+        case CurveOrders::Cubic: return EvaluateBezier_Cubic(t, /*$(Variable:CP1)*/, /*$(Variable:CP2)*/, /*$(Variable:CP3)*/, /*$(Variable:CP4)*/);
+        case CurveOrders::Quartic: return EvaluateBezier_Quartic(t, /*$(Variable:CP1)*/, /*$(Variable:CP2)*/, /*$(Variable:CP3)*/, /*$(Variable:CP4)*/, /*$(Variable:CP5)*/);
+        case CurveOrders::Quintic: return EvaluateBezier_Quintic(t, /*$(Variable:CP1)*/, /*$(Variable:CP2)*/, /*$(Variable:CP3)*/, /*$(Variable:CP4)*/, /*$(Variable:CP5)*/, /*$(Variable:CP6)*/);
+    }
+    return 0.0f;
+}
+
+float3 EvaluateTextureDeCasteljau(float3 t)
+{
+    switch (/*$(Variable:CurveOrder)*/)
+    {
+        case CurveOrders::Linear: return DeCasteljauTexture_Read_Linear(DCTexture2D, t, LinearSampler);
+        case CurveOrders::Quadratic: return DeCasteljauTexture_Read_Quadratic(DCTexture2D, t, LinearSampler);
+        case CurveOrders::Cubic: return DeCasteljauTexture_Read_Cubic(DCTexture3D, t, LinearSampler);
+        case CurveOrders::Quartic: return DeCasteljauTexture_Read_Quartic(DCTexture3D, t, LinearSampler);
+        case CurveOrders::Quintic: return DeCasteljauTexture_Read_Quintic(DCTexture3D, t, LinearSampler);
+    }
+    return 0.0f;
+}
+
+float3 EvaluateTextureSeiler(float3 t)
+{
+    switch (/*$(Variable:CurveOrder)*/)
+    {
+        case CurveOrders::Linear: return SeilerTexture_Read_Linear(SeilerTexture2D, t, LinearSampler);
+        case CurveOrders::Quadratic: return SeilerTexture_Read_Quadratic(SeilerTexture2D, t, LinearSampler);
+        case CurveOrders::Cubic: return SeilerTexture_Read_Cubic(SeilerTexture2D, t, LinearSampler);
+        case CurveOrders::Quartic: return SeilerTexture_Read_Quartic(SeilerTexture3D, t, LinearSampler);
+        case CurveOrders::Quintic: return SeilerTexture_Read_Quintic(SeilerTexture3D, t, LinearSampler);
+    }
+    return 0.0f;
+}
+
+void ColorGrade(inout float3 color)
+{
+    switch (/*$(Variable:CurveType)*/)
+    {
+        case CurveTypes::Polynomial: color = EvaluatePolynomial(color); break;
+        case CurveTypes::TextureDeCasteljau: color = EvaluateTextureDeCasteljau(color); break;
+        case CurveTypes::TextureSeiler: color = EvaluateTextureSeiler(color); break;
+        default: color = float3(1.0f, 0.0f, 1.0f); break;
+    }
+}
+
+/*$(Embed:DemofoxNeonDesert_common.hlsl)*/
 
 float3 RenderScene(uint2 px)
 {
@@ -70,74 +120,37 @@ float3 RenderScene(uint2 px)
         color = lerp(color, GetColorForRay(rayOrigin, rayDirection, rngState, c_numBounces, c_rayMarchSteps, c_minStepDistance), 1.0f / float(rayIndex + 1));
     }
 
-    // average the frames together
-    float4 lastFrameColor = /*$(RWTextureR:Accumulation)*/[px];
-    float blend = (/*$(Variable:iFrame)*/ < 2 || c_reset || lastFrameColor.a == 0.0f || /*$(Variable:CameraChanged)*/) ? 1.0f : 1.0f / (1.0f + (1.0f / lastFrameColor.a));
-    color = lerp(lastFrameColor.rgb, color, blend);
+    if (/*$(Variable:ColorGrade)*/ == ColorGradeTimings::OncePerFrame)
+        ColorGrade(color);
+
+    float blend;
+    if (c_raysPerFrame > 0)
+    {
+        // average the frames together
+        float4 lastFrameColor = /*$(RWTextureR:Accumulation)*/[px];
+        blend = (/*$(Variable:iFrame)*/ < 2 || c_reset || lastFrameColor.a == 0.0f || /*$(Variable:CameraChanged)*/) ? 1.0f : 1.0f / (1.0f + (1.0f / lastFrameColor.a));
+        color = lerp(lastFrameColor.rgb, color, blend);
+    }
+    else
+    {
+        float4 lastFrameColor = /*$(RWTextureR:Accumulation)*/[px];
+        color = /*$(RWTextureR:Accumulation)*/[px].rgb;
+        blend = lastFrameColor.a;
+    }
+
+    if (/*$(Variable:ResetAccumulation)*/)
+        blend = 1.0f;
 
     // accumulate the result
     Accumulation[px] = float4(color, blend);
 
-    return ACESFilm(color / 0.6f);
-}
-
-float3 EvaluatePolynomial(float3 t)
-{
-    switch (/*$(Variable:CurveOrder)*/)
-    {
-        case CurveOrders::Linear: return EvaluateBezier_Linear(t, /*$(Variable:CP1)*/, /*$(Variable:CP2)*/);
-        case CurveOrders::Quadratic: return EvaluateBezier_Quadratic(t, /*$(Variable:CP1)*/, /*$(Variable:CP2)*/, /*$(Variable:CP3)*/);
-        case CurveOrders::Cubic: return EvaluateBezier_Cubic(t, /*$(Variable:CP1)*/, /*$(Variable:CP2)*/, /*$(Variable:CP3)*/, /*$(Variable:CP4)*/);
-        case CurveOrders::Quartic: return EvaluateBezier_Quartic(t, /*$(Variable:CP1)*/, /*$(Variable:CP2)*/, /*$(Variable:CP3)*/, /*$(Variable:CP4)*/, /*$(Variable:CP5)*/);
-        case CurveOrders::Quintic: return EvaluateBezier_Quintic(t, /*$(Variable:CP1)*/, /*$(Variable:CP2)*/, /*$(Variable:CP3)*/, /*$(Variable:CP4)*/, /*$(Variable:CP5)*/, /*$(Variable:CP6)*/);
-    }
-    return 0.0f;
-}
-
-float3 EvaluateTextureDeCasteljau(float3 t)
-{
-    switch (/*$(Variable:CurveOrder)*/)
-    {
-        case CurveOrders::Linear: return DeCasteljauTexture_Read_Linear(DCTexture2D, t, LinearSampler);
-        case CurveOrders::Quadratic: return DeCasteljauTexture_Read_Quadratic(DCTexture2D, t, LinearSampler);
-        case CurveOrders::Cubic: return DeCasteljauTexture_Read_Cubic(DCTexture3D, t, LinearSampler);
-        case CurveOrders::Quartic: return DeCasteljauTexture_Read_Quartic(DCTexture3D, t, LinearSampler);
-        case CurveOrders::Quintic: return DeCasteljauTexture_Read_Quintic(DCTexture3D, t, LinearSampler);
-    }
-    return 0.0f;
-}
-
-float3 EvaluateTextureSeiler(float3 t)
-{
-    switch (/*$(Variable:CurveOrder)*/)
-    {
-        case CurveOrders::Linear: return SeilerTexture_Read_Linear(SeilerTexture2D, t, LinearSampler);
-        case CurveOrders::Quadratic: return SeilerTexture_Read_Quadratic(SeilerTexture2D, t, LinearSampler);
-        case CurveOrders::Cubic: return SeilerTexture_Read_Cubic(SeilerTexture2D, t, LinearSampler);
-        case CurveOrders::Quartic: return SeilerTexture_Read_Quartic(SeilerTexture3D, t, LinearSampler);
-        case CurveOrders::Quintic: return SeilerTexture_Read_Quintic(SeilerTexture3D, t, LinearSampler);
-    }
-    return 0.0f;
+     return ACESFilm(color / 0.6f);
 }
 
 /*$(_compute:main)*/(uint3 DTid : SV_DispatchThreadID)
 {
     uint2 px = DTid.xy;
-    float3 color = Input[px].rgb;
-
-    if (/*$(Variable:RenderScene)*/)
-    {
-        color = RenderScene(px);
-    }
-
-    switch (/*$(Variable:CurveType)*/)
-    {
-        case CurveTypes::Polynomial: color = EvaluatePolynomial(color); break;
-        case CurveTypes::TextureDeCasteljau: color = EvaluateTextureDeCasteljau(color); break;
-        case CurveTypes::TextureSeiler: color = EvaluateTextureSeiler(color); break;
-        default: color = float3(1.0f, 0.0f, 1.0f); break;
-    }
-
+    float3 color = RenderScene(px);
     Output[px] = float4(LinearToSRGB(color), 1.0f);
 }
 

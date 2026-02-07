@@ -967,6 +967,9 @@ float3 GetColorForRay(in float3 startRayPos, in float3 startRayDir, inout uint r
         // Attenuate diffuse by the dot product of the outgoing ray and the normal (aka multiply diffuse by cosine theta or N dot L)
         float NdotL = dot(hitInfo.normal, rayDir);
         colorMultiplier *= lerp(hitInfo.material.diffuse * NdotL, hitInfo.material.specular, doSpecular);
+
+        if (/*$(Variable:ColorGrade)*/ == ColorGradeTimings::EveryRay)
+            ColorGrade(ret);
     }
 
     return ret;

@@ -20,17 +20,14 @@ let numExecutions = 1;
 
 /* TODO:
 provide imported resources or variable values to the technique:
-                    ColorGrading.texture_Input = null;
-                    ColorGrading.texture_Input_size = [0, 0, 0];
-                    ColorGrading.texture_Input_format = "";
                 Host Variables:
-                    ColorGrading.variable_CameraPos = 0., 0., 0.; // (Float3)
-                    ColorGrading.variable_InvViewProjMtx = 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.; // (Float4x4)
-                    ColorGrading.variable_InvViewMtx = 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.; // (Float4x4)
-                    ColorGrading.variable_CameraChanged = false; // (Bool)
                     ColorGrading.variable_iFrame = 0; // (Int)
+                    ColorGrading.variable_CameraChanged = false; // (Bool)
+                    ColorGrading.variable_InvViewMtx = 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.; // (Float4x4)
+                    ColorGrading.variable_InvViewProjMtx = 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.; // (Float4x4)
+                    ColorGrading.variable_CameraPos = 0., 0., 0.; // (Float3)
                 User Variables (These show in the UI):
-                    ColorGrading.variable_RenderScene = false; // (Bool) If true, renders a scene instead of showing an image
+                    ColorGrading.variable_RenderSize = 1920, 1080; // (Uint2)
                     ColorGrading.variable_CurveType = this.constructor.Enum_CurveTypes.Polynomial; // (Int)
                     ColorGrading.variable_CurveOrder = this.constructor.Enum_CurveOrders.Quintic; // (Int)
                     ColorGrading.variable_CP1 = 0., 0., 0.; // (Float3)
@@ -40,7 +37,9 @@ provide imported resources or variable values to the technique:
                     ColorGrading.variable_CP5 = 0.800000012, 0.800000012, 0.800000012; // (Float3)
                     ColorGrading.variable_CP6 = 1., 1., 1.; // (Float3)
                     ColorGrading.variable_RaysPerPixelPerFrame = 16; // (Int) Rays per pixel per frame when rendering the scene
+                    ColorGrading.variable_ColorGrade = this.constructor.Enum_ColorGradeTimings.EveryRay; // (Int) Should the color grading happen once per frame, or with every ray?
                     ColorGrading.variable_NormalizedCPs = false; // (Bool) When clicked, makes a linear no-op curve out of the control points
+                    ColorGrading.variable_ResetAccumulation = false; // (Bool)
 
                 An example of how to load a texture:
                     const loadedTexture = await Shared.CreateTextureWithPNG(device, "cabinsmall.png", ColorGrading.texture_someTexture_usageFlags);

@@ -36,19 +36,33 @@ namespace ColorGrading
         }
     }
 
-    inline PyObject* Set_RenderScene(PyObject* self, PyObject* args)
+    inline PyObject* ColorGradeTimingsToString(PyObject* self, PyObject* args)
+    {
+        int value;
+        if (!PyArg_ParseTuple(args, "i:ColorGradeTimingsToString", &value))
+            return PyErr_Format(PyExc_TypeError, "type error");
+
+        switch((ColorGradeTimings)value)
+        {
+            case ColorGradeTimings::EveryRay: return Py_BuildValue("s", "EveryRay");
+            case ColorGradeTimings::OncePerFrame: return Py_BuildValue("s", "OncePerFrame");
+            default: return Py_BuildValue("s", "<invalid ColorGradeTimings value>");
+        }
+    }
+
+    inline PyObject* Set_RenderSize(PyObject* self, PyObject* args)
     {
         int contextIndex;
-        bool value;
+        uint2 value;
 
-        if (!PyArg_ParseTuple(args, "ib:Set_RenderScene", &contextIndex, &value))
+        if (!PyArg_ParseTuple(args, "iII:Set_RenderSize", &contextIndex, &value[0], &value[1]))
             return PyErr_Format(PyExc_TypeError, "type error");
 
         Context* context = Context::GetContext(contextIndex);
         if (!context)
             return PyErr_Format(PyExc_IndexError, __FUNCTION__, "() : index % i is out of range(count = % i)", contextIndex, Context::GetContextCount());
 
-        context->m_input.variable_RenderScene = value;
+        context->m_input.variable_RenderSize = value;
 
         Py_INCREF(Py_None);
         return Py_None;
@@ -216,6 +230,24 @@ namespace ColorGrading
         return Py_None;
     }
 
+    inline PyObject* Set_ColorGrade(PyObject* self, PyObject* args)
+    {
+        int contextIndex;
+        int value;
+
+        if (!PyArg_ParseTuple(args, "ii:Set_ColorGrade", &contextIndex, &value))
+            return PyErr_Format(PyExc_TypeError, "type error");
+
+        Context* context = Context::GetContext(contextIndex);
+        if (!context)
+            return PyErr_Format(PyExc_IndexError, __FUNCTION__, "() : index % i is out of range(count = % i)", contextIndex, Context::GetContextCount());
+
+        context->m_input.variable_ColorGrade = (ColorGradeTimings)value;
+
+        Py_INCREF(Py_None);
+        return Py_None;
+    }
+
     inline PyObject* Set_NormalizedCPs(PyObject* self, PyObject* args)
     {
         int contextIndex;
@@ -234,10 +266,29 @@ namespace ColorGrading
         return Py_None;
     }
 
+    inline PyObject* Set_ResetAccumulation(PyObject* self, PyObject* args)
+    {
+        int contextIndex;
+        bool value;
+
+        if (!PyArg_ParseTuple(args, "ib:Set_ResetAccumulation", &contextIndex, &value))
+            return PyErr_Format(PyExc_TypeError, "type error");
+
+        Context* context = Context::GetContext(contextIndex);
+        if (!context)
+            return PyErr_Format(PyExc_IndexError, __FUNCTION__, "() : index % i is out of range(count = % i)", contextIndex, Context::GetContextCount());
+
+        context->m_input.variable_ResetAccumulation = value;
+
+        Py_INCREF(Py_None);
+        return Py_None;
+    }
+
     static PyMethodDef pythonModuleMethods[] = {
         {"CurveOrdersToString", CurveOrdersToString, METH_VARARGS, ""},
         {"CurveTypesToString", CurveTypesToString, METH_VARARGS, ""},
-        {"Set_RenderScene", Set_RenderScene, METH_VARARGS, "If true, renders a scene instead of showing an image"},
+        {"ColorGradeTimingsToString", ColorGradeTimingsToString, METH_VARARGS, ""},
+        {"Set_RenderSize", Set_RenderSize, METH_VARARGS, ""},
         {"Set_CurveType", Set_CurveType, METH_VARARGS, ""},
         {"Set_CurveOrder", Set_CurveOrder, METH_VARARGS, ""},
         {"Set_CP1", Set_CP1, METH_VARARGS, ""},
@@ -247,7 +298,9 @@ namespace ColorGrading
         {"Set_CP5", Set_CP5, METH_VARARGS, ""},
         {"Set_CP6", Set_CP6, METH_VARARGS, ""},
         {"Set_RaysPerPixelPerFrame", Set_RaysPerPixelPerFrame, METH_VARARGS, "Rays per pixel per frame when rendering the scene"},
+        {"Set_ColorGrade", Set_ColorGrade, METH_VARARGS, "Should the color grading happen once per frame, or with every ray?"},
         {"Set_NormalizedCPs", Set_NormalizedCPs, METH_VARARGS, "When clicked, makes a linear no-op curve out of the control points"},
+        {"Set_ResetAccumulation", Set_ResetAccumulation, METH_VARARGS, ""},
         {nullptr, nullptr, 0, nullptr}
     };
 
@@ -267,6 +320,8 @@ namespace ColorGrading
         PyModule_AddIntConstant(module, "CurveTypes_Polynomial", 0);
         PyModule_AddIntConstant(module, "CurveTypes_TextureDeCasteljau", 1);
         PyModule_AddIntConstant(module, "CurveTypes_TextureSeiler", 2);
+        PyModule_AddIntConstant(module, "ColorGradeTimings_EveryRay", 0);
+        PyModule_AddIntConstant(module, "ColorGradeTimings_OncePerFrame", 1);
         return module;
     }
 };

@@ -17,6 +17,12 @@ struct CurveTypes
     static const int TextureSeiler = 2;
 };
 
+struct ColorGradeTimings
+{
+    static const int EveryRay = 0;
+    static const int OncePerFrame = 1;
+};
+
 struct Struct__MakeCurveTextures_0CB
 {
     float3 CP1;

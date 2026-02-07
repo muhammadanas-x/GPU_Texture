@@ -511,28 +511,6 @@ int main(int, char**)
             if (firstPreExecute)
             {
                 firstPreExecute = false;
-                // Texture Input
-                {
-                    // Note: Use CreateManagedTexture() to create a texture with specific initial data, instead of loading it from disk
-                    const char* fileName = "./assets/1080pRainbow.png";
-                    bool fileIsSRGB = true;
-                    m_ColorGrading->m_input.texture_Input_format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
-                    m_ColorGrading->m_input.texture_Input_state = D3D12_RESOURCE_STATE_COMMON;
-                    m_ColorGrading->m_input.texture_Input = m_ColorGrading->CreateManagedTextureFromFile(
-                        g_pd3dDevice,
-                        g_pd3dCommandList,
-                        m_ColorGrading->m_input.texture_Input_flags,
-                        m_ColorGrading->m_input.texture_Input_format,
-                        DX12Utils::ResourceType::Texture2D,
-                        fileName,
-                        fileIsSRGB,
-                        m_ColorGrading->m_input.texture_Input_size,
-                        L"ColorGrading.Input",
-                        m_ColorGrading->m_input.texture_Input_state
-                    );
-                }
-
-                m_ColorGrading->m_input.variable_RenderScene = true;
             }
 
             m_ColorGrading->m_input.variable_iFrame = g_frameIndex;
@@ -543,7 +521,7 @@ int main(int, char**)
 
             memcpy(&m_ColorGrading->m_input.variable_CameraPos[0], &g_cameraPos[0], sizeof(float) * 3);
 
-            float resolution[2] = { (float)m_ColorGrading->m_input.texture_Input_size[0], (float)m_ColorGrading->m_input.texture_Input_size[1] };
+            float resolution[2] = { (float)c_renderSize[0], (float)c_renderSize[1] };
             DirectX::XMMATRIX projMtx = g_camera.GetProjMatrix(45.0f, resolution, 0.1f, 1000.0f, true, true);
             DirectX::XMMATRIX viewMtx = g_camera.GetViewMatrix(g_cameraPos, g_cameraAltitudeAzimuth);
 

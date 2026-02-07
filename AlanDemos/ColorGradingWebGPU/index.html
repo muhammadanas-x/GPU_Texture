@@ -253,25 +253,9 @@
             canvas.addEventListener('keydown', (event) => { KeyStates[event.keyCode] = 1; });
             canvas.addEventListener('keyup', (event) => { KeyStates[event.keyCode] = 0; });
 
-            // Hook up the on change events for imported resources
-            document.getElementById('importedResourceURL_Input').addEventListener('change', async (event) =>
-                {
-                    if (typeof ColorGrading.importedResourceURL_Input === 'undefined' || ColorGrading.importedResourceURL_Input != event.target.value)
-                    {
-                        ColorGrading.importedResourceURL_Input = event.target.value;
-                        const loadedTexture = await Shared.CreateTextureWithPNG(device, event.target.value, ColorGrading.texture_Input_usageFlags);
-                        if (loadedTexture !== null)
-                        {
-                            ColorGrading.texture_Input = loadedTexture.texture;
-                            ColorGrading.texture_Input_size = loadedTexture.size;
-                            ColorGrading.texture_Input_format = loadedTexture.format;
-                        }
-                    }
-                }
-            );
-
             // Hook up the on change events for UI
-            document.getElementById('inputBox_RenderScene').addEventListener('change',(event) => {ColorGrading.variable_RenderScene=event.target.checked;});
+            document.getElementById('inputBox_RenderSize0').addEventListener('change',(event) => {event.target.value=parseUint(event.target.value); ColorGrading.variable_RenderSize[0]=event.target.value;});
+            document.getElementById('inputBox_RenderSize1').addEventListener('change',(event) => {event.target.value=parseUint(event.target.value); ColorGrading.variable_RenderSize[1]=event.target.value;});
             document.getElementById('inputBox_CurveType').addEventListener('change',(event) => {event.target.value=event.target.value; ColorGrading.variable_CurveType=event.target.value;});
             document.getElementById('inputBox_CurveOrder').addEventListener('change',(event) => {event.target.value=event.target.value; ColorGrading.variable_CurveOrder=event.target.value;});
             document.getElementById('inputBox_CP10').addEventListener('change',(event) => {event.target.value=parseFloat(event.target.value); ColorGrading.variable_CP1[0]=event.target.value;});
@@ -294,26 +278,12 @@
             document.getElementById('inputBox_CP62').addEventListener('change',(event) => {event.target.value=parseFloat(event.target.value); ColorGrading.variable_CP6[2]=event.target.value;});
             document.getElementById('inputBox_RaysPerPixelPerFrame').addEventListener('change',(event) => {event.target.value=parseInt(event.target.value); ColorGrading.variable_RaysPerPixelPerFrame=event.target.value;});
             document.getElementById('inputBox_NumCPsMinus1Float').addEventListener('change',(event) => {event.target.value=parseFloat(event.target.value); ColorGrading.variable_NumCPsMinus1Float=event.target.value;});
+            document.getElementById('inputBox_ColorGrade').addEventListener('change',(event) => {event.target.value=event.target.value; ColorGrading.variable_ColorGrade=event.target.value;});
             document.getElementById('inputBox_NormalizedCPs').addEventListener('click',(event) => {ColorGrading.variable_NormalizedCPs=true;});
-            document.getElementById('inputBox_CameraPos0').addEventListener('change',(event) => {event.target.value=parseFloat(event.target.value); ColorGrading.variable_CameraPos[0]=event.target.value;});
-            document.getElementById('inputBox_CameraPos1').addEventListener('change',(event) => {event.target.value=parseFloat(event.target.value); ColorGrading.variable_CameraPos[1]=event.target.value;});
-            document.getElementById('inputBox_CameraPos2').addEventListener('change',(event) => {event.target.value=parseFloat(event.target.value); ColorGrading.variable_CameraPos[2]=event.target.value;});
-            document.getElementById('inputBox_InvViewProjMtx0').addEventListener('change',(event) => {event.target.value=parseFloat(event.target.value); ColorGrading.variable_InvViewProjMtx[0]=event.target.value;});
-            document.getElementById('inputBox_InvViewProjMtx1').addEventListener('change',(event) => {event.target.value=parseFloat(event.target.value); ColorGrading.variable_InvViewProjMtx[1]=event.target.value;});
-            document.getElementById('inputBox_InvViewProjMtx2').addEventListener('change',(event) => {event.target.value=parseFloat(event.target.value); ColorGrading.variable_InvViewProjMtx[2]=event.target.value;});
-            document.getElementById('inputBox_InvViewProjMtx3').addEventListener('change',(event) => {event.target.value=parseFloat(event.target.value); ColorGrading.variable_InvViewProjMtx[3]=event.target.value;});
-            document.getElementById('inputBox_InvViewProjMtx4').addEventListener('change',(event) => {event.target.value=parseFloat(event.target.value); ColorGrading.variable_InvViewProjMtx[4]=event.target.value;});
-            document.getElementById('inputBox_InvViewProjMtx5').addEventListener('change',(event) => {event.target.value=parseFloat(event.target.value); ColorGrading.variable_InvViewProjMtx[5]=event.target.value;});
-            document.getElementById('inputBox_InvViewProjMtx6').addEventListener('change',(event) => {event.target.value=parseFloat(event.target.value); ColorGrading.variable_InvViewProjMtx[6]=event.target.value;});
-            document.getElementById('inputBox_InvViewProjMtx7').addEventListener('change',(event) => {event.target.value=parseFloat(event.target.value); ColorGrading.variable_InvViewProjMtx[7]=event.target.value;});
-            document.getElementById('inputBox_InvViewProjMtx8').addEventListener('change',(event) => {event.target.value=parseFloat(event.target.value); ColorGrading.variable_InvViewProjMtx[8]=event.target.value;});
-            document.getElementById('inputBox_InvViewProjMtx9').addEventListener('change',(event) => {event.target.value=parseFloat(event.target.value); ColorGrading.variable_InvViewProjMtx[9]=event.target.value;});
-            document.getElementById('inputBox_InvViewProjMtx10').addEventListener('change',(event) => {event.target.value=parseFloat(event.target.value); ColorGrading.variable_InvViewProjMtx[10]=event.target.value;});
-            document.getElementById('inputBox_InvViewProjMtx11').addEventListener('change',(event) => {event.target.value=parseFloat(event.target.value); ColorGrading.variable_InvViewProjMtx[11]=event.target.value;});
-            document.getElementById('inputBox_InvViewProjMtx12').addEventListener('change',(event) => {event.target.value=parseFloat(event.target.value); ColorGrading.variable_InvViewProjMtx[12]=event.target.value;});
-            document.getElementById('inputBox_InvViewProjMtx13').addEventListener('change',(event) => {event.target.value=parseFloat(event.target.value); ColorGrading.variable_InvViewProjMtx[13]=event.target.value;});
-            document.getElementById('inputBox_InvViewProjMtx14').addEventListener('change',(event) => {event.target.value=parseFloat(event.target.value); ColorGrading.variable_InvViewProjMtx[14]=event.target.value;});
-            document.getElementById('inputBox_InvViewProjMtx15').addEventListener('change',(event) => {event.target.value=parseFloat(event.target.value); ColorGrading.variable_InvViewProjMtx[15]=event.target.value;});
+            document.getElementById('inputBox_ResetAccumulation').addEventListener('click',(event) => {ColorGrading.variable_ResetAccumulation=true;});
+            document.getElementById('inputBox_MakeCurveTexture').addEventListener('change',(event) => {ColorGrading.variable_MakeCurveTexture=event.target.checked;});
+            document.getElementById('inputBox_iFrame').addEventListener('change',(event) => {event.target.value=parseInt(event.target.value); ColorGrading.variable_iFrame=event.target.value;});
+            document.getElementById('inputBox_CameraChanged').addEventListener('change',(event) => {ColorGrading.variable_CameraChanged=event.target.checked;});
             document.getElementById('inputBox_InvViewMtx0').addEventListener('change',(event) => {event.target.value=parseFloat(event.target.value); ColorGrading.variable_InvViewMtx[0]=event.target.value;});
             document.getElementById('inputBox_InvViewMtx1').addEventListener('change',(event) => {event.target.value=parseFloat(event.target.value); ColorGrading.variable_InvViewMtx[1]=event.target.value;});
             document.getElementById('inputBox_InvViewMtx2').addEventListener('change',(event) => {event.target.value=parseFloat(event.target.value); ColorGrading.variable_InvViewMtx[2]=event.target.value;});
@@ -330,14 +300,30 @@
             document.getElementById('inputBox_InvViewMtx13').addEventListener('change',(event) => {event.target.value=parseFloat(event.target.value); ColorGrading.variable_InvViewMtx[13]=event.target.value;});
             document.getElementById('inputBox_InvViewMtx14').addEventListener('change',(event) => {event.target.value=parseFloat(event.target.value); ColorGrading.variable_InvViewMtx[14]=event.target.value;});
             document.getElementById('inputBox_InvViewMtx15').addEventListener('change',(event) => {event.target.value=parseFloat(event.target.value); ColorGrading.variable_InvViewMtx[15]=event.target.value;});
-            document.getElementById('inputBox_CameraChanged').addEventListener('change',(event) => {ColorGrading.variable_CameraChanged=event.target.checked;});
-            document.getElementById('inputBox_iFrame').addEventListener('change',(event) => {event.target.value=parseInt(event.target.value); ColorGrading.variable_iFrame=event.target.value;});
-            document.getElementById('inputBox_ResetAccum').addEventListener('change',(event) => {ColorGrading.variable_ResetAccum=event.target.checked;});
-            document.getElementById('inputBox_MakeCurveTexture').addEventListener('change',(event) => {ColorGrading.variable_MakeCurveTexture=event.target.checked;});
+            document.getElementById('inputBox_InvViewProjMtx0').addEventListener('change',(event) => {event.target.value=parseFloat(event.target.value); ColorGrading.variable_InvViewProjMtx[0]=event.target.value;});
+            document.getElementById('inputBox_InvViewProjMtx1').addEventListener('change',(event) => {event.target.value=parseFloat(event.target.value); ColorGrading.variable_InvViewProjMtx[1]=event.target.value;});
+            document.getElementById('inputBox_InvViewProjMtx2').addEventListener('change',(event) => {event.target.value=parseFloat(event.target.value); ColorGrading.variable_InvViewProjMtx[2]=event.target.value;});
+            document.getElementById('inputBox_InvViewProjMtx3').addEventListener('change',(event) => {event.target.value=parseFloat(event.target.value); ColorGrading.variable_InvViewProjMtx[3]=event.target.value;});
+            document.getElementById('inputBox_InvViewProjMtx4').addEventListener('change',(event) => {event.target.value=parseFloat(event.target.value); ColorGrading.variable_InvViewProjMtx[4]=event.target.value;});
+            document.getElementById('inputBox_InvViewProjMtx5').addEventListener('change',(event) => {event.target.value=parseFloat(event.target.value); ColorGrading.variable_InvViewProjMtx[5]=event.target.value;});
+            document.getElementById('inputBox_InvViewProjMtx6').addEventListener('change',(event) => {event.target.value=parseFloat(event.target.value); ColorGrading.variable_InvViewProjMtx[6]=event.target.value;});
+            document.getElementById('inputBox_InvViewProjMtx7').addEventListener('change',(event) => {event.target.value=parseFloat(event.target.value); ColorGrading.variable_InvViewProjMtx[7]=event.target.value;});
+            document.getElementById('inputBox_InvViewProjMtx8').addEventListener('change',(event) => {event.target.value=parseFloat(event.target.value); ColorGrading.variable_InvViewProjMtx[8]=event.target.value;});
+            document.getElementById('inputBox_InvViewProjMtx9').addEventListener('change',(event) => {event.target.value=parseFloat(event.target.value); ColorGrading.variable_InvViewProjMtx[9]=event.target.value;});
+            document.getElementById('inputBox_InvViewProjMtx10').addEventListener('change',(event) => {event.target.value=parseFloat(event.target.value); ColorGrading.variable_InvViewProjMtx[10]=event.target.value;});
+            document.getElementById('inputBox_InvViewProjMtx11').addEventListener('change',(event) => {event.target.value=parseFloat(event.target.value); ColorGrading.variable_InvViewProjMtx[11]=event.target.value;});
+            document.getElementById('inputBox_InvViewProjMtx12').addEventListener('change',(event) => {event.target.value=parseFloat(event.target.value); ColorGrading.variable_InvViewProjMtx[12]=event.target.value;});
+            document.getElementById('inputBox_InvViewProjMtx13').addEventListener('change',(event) => {event.target.value=parseFloat(event.target.value); ColorGrading.variable_InvViewProjMtx[13]=event.target.value;});
+            document.getElementById('inputBox_InvViewProjMtx14').addEventListener('change',(event) => {event.target.value=parseFloat(event.target.value); ColorGrading.variable_InvViewProjMtx[14]=event.target.value;});
+            document.getElementById('inputBox_InvViewProjMtx15').addEventListener('change',(event) => {event.target.value=parseFloat(event.target.value); ColorGrading.variable_InvViewProjMtx[15]=event.target.value;});
+            document.getElementById('inputBox_CameraPos0').addEventListener('change',(event) => {event.target.value=parseFloat(event.target.value); ColorGrading.variable_CameraPos[0]=event.target.value;});
+            document.getElementById('inputBox_CameraPos1').addEventListener('change',(event) => {event.target.value=parseFloat(event.target.value); ColorGrading.variable_CameraPos[1]=event.target.value;});
+            document.getElementById('inputBox_CameraPos2').addEventListener('change',(event) => {event.target.value=parseFloat(event.target.value); ColorGrading.variable_CameraPos[2]=event.target.value;});
 
             function ResetVariables()
             {
-                    ColorGrading.variable_RenderScene = ColorGrading.variableDefault_RenderScene;
+                    ColorGrading.variable_RenderSize[0] = ColorGrading.variableDefault_RenderSize[0];
+                    ColorGrading.variable_RenderSize[1] = ColorGrading.variableDefault_RenderSize[1];
                     ColorGrading.variable_CurveType = ColorGrading.variableDefault_CurveType;
                     ColorGrading.variable_CurveOrder = ColorGrading.variableDefault_CurveOrder;
                     ColorGrading.variable_CP1[0] = ColorGrading.variableDefault_CP1[0];
@@ -360,25 +346,10 @@
                     ColorGrading.variable_CP6[2] = ColorGrading.variableDefault_CP6[2];
                     ColorGrading.variable_RaysPerPixelPerFrame = ColorGrading.variableDefault_RaysPerPixelPerFrame;
                     ColorGrading.variable_NumCPsMinus1Float = ColorGrading.variableDefault_NumCPsMinus1Float;
-                    ColorGrading.variable_CameraPos[0] = ColorGrading.variableDefault_CameraPos[0];
-                    ColorGrading.variable_CameraPos[1] = ColorGrading.variableDefault_CameraPos[1];
-                    ColorGrading.variable_CameraPos[2] = ColorGrading.variableDefault_CameraPos[2];
-                    ColorGrading.variable_InvViewProjMtx[0] = ColorGrading.variableDefault_InvViewProjMtx[0];
-                    ColorGrading.variable_InvViewProjMtx[1] = ColorGrading.variableDefault_InvViewProjMtx[1];
-                    ColorGrading.variable_InvViewProjMtx[2] = ColorGrading.variableDefault_InvViewProjMtx[2];
-                    ColorGrading.variable_InvViewProjMtx[3] = ColorGrading.variableDefault_InvViewProjMtx[3];
-                    ColorGrading.variable_InvViewProjMtx[4] = ColorGrading.variableDefault_InvViewProjMtx[4];
-                    ColorGrading.variable_InvViewProjMtx[5] = ColorGrading.variableDefault_InvViewProjMtx[5];
-                    ColorGrading.variable_InvViewProjMtx[6] = ColorGrading.variableDefault_InvViewProjMtx[6];
-                    ColorGrading.variable_InvViewProjMtx[7] = ColorGrading.variableDefault_InvViewProjMtx[7];
-                    ColorGrading.variable_InvViewProjMtx[8] = ColorGrading.variableDefault_InvViewProjMtx[8];
-                    ColorGrading.variable_InvViewProjMtx[9] = ColorGrading.variableDefault_InvViewProjMtx[9];
-                    ColorGrading.variable_InvViewProjMtx[10] = ColorGrading.variableDefault_InvViewProjMtx[10];
-                    ColorGrading.variable_InvViewProjMtx[11] = ColorGrading.variableDefault_InvViewProjMtx[11];
-                    ColorGrading.variable_InvViewProjMtx[12] = ColorGrading.variableDefault_InvViewProjMtx[12];
-                    ColorGrading.variable_InvViewProjMtx[13] = ColorGrading.variableDefault_InvViewProjMtx[13];
-                    ColorGrading.variable_InvViewProjMtx[14] = ColorGrading.variableDefault_InvViewProjMtx[14];
-                    ColorGrading.variable_InvViewProjMtx[15] = ColorGrading.variableDefault_InvViewProjMtx[15];
+                    ColorGrading.variable_ColorGrade = ColorGrading.variableDefault_ColorGrade;
+                    ColorGrading.variable_MakeCurveTexture = ColorGrading.variableDefault_MakeCurveTexture;
+                    ColorGrading.variable_iFrame = ColorGrading.variableDefault_iFrame;
+                    ColorGrading.variable_CameraChanged = ColorGrading.variableDefault_CameraChanged;
                     ColorGrading.variable_InvViewMtx[0] = ColorGrading.variableDefault_InvViewMtx[0];
                     ColorGrading.variable_InvViewMtx[1] = ColorGrading.variableDefault_InvViewMtx[1];
                     ColorGrading.variable_InvViewMtx[2] = ColorGrading.variableDefault_InvViewMtx[2];
@@ -395,15 +366,31 @@
                     ColorGrading.variable_InvViewMtx[13] = ColorGrading.variableDefault_InvViewMtx[13];
                     ColorGrading.variable_InvViewMtx[14] = ColorGrading.variableDefault_InvViewMtx[14];
                     ColorGrading.variable_InvViewMtx[15] = ColorGrading.variableDefault_InvViewMtx[15];
-                    ColorGrading.variable_CameraChanged = ColorGrading.variableDefault_CameraChanged;
-                    ColorGrading.variable_iFrame = ColorGrading.variableDefault_iFrame;
-                    ColorGrading.variable_ResetAccum = ColorGrading.variableDefault_ResetAccum;
-                    ColorGrading.variable_MakeCurveTexture = ColorGrading.variableDefault_MakeCurveTexture;
+                    ColorGrading.variable_InvViewProjMtx[0] = ColorGrading.variableDefault_InvViewProjMtx[0];
+                    ColorGrading.variable_InvViewProjMtx[1] = ColorGrading.variableDefault_InvViewProjMtx[1];
+                    ColorGrading.variable_InvViewProjMtx[2] = ColorGrading.variableDefault_InvViewProjMtx[2];
+                    ColorGrading.variable_InvViewProjMtx[3] = ColorGrading.variableDefault_InvViewProjMtx[3];
+                    ColorGrading.variable_InvViewProjMtx[4] = ColorGrading.variableDefault_InvViewProjMtx[4];
+                    ColorGrading.variable_InvViewProjMtx[5] = ColorGrading.variableDefault_InvViewProjMtx[5];
+                    ColorGrading.variable_InvViewProjMtx[6] = ColorGrading.variableDefault_InvViewProjMtx[6];
+                    ColorGrading.variable_InvViewProjMtx[7] = ColorGrading.variableDefault_InvViewProjMtx[7];
+                    ColorGrading.variable_InvViewProjMtx[8] = ColorGrading.variableDefault_InvViewProjMtx[8];
+                    ColorGrading.variable_InvViewProjMtx[9] = ColorGrading.variableDefault_InvViewProjMtx[9];
+                    ColorGrading.variable_InvViewProjMtx[10] = ColorGrading.variableDefault_InvViewProjMtx[10];
+                    ColorGrading.variable_InvViewProjMtx[11] = ColorGrading.variableDefault_InvViewProjMtx[11];
+                    ColorGrading.variable_InvViewProjMtx[12] = ColorGrading.variableDefault_InvViewProjMtx[12];
+                    ColorGrading.variable_InvViewProjMtx[13] = ColorGrading.variableDefault_InvViewProjMtx[13];
+                    ColorGrading.variable_InvViewProjMtx[14] = ColorGrading.variableDefault_InvViewProjMtx[14];
+                    ColorGrading.variable_InvViewProjMtx[15] = ColorGrading.variableDefault_InvViewProjMtx[15];
+                    ColorGrading.variable_CameraPos[0] = ColorGrading.variableDefault_CameraPos[0];
+                    ColorGrading.variable_CameraPos[1] = ColorGrading.variableDefault_CameraPos[1];
+                    ColorGrading.variable_CameraPos[2] = ColorGrading.variableDefault_CameraPos[2];
             }
 
             function SetUIToVariables()
             {
-                    document.getElementById('inputBox_RenderScene').checked = Boolean(ColorGrading.variable_RenderScene);
+                    document.getElementById('inputBox_RenderSize0').value = ColorGrading.variable_RenderSize[0];
+                    document.getElementById('inputBox_RenderSize1').value = ColorGrading.variable_RenderSize[1];
                     document.getElementById('inputBox_CurveType').value = ColorGrading.variable_CurveType;
                     document.getElementById('inputBox_CurveOrder').value = ColorGrading.variable_CurveOrder;
                     document.getElementById('inputBox_CP10').value = ColorGrading.variable_CP1[0];
@@ -426,25 +413,10 @@
                     document.getElementById('inputBox_CP62').value = ColorGrading.variable_CP6[2];
                     document.getElementById('inputBox_RaysPerPixelPerFrame').value = ColorGrading.variable_RaysPerPixelPerFrame;
                     document.getElementById('inputBox_NumCPsMinus1Float').value = ColorGrading.variable_NumCPsMinus1Float;
-                    document.getElementById('inputBox_CameraPos0').value = ColorGrading.variable_CameraPos[0];
-                    document.getElementById('inputBox_CameraPos1').value = ColorGrading.variable_CameraPos[1];
-                    document.getElementById('inputBox_CameraPos2').value = ColorGrading.variable_CameraPos[2];
-                    document.getElementById('inputBox_InvViewProjMtx0').value = ColorGrading.variable_InvViewProjMtx[0];
-                    document.getElementById('inputBox_InvViewProjMtx1').value = ColorGrading.variable_InvViewProjMtx[1];
-                    document.getElementById('inputBox_InvViewProjMtx2').value = ColorGrading.variable_InvViewProjMtx[2];
-                    document.getElementById('inputBox_InvViewProjMtx3').value = ColorGrading.variable_InvViewProjMtx[3];
-                    document.getElementById('inputBox_InvViewProjMtx4').value = ColorGrading.variable_InvViewProjMtx[4];
-                    document.getElementById('inputBox_InvViewProjMtx5').value = ColorGrading.variable_InvViewProjMtx[5];
-                    document.getElementById('inputBox_InvViewProjMtx6').value = ColorGrading.variable_InvViewProjMtx[6];
-                    document.getElementById('inputBox_InvViewProjMtx7').value = ColorGrading.variable_InvViewProjMtx[7];
-                    document.getElementById('inputBox_InvViewProjMtx8').value = ColorGrading.variable_InvViewProjMtx[8];
-                    document.getElementById('inputBox_InvViewProjMtx9').value = ColorGrading.variable_InvViewProjMtx[9];
-                    document.getElementById('inputBox_InvViewProjMtx10').value = ColorGrading.variable_InvViewProjMtx[10];
-                    document.getElementById('inputBox_InvViewProjMtx11').value = ColorGrading.variable_InvViewProjMtx[11];
-                    document.getElementById('inputBox_InvViewProjMtx12').value = ColorGrading.variable_InvViewProjMtx[12];
-                    document.getElementById('inputBox_InvViewProjMtx13').value = ColorGrading.variable_InvViewProjMtx[13];
-                    document.getElementById('inputBox_InvViewProjMtx14').value = ColorGrading.variable_InvViewProjMtx[14];
-                    document.getElementById('inputBox_InvViewProjMtx15').value = ColorGrading.variable_InvViewProjMtx[15];
+                    document.getElementById('inputBox_ColorGrade').value = ColorGrading.variable_ColorGrade;
+                    document.getElementById('inputBox_MakeCurveTexture').checked = Boolean(ColorGrading.variable_MakeCurveTexture);
+                    document.getElementById('inputBox_iFrame').value = ColorGrading.variable_iFrame;
+                    document.getElementById('inputBox_CameraChanged').checked = Boolean(ColorGrading.variable_CameraChanged);
                     document.getElementById('inputBox_InvViewMtx0').value = ColorGrading.variable_InvViewMtx[0];
                     document.getElementById('inputBox_InvViewMtx1').value = ColorGrading.variable_InvViewMtx[1];
                     document.getElementById('inputBox_InvViewMtx2').value = ColorGrading.variable_InvViewMtx[2];
@@ -461,10 +433,25 @@
                     document.getElementById('inputBox_InvViewMtx13').value = ColorGrading.variable_InvViewMtx[13];
                     document.getElementById('inputBox_InvViewMtx14').value = ColorGrading.variable_InvViewMtx[14];
                     document.getElementById('inputBox_InvViewMtx15').value = ColorGrading.variable_InvViewMtx[15];
-                    document.getElementById('inputBox_CameraChanged').checked = Boolean(ColorGrading.variable_CameraChanged);
-                    document.getElementById('inputBox_iFrame').value = ColorGrading.variable_iFrame;
-                    document.getElementById('inputBox_ResetAccum').checked = Boolean(ColorGrading.variable_ResetAccum);
-                    document.getElementById('inputBox_MakeCurveTexture').checked = Boolean(ColorGrading.variable_MakeCurveTexture);
+                    document.getElementById('inputBox_InvViewProjMtx0').value = ColorGrading.variable_InvViewProjMtx[0];
+                    document.getElementById('inputBox_InvViewProjMtx1').value = ColorGrading.variable_InvViewProjMtx[1];
+                    document.getElementById('inputBox_InvViewProjMtx2').value = ColorGrading.variable_InvViewProjMtx[2];
+                    document.getElementById('inputBox_InvViewProjMtx3').value = ColorGrading.variable_InvViewProjMtx[3];
+                    document.getElementById('inputBox_InvViewProjMtx4').value = ColorGrading.variable_InvViewProjMtx[4];
+                    document.getElementById('inputBox_InvViewProjMtx5').value = ColorGrading.variable_InvViewProjMtx[5];
+                    document.getElementById('inputBox_InvViewProjMtx6').value = ColorGrading.variable_InvViewProjMtx[6];
+                    document.getElementById('inputBox_InvViewProjMtx7').value = ColorGrading.variable_InvViewProjMtx[7];
+                    document.getElementById('inputBox_InvViewProjMtx8').value = ColorGrading.variable_InvViewProjMtx[8];
+                    document.getElementById('inputBox_InvViewProjMtx9').value = ColorGrading.variable_InvViewProjMtx[9];
+                    document.getElementById('inputBox_InvViewProjMtx10').value = ColorGrading.variable_InvViewProjMtx[10];
+                    document.getElementById('inputBox_InvViewProjMtx11').value = ColorGrading.variable_InvViewProjMtx[11];
+                    document.getElementById('inputBox_InvViewProjMtx12').value = ColorGrading.variable_InvViewProjMtx[12];
+                    document.getElementById('inputBox_InvViewProjMtx13').value = ColorGrading.variable_InvViewProjMtx[13];
+                    document.getElementById('inputBox_InvViewProjMtx14').value = ColorGrading.variable_InvViewProjMtx[14];
+                    document.getElementById('inputBox_InvViewProjMtx15').value = ColorGrading.variable_InvViewProjMtx[15];
+                    document.getElementById('inputBox_CameraPos0').value = ColorGrading.variable_CameraPos[0];
+                    document.getElementById('inputBox_CameraPos1').value = ColorGrading.variable_CameraPos[1];
+                    document.getElementById('inputBox_CameraPos2').value = ColorGrading.variable_CameraPos[2];
             }
 
             // Set variables to their defaults
@@ -472,26 +459,16 @@
 
             document.getElementById('ResetVariables').addEventListener('click',(event) => { ResetVariables(); SetUIToVariables(); });
 
-            // Load the imported texture
-            let Imported_Image = await Shared.CreateTextureWithPNG(device, "assets/MountainsSmall.png", ColorGrading.texture_Input_usageFlags);
-            ColorGrading.texture_Input_size = Imported_Image.size;
-            ColorGrading.texture_Input_format = Imported_Image.format;
-            ColorGrading.texture_Input = Imported_Image.texture;
-            document.getElementById("importedResourceURL_Input").value = "assets/MountainsSmall.png";
-
             /* TODO:
             provide imported resources or variable values to the technique that only need to be set once:
-                    ColorGrading.texture_Input = null;
-                    ColorGrading.texture_Input_size = [0, 0, 0];
-                    ColorGrading.texture_Input_format = "";
                 Host Variables:
-                    ColorGrading.variable_CameraPos = 0., 0., 0.; // (Float3)
-                    ColorGrading.variable_InvViewProjMtx = 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.; // (Float4x4)
-                    ColorGrading.variable_InvViewMtx = 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.; // (Float4x4)
-                    ColorGrading.variable_CameraChanged = false; // (Bool)
                     ColorGrading.variable_iFrame = 0; // (Int)
+                    ColorGrading.variable_CameraChanged = false; // (Bool)
+                    ColorGrading.variable_InvViewMtx = 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.; // (Float4x4)
+                    ColorGrading.variable_InvViewProjMtx = 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.; // (Float4x4)
+                    ColorGrading.variable_CameraPos = 0., 0., 0.; // (Float3)
                 User Variables (These show in the UI):
-                    ColorGrading.variable_RenderScene = false; // (Bool) If true, renders a scene instead of showing an image
+                    ColorGrading.variable_RenderSize = 1920, 1080; // (Uint2)
                     ColorGrading.variable_CurveType = this.constructor.Enum_CurveTypes.Polynomial; // (Int)
                     ColorGrading.variable_CurveOrder = this.constructor.Enum_CurveOrders.Quintic; // (Int)
                     ColorGrading.variable_CP1 = 0., 0., 0.; // (Float3)
@@ -501,7 +478,9 @@
                     ColorGrading.variable_CP5 = 0.800000012, 0.800000012, 0.800000012; // (Float3)
                     ColorGrading.variable_CP6 = 1., 1., 1.; // (Float3)
                     ColorGrading.variable_RaysPerPixelPerFrame = 16; // (Int) Rays per pixel per frame when rendering the scene
+                    ColorGrading.variable_ColorGrade = this.constructor.Enum_ColorGradeTimings.EveryRay; // (Int) Should the color grading happen once per frame, or with every ray?
                     ColorGrading.variable_NormalizedCPs = false; // (Bool) When clicked, makes a linear no-op curve out of the control points
+                    ColorGrading.variable_ResetAccumulation = false; // (Bool)
 
                 An example of how to load a texture:
                     const loadedTexture = await Shared.CreateTextureWithPNG(device, "cabinsmall.png", ColorGrading.texture_someTexture_usageFlags);
@@ -521,13 +500,6 @@
             let frameIndex = 0
             async function RenderFrame(currentTimeMs) {
 
-                // Don't run the technique if any imported resources are missing
-                if ( ColorGrading.texture_Input === null )
-                {
-                    requestAnimationFrame(RenderFrame);
-                    return;
-                }
-
                 // Handle frame timing
                 if (startTimeMs === undefined)
                 {
@@ -546,17 +518,14 @@
 
                 /* TODO:
             provide imported resources or variable values to the technique that need to change every frame:
-                    ColorGrading.texture_Input = null;
-                    ColorGrading.texture_Input_size = [0, 0, 0];
-                    ColorGrading.texture_Input_format = "";
                 Host Variables:
-                    ColorGrading.variable_CameraPos = 0., 0., 0.; // (Float3)
-                    ColorGrading.variable_InvViewProjMtx = 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.; // (Float4x4)
-                    ColorGrading.variable_InvViewMtx = 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.; // (Float4x4)
-                    ColorGrading.variable_CameraChanged = false; // (Bool)
                     ColorGrading.variable_iFrame = 0; // (Int)
+                    ColorGrading.variable_CameraChanged = false; // (Bool)
+                    ColorGrading.variable_InvViewMtx = 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.; // (Float4x4)
+                    ColorGrading.variable_InvViewProjMtx = 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.; // (Float4x4)
+                    ColorGrading.variable_CameraPos = 0., 0., 0.; // (Float3)
                 User Variables (These show in the UI):
-                    ColorGrading.variable_RenderScene = false; // (Bool) If true, renders a scene instead of showing an image
+                    ColorGrading.variable_RenderSize = 1920, 1080; // (Uint2)
                     ColorGrading.variable_CurveType = this.constructor.Enum_CurveTypes.Polynomial; // (Int)
                     ColorGrading.variable_CurveOrder = this.constructor.Enum_CurveOrders.Quintic; // (Int)
                     ColorGrading.variable_CP1 = 0., 0., 0.; // (Float3)
@@ -566,7 +535,9 @@
                     ColorGrading.variable_CP5 = 0.800000012, 0.800000012, 0.800000012; // (Float3)
                     ColorGrading.variable_CP6 = 1., 1., 1.; // (Float3)
                     ColorGrading.variable_RaysPerPixelPerFrame = 16; // (Int) Rays per pixel per frame when rendering the scene
+                    ColorGrading.variable_ColorGrade = this.constructor.Enum_ColorGradeTimings.EveryRay; // (Int) Should the color grading happen once per frame, or with every ray?
                     ColorGrading.variable_NormalizedCPs = false; // (Bool) When clicked, makes a linear no-op curve out of the control points
+                    ColorGrading.variable_ResetAccumulation = false; // (Bool)
 
                 An example of how to load a texture:
                     const loadedTexture = await Shared.CreateTextureWithPNG(device, "cabinsmall.png", ColorGrading.texture_someTexture_usageFlags);
@@ -576,6 +547,8 @@
 
                 See _GeneratedCode\UnitTests\WebGPU\UnitTestLogic.js for more examples of loading files of various kinds.
                 */
+
+                ColorGrading.variable_RenderSize = [1024, 768];
 
                 // Set the frame index
                 ColorGrading.variable_iFrame = frameIndex;
@@ -636,10 +609,16 @@
                 }
 
                 // If the technique changed the variables, update the UI
-                if (ColorGrading.variableChanged_RenderScene)
+                if (ColorGrading.variableChanged_RenderSize[0])
                 {
-                    document.getElementById('inputBox_RenderScene').checked=Boolean(ColorGrading.variable_RenderScene);
-                    ColorGrading.variableChanged_RenderScene = false;
+                    document.getElementById('inputBox_RenderSize0').value = ColorGrading.variable_RenderSize[0];
+                    ColorGrading.variableChanged_RenderSize[0] = false;
+                }
+
+                if (ColorGrading.variableChanged_RenderSize[1])
+                {
+                    document.getElementById('inputBox_RenderSize1').value = ColorGrading.variable_RenderSize[1];
+                    ColorGrading.variableChanged_RenderSize[1] = false;
                 }
 
                 if (ColorGrading.variableChanged_CurveType)
@@ -774,120 +753,32 @@
                     ColorGrading.variableChanged_NumCPsMinus1Float = false;
                 }
 
+                if (ColorGrading.variableChanged_ColorGrade)
+                {
+                    document.getElementById('inputBox_ColorGrade').value = ColorGrading.variable_ColorGrade;
+                    ColorGrading.variableChanged_ColorGrade = false;
+                }
+
                 ColorGrading.variable_NormalizedCPs=false;
 
-                if (ColorGrading.variableChanged_CameraPos[0])
+                ColorGrading.variable_ResetAccumulation=false;
+
+                if (ColorGrading.variableChanged_MakeCurveTexture)
                 {
-                    document.getElementById('inputBox_CameraPos0').value = ColorGrading.variable_CameraPos[0];
-                    ColorGrading.variableChanged_CameraPos[0] = false;
+                    document.getElementById('inputBox_MakeCurveTexture').checked=Boolean(ColorGrading.variable_MakeCurveTexture);
+                    ColorGrading.variableChanged_MakeCurveTexture = false;
                 }
 
-                if (ColorGrading.variableChanged_CameraPos[1])
+                if (ColorGrading.variableChanged_iFrame)
                 {
-                    document.getElementById('inputBox_CameraPos1').value = ColorGrading.variable_CameraPos[1];
-                    ColorGrading.variableChanged_CameraPos[1] = false;
+                    document.getElementById('inputBox_iFrame').value = ColorGrading.variable_iFrame;
+                    ColorGrading.variableChanged_iFrame = false;
                 }
 
-                if (ColorGrading.variableChanged_CameraPos[2])
+                if (ColorGrading.variableChanged_CameraChanged)
                 {
-                    document.getElementById('inputBox_CameraPos2').value = ColorGrading.variable_CameraPos[2];
-                    ColorGrading.variableChanged_CameraPos[2] = false;
-                }
-
-                if (ColorGrading.variableChanged_InvViewProjMtx[0])
-                {
-                    document.getElementById('inputBox_InvViewProjMtx0').value = ColorGrading.variable_InvViewProjMtx[0];
-                    ColorGrading.variableChanged_InvViewProjMtx[0] = false;
-                }
-
-                if (ColorGrading.variableChanged_InvViewProjMtx[1])
-                {
-                    document.getElementById('inputBox_InvViewProjMtx1').value = ColorGrading.variable_InvViewProjMtx[1];
-                    ColorGrading.variableChanged_InvViewProjMtx[1] = false;
-                }
-
-                if (ColorGrading.variableChanged_InvViewProjMtx[2])
-                {
-                    document.getElementById('inputBox_InvViewProjMtx2').value = ColorGrading.variable_InvViewProjMtx[2];
-                    ColorGrading.variableChanged_InvViewProjMtx[2] = false;
-                }
-
-                if (ColorGrading.variableChanged_InvViewProjMtx[3])
-                {
-                    document.getElementById('inputBox_InvViewProjMtx3').value = ColorGrading.variable_InvViewProjMtx[3];
-                    ColorGrading.variableChanged_InvViewProjMtx[3] = false;
-                }
-
-                if (ColorGrading.variableChanged_InvViewProjMtx[4])
-                {
-                    document.getElementById('inputBox_InvViewProjMtx4').value = ColorGrading.variable_InvViewProjMtx[4];
-                    ColorGrading.variableChanged_InvViewProjMtx[4] = false;
-                }
-
-                if (ColorGrading.variableChanged_InvViewProjMtx[5])
-                {
-                    document.getElementById('inputBox_InvViewProjMtx5').value = ColorGrading.variable_InvViewProjMtx[5];
-                    ColorGrading.variableChanged_InvViewProjMtx[5] = false;
-                }
-
-                if (ColorGrading.variableChanged_InvViewProjMtx[6])
-                {
-                    document.getElementById('inputBox_InvViewProjMtx6').value = ColorGrading.variable_InvViewProjMtx[6];
-                    ColorGrading.variableChanged_InvViewProjMtx[6] = false;
-                }
-
-                if (ColorGrading.variableChanged_InvViewProjMtx[7])
-                {
-                    document.getElementById('inputBox_InvViewProjMtx7').value = ColorGrading.variable_InvViewProjMtx[7];
-                    ColorGrading.variableChanged_InvViewProjMtx[7] = false;
-                }
-
-                if (ColorGrading.variableChanged_InvViewProjMtx[8])
-                {
-                    document.getElementById('inputBox_InvViewProjMtx8').value = ColorGrading.variable_InvViewProjMtx[8];
-                    ColorGrading.variableChanged_InvViewProjMtx[8] = false;
-                }
-
-                if (ColorGrading.variableChanged_InvViewProjMtx[9])
-                {
-                    document.getElementById('inputBox_InvViewProjMtx9').value = ColorGrading.variable_InvViewProjMtx[9];
-                    ColorGrading.variableChanged_InvViewProjMtx[9] = false;
-                }
-
-                if (ColorGrading.variableChanged_InvViewProjMtx[10])
-                {
-                    document.getElementById('inputBox_InvViewProjMtx10').value = ColorGrading.variable_InvViewProjMtx[10];
-                    ColorGrading.variableChanged_InvViewProjMtx[10] = false;
-                }
-
-                if (ColorGrading.variableChanged_InvViewProjMtx[11])
-                {
-                    document.getElementById('inputBox_InvViewProjMtx11').value = ColorGrading.variable_InvViewProjMtx[11];
-                    ColorGrading.variableChanged_InvViewProjMtx[11] = false;
-                }
-
-                if (ColorGrading.variableChanged_InvViewProjMtx[12])
-                {
-                    document.getElementById('inputBox_InvViewProjMtx12').value = ColorGrading.variable_InvViewProjMtx[12];
-                    ColorGrading.variableChanged_InvViewProjMtx[12] = false;
-                }
-
-                if (ColorGrading.variableChanged_InvViewProjMtx[13])
-                {
-                    document.getElementById('inputBox_InvViewProjMtx13').value = ColorGrading.variable_InvViewProjMtx[13];
-                    ColorGrading.variableChanged_InvViewProjMtx[13] = false;
-                }
-
-                if (ColorGrading.variableChanged_InvViewProjMtx[14])
-                {
-                    document.getElementById('inputBox_InvViewProjMtx14').value = ColorGrading.variable_InvViewProjMtx[14];
-                    ColorGrading.variableChanged_InvViewProjMtx[14] = false;
-                }
-
-                if (ColorGrading.variableChanged_InvViewProjMtx[15])
-                {
-                    document.getElementById('inputBox_InvViewProjMtx15').value = ColorGrading.variable_InvViewProjMtx[15];
-                    ColorGrading.variableChanged_InvViewProjMtx[15] = false;
+                    document.getElementById('inputBox_CameraChanged').checked=Boolean(ColorGrading.variable_CameraChanged);
+                    ColorGrading.variableChanged_CameraChanged = false;
                 }
 
                 if (ColorGrading.variableChanged_InvViewMtx[0])
@@ -986,28 +877,118 @@
                     ColorGrading.variableChanged_InvViewMtx[15] = false;
                 }
 
-                if (ColorGrading.variableChanged_CameraChanged)
+                if (ColorGrading.variableChanged_InvViewProjMtx[0])
                 {
-                    document.getElementById('inputBox_CameraChanged').checked=Boolean(ColorGrading.variable_CameraChanged);
-                    ColorGrading.variableChanged_CameraChanged = false;
+                    document.getElementById('inputBox_InvViewProjMtx0').value = ColorGrading.variable_InvViewProjMtx[0];
+                    ColorGrading.variableChanged_InvViewProjMtx[0] = false;
                 }
 
-                if (ColorGrading.variableChanged_iFrame)
+                if (ColorGrading.variableChanged_InvViewProjMtx[1])
                 {
-                    document.getElementById('inputBox_iFrame').value = ColorGrading.variable_iFrame;
-                    ColorGrading.variableChanged_iFrame = false;
+                    document.getElementById('inputBox_InvViewProjMtx1').value = ColorGrading.variable_InvViewProjMtx[1];
+                    ColorGrading.variableChanged_InvViewProjMtx[1] = false;
                 }
 
-                if (ColorGrading.variableChanged_ResetAccum)
+                if (ColorGrading.variableChanged_InvViewProjMtx[2])
                 {
-                    document.getElementById('inputBox_ResetAccum').checked=Boolean(ColorGrading.variable_ResetAccum);
-                    ColorGrading.variableChanged_ResetAccum = false;
+                    document.getElementById('inputBox_InvViewProjMtx2').value = ColorGrading.variable_InvViewProjMtx[2];
+                    ColorGrading.variableChanged_InvViewProjMtx[2] = false;
                 }
 
-                if (ColorGrading.variableChanged_MakeCurveTexture)
+                if (ColorGrading.variableChanged_InvViewProjMtx[3])
                 {
-                    document.getElementById('inputBox_MakeCurveTexture').checked=Boolean(ColorGrading.variable_MakeCurveTexture);
-                    ColorGrading.variableChanged_MakeCurveTexture = false;
+                    document.getElementById('inputBox_InvViewProjMtx3').value = ColorGrading.variable_InvViewProjMtx[3];
+                    ColorGrading.variableChanged_InvViewProjMtx[3] = false;
+                }
+
+                if (ColorGrading.variableChanged_InvViewProjMtx[4])
+                {
+                    document.getElementById('inputBox_InvViewProjMtx4').value = ColorGrading.variable_InvViewProjMtx[4];
+                    ColorGrading.variableChanged_InvViewProjMtx[4] = false;
+                }
+
+                if (ColorGrading.variableChanged_InvViewProjMtx[5])
+                {
+                    document.getElementById('inputBox_InvViewProjMtx5').value = ColorGrading.variable_InvViewProjMtx[5];
+                    ColorGrading.variableChanged_InvViewProjMtx[5] = false;
+                }
+
+                if (ColorGrading.variableChanged_InvViewProjMtx[6])
+                {
+                    document.getElementById('inputBox_InvViewProjMtx6').value = ColorGrading.variable_InvViewProjMtx[6];
+                    ColorGrading.variableChanged_InvViewProjMtx[6] = false;
+                }
+
+                if (ColorGrading.variableChanged_InvViewProjMtx[7])
+                {
+                    document.getElementById('inputBox_InvViewProjMtx7').value = ColorGrading.variable_InvViewProjMtx[7];
+                    ColorGrading.variableChanged_InvViewProjMtx[7] = false;
+                }
+
+                if (ColorGrading.variableChanged_InvViewProjMtx[8])
+                {
+                    document.getElementById('inputBox_InvViewProjMtx8').value = ColorGrading.variable_InvViewProjMtx[8];
+                    ColorGrading.variableChanged_InvViewProjMtx[8] = false;
+                }
+
+                if (ColorGrading.variableChanged_InvViewProjMtx[9])
+                {
+                    document.getElementById('inputBox_InvViewProjMtx9').value = ColorGrading.variable_InvViewProjMtx[9];
+                    ColorGrading.variableChanged_InvViewProjMtx[9] = false;
+                }
+
+                if (ColorGrading.variableChanged_InvViewProjMtx[10])
+                {
+                    document.getElementById('inputBox_InvViewProjMtx10').value = ColorGrading.variable_InvViewProjMtx[10];
+                    ColorGrading.variableChanged_InvViewProjMtx[10] = false;
+                }
+
+                if (ColorGrading.variableChanged_InvViewProjMtx[11])
+                {
+                    document.getElementById('inputBox_InvViewProjMtx11').value = ColorGrading.variable_InvViewProjMtx[11];
+                    ColorGrading.variableChanged_InvViewProjMtx[11] = false;
+                }
+
+                if (ColorGrading.variableChanged_InvViewProjMtx[12])
+                {
+                    document.getElementById('inputBox_InvViewProjMtx12').value = ColorGrading.variable_InvViewProjMtx[12];
+                    ColorGrading.variableChanged_InvViewProjMtx[12] = false;
+                }
+
+                if (ColorGrading.variableChanged_InvViewProjMtx[13])
+                {
+                    document.getElementById('inputBox_InvViewProjMtx13').value = ColorGrading.variable_InvViewProjMtx[13];
+                    ColorGrading.variableChanged_InvViewProjMtx[13] = false;
+                }
+
+                if (ColorGrading.variableChanged_InvViewProjMtx[14])
+                {
+                    document.getElementById('inputBox_InvViewProjMtx14').value = ColorGrading.variable_InvViewProjMtx[14];
+                    ColorGrading.variableChanged_InvViewProjMtx[14] = false;
+                }
+
+                if (ColorGrading.variableChanged_InvViewProjMtx[15])
+                {
+                    document.getElementById('inputBox_InvViewProjMtx15').value = ColorGrading.variable_InvViewProjMtx[15];
+                    ColorGrading.variableChanged_InvViewProjMtx[15] = false;
+                }
+
+                if (ColorGrading.variableChanged_CameraPos[0])
+                {
+                    document.getElementById('inputBox_CameraPos0').value = ColorGrading.variable_CameraPos[0];
+                    ColorGrading.variableChanged_CameraPos[0] = false;
+                }
+
+                if (ColorGrading.variableChanged_CameraPos[1])
+                {
+                    document.getElementById('inputBox_CameraPos1').value = ColorGrading.variable_CameraPos[1];
+                    ColorGrading.variableChanged_CameraPos[1] = false;
+                }
+
+                if (ColorGrading.variableChanged_CameraPos[2])
+                {
+                    document.getElementById('inputBox_CameraPos2').value = ColorGrading.variable_CameraPos[2];
+                    ColorGrading.variableChanged_CameraPos[2] = false;
                 }
 
 
@@ -1058,12 +1039,11 @@
                     <label for="Viewing">Viewing</label>
                     <select name="Viewing" id="Viewing">
                         <option value="Output">Output</option><br/>
-                        <option value="">----- Imported Textures -----</option><br/>
-                        <option value="Input">Input</option><br/>
                         <option value="">----- Internal Textures -----</option><br/>
                         <option value="Accumulation">Accumulation</option><br/>
                         <option value="DCTexture2D">DCTexture2D</option><br/>
                         <option value="DCTexture3D">DCTexture3D</option><br/>
+                        <option value="Input">Input</option><br/>
                         <option value="MakeCurveTextures_DCTexture2D_ReadOnly">MakeCurveTextures_DCTexture2D_ReadOnly</option><br/>
                         <option value="MakeCurveTextures_DCTexture3D_ReadOnly">MakeCurveTextures_DCTexture3D_ReadOnly</option><br/>
                         <option value="MakeCurveTextures_SeilerTexture2D_ReadOnly">MakeCurveTextures_SeilerTexture2D_ReadOnly</option><br/>
@@ -1081,9 +1061,10 @@
                     <button type="button" class="collapsible">User Variables</button>
                     <table cellspacing="0" cellpadding="0" class="collapsiblecontent" style="display:block">
                         <tr>
-                            <td valign="top"><div class="tooltip">RenderScene&nbsp;<span class="tooltiptext">If true, renders a scene instead of showing an image</span></div></td>
+                            <td valign="top">RenderSize&nbsp;</td>
                             <td>
-                                <input type="checkbox" id="inputBox_RenderScene">
+                                <input type="text" id="inputBox_RenderSize0">
+                                <input type="text" id="inputBox_RenderSize1">
                             </td>
                         </tr>
                         <tr>
@@ -1163,9 +1144,24 @@
                             </td>
                         </tr>
                         <tr>
+                            <td valign="top"><div class="tooltip">ColorGrade&nbsp;<span class="tooltiptext">Should the color grading happen once per frame, or with every ray?</span></div></td>
+                            <td>
+                                <select id="inputBox_ColorGrade">
+                                    <option value="0">EveryRay</option>
+                                    <option value="1">OncePerFrame</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
                             <td valign="top"><div class="tooltip"><span class="tooltiptext">When clicked, makes a linear no-op curve out of the control points</span></div></td>
                             <td>
                                 <button type="button" id="inputBox_NormalizedCPs">NormalizedCPs</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td valign="top"></td>
+                            <td>
+                                <button type="button" id="inputBox_ResetAccumulation">ResetAccumulation</button>
                             </td>
                         </tr>
                     </table>
@@ -1173,35 +1169,15 @@
                     <button type="button" class="collapsible">Host Variables</button>
                     <table cellspacing="0" cellpadding="0" class="collapsiblecontent" style="display:none">
                         <tr>
-                            <td valign="top">CameraPos&nbsp;</td>
+                            <td valign="top">iFrame&nbsp;</td>
                             <td>
-                                <input type="text" id="inputBox_CameraPos0">
-                                <input type="text" id="inputBox_CameraPos1">
-                                <input type="text" id="inputBox_CameraPos2">
+                                <input type="text" id="inputBox_iFrame">
                             </td>
                         </tr>
                         <tr>
-                            <td valign="top">InvViewProjMtx&nbsp;</td>
+                            <td valign="top">CameraChanged&nbsp;</td>
                             <td>
-                                <input type="text" id="inputBox_InvViewProjMtx0">
-                                <input type="text" id="inputBox_InvViewProjMtx1">
-                                <input type="text" id="inputBox_InvViewProjMtx2">
-                                <input type="text" id="inputBox_InvViewProjMtx3">
-                                <br>
-                                <input type="text" id="inputBox_InvViewProjMtx4">
-                                <input type="text" id="inputBox_InvViewProjMtx5">
-                                <input type="text" id="inputBox_InvViewProjMtx6">
-                                <input type="text" id="inputBox_InvViewProjMtx7">
-                                <br>
-                                <input type="text" id="inputBox_InvViewProjMtx8">
-                                <input type="text" id="inputBox_InvViewProjMtx9">
-                                <input type="text" id="inputBox_InvViewProjMtx10">
-                                <input type="text" id="inputBox_InvViewProjMtx11">
-                                <br>
-                                <input type="text" id="inputBox_InvViewProjMtx12">
-                                <input type="text" id="inputBox_InvViewProjMtx13">
-                                <input type="text" id="inputBox_InvViewProjMtx14">
-                                <input type="text" id="inputBox_InvViewProjMtx15">
+                                <input type="checkbox" id="inputBox_CameraChanged">
                             </td>
                         </tr>
                         <tr>
@@ -1229,15 +1205,35 @@
                             </td>
                         </tr>
                         <tr>
-                            <td valign="top">CameraChanged&nbsp;</td>
+                            <td valign="top">InvViewProjMtx&nbsp;</td>
                             <td>
-                                <input type="checkbox" id="inputBox_CameraChanged">
+                                <input type="text" id="inputBox_InvViewProjMtx0">
+                                <input type="text" id="inputBox_InvViewProjMtx1">
+                                <input type="text" id="inputBox_InvViewProjMtx2">
+                                <input type="text" id="inputBox_InvViewProjMtx3">
+                                <br>
+                                <input type="text" id="inputBox_InvViewProjMtx4">
+                                <input type="text" id="inputBox_InvViewProjMtx5">
+                                <input type="text" id="inputBox_InvViewProjMtx6">
+                                <input type="text" id="inputBox_InvViewProjMtx7">
+                                <br>
+                                <input type="text" id="inputBox_InvViewProjMtx8">
+                                <input type="text" id="inputBox_InvViewProjMtx9">
+                                <input type="text" id="inputBox_InvViewProjMtx10">
+                                <input type="text" id="inputBox_InvViewProjMtx11">
+                                <br>
+                                <input type="text" id="inputBox_InvViewProjMtx12">
+                                <input type="text" id="inputBox_InvViewProjMtx13">
+                                <input type="text" id="inputBox_InvViewProjMtx14">
+                                <input type="text" id="inputBox_InvViewProjMtx15">
                             </td>
                         </tr>
                         <tr>
-                            <td valign="top">iFrame&nbsp;</td>
+                            <td valign="top">CameraPos&nbsp;</td>
                             <td>
-                                <input type="text" id="inputBox_iFrame">
+                                <input type="text" id="inputBox_CameraPos0">
+                                <input type="text" id="inputBox_CameraPos1">
+                                <input type="text" id="inputBox_CameraPos2">
                             </td>
                         </tr>
                     </table>
@@ -1251,12 +1247,6 @@
                             </td>
                         </tr>
                         <tr>
-                            <td valign="top">ResetAccum&nbsp;</td>
-                            <td>
-                                <input type="checkbox" id="inputBox_ResetAccum">
-                            </td>
-                        </tr>
-                        <tr>
                             <td valign="top">MakeCurveTexture&nbsp;</td>
                             <td>
                                 <input type="checkbox" id="inputBox_MakeCurveTexture">
@@ -1267,11 +1257,6 @@
                     <button type="button" id="ResetVariables">Reset Variables</button>
                     <br/>
                     <br/>
-                    <button type="button" class="collapsible">Imported Resources</button>
-                    <table cellspacing="0" cellpadding="0" class="collapsiblecontent" style="display:block">
-                        <tr><td>Texture URL: Input&nbsp;</td><td><input type="text" id="importedResourceURL_Input"></td></tr>
-                    </table>
-                    <br><br>
 
                     <button type=button class="collapsible">Camera</button>
                     <table cellspacing=0 cellpadding=0 class="collapsiblecontent" style="display:none">

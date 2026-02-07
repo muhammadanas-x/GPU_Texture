@@ -45,7 +45,7 @@ namespace ColorGrading
         {
 
             // Variables
-            bool variable_RenderScene = false;  // If true, renders a scene instead of showing an image
+            uint2 variable_RenderSize = {1920, 1080};
             CurveTypes variable_CurveType = CurveTypes::Polynomial;
             CurveOrders variable_CurveOrder = CurveOrders::Quintic;
             float3 variable_CP1 = {0.f, 0.f, 0.f};
@@ -55,19 +55,14 @@ namespace ColorGrading
             float3 variable_CP5 = {0.800000012f, 0.800000012f, 0.800000012f};
             float3 variable_CP6 = {1.f, 1.f, 1.f};
             int variable_RaysPerPixelPerFrame = 16;  // Rays per pixel per frame when rendering the scene
+            ColorGradeTimings variable_ColorGrade = ColorGradeTimings::EveryRay;  // Should the color grading happen once per frame, or with every ray?
             bool variable_NormalizedCPs = false;  // When clicked, makes a linear no-op curve out of the control points
-            float3 variable_CameraPos = {0.f, 0.f, 0.f};
-            float4x4 variable_InvViewProjMtx = {0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f};
-            float4x4 variable_InvViewMtx = {0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f};
-            bool variable_CameraChanged = false;
+            bool variable_ResetAccumulation = false;
             int variable_iFrame = 0;
-
-            ID3D12Resource* texture_Input = nullptr;
-            unsigned int texture_Input_size[3] = { 0, 0, 0 };
-            unsigned int texture_Input_numMips = 0;
-            DXGI_FORMAT texture_Input_format = DXGI_FORMAT_UNKNOWN;
-            static const D3D12_RESOURCE_FLAGS texture_Input_flags =  D3D12_RESOURCE_FLAG_NONE;
-            D3D12_RESOURCE_STATES texture_Input_state = D3D12_RESOURCE_STATE_COMMON;
+            bool variable_CameraChanged = false;
+            float4x4 variable_InvViewMtx = {0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f};
+            float4x4 variable_InvViewProjMtx = {0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f};
+            float3 variable_CameraPos = {0.f, 0.f, 0.f};
         };
         ContextInput m_input;
 
