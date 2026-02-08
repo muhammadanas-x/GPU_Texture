@@ -49,23 +49,48 @@ struct Struct_DrawCurves_0CB_std140_0
     @align(16) CP5_0 : f32,
     @align(4) CP6_0 : f32,
     @align(8) CurveOrder_0 : i32,
+    @align(4) _padding0_0 : f32,
+    @align(16) DeCasteljauColor_0 : vec3<f32>,
+    @align(4) _padding1_0 : f32,
+    @align(16) HybridColor_0 : vec3<f32>,
+    @align(4) _padding2_0 : f32,
+    @align(16) PolynomialColor_0 : vec3<f32>,
+    @align(4) _padding3_0 : f32,
+    @align(16) SeilerColor_0 : vec3<f32>,
     @align(4) ShowControlPoints_0 : u32,
     @align(16) ShowDeCasteljauTexture_0 : u32,
-    @align(4) ShowPolynomial_0 : u32,
-    @align(8) ShowSeilerTexture_0 : u32,
-    @align(4) _padding0_0 : f32,
+    @align(4) ShowHybrid_0 : u32,
+    @align(8) ShowPolynomial_0 : u32,
+    @align(4) ShowSeilerTexture_0 : u32,
+    @align(16) TextureFormat_0 : i32,
+    @align(4) _padding4_0 : f32,
+    @align(8) _padding5_0 : f32,
+    @align(4) _padding6_0 : f32,
 };
 
-@binding(6) @group(0) var<uniform> _DrawCurves_0CB : Struct_DrawCurves_0CB_std140_0;
+@binding(10) @group(0) var<uniform> _DrawCurves_0CB : Struct_DrawCurves_0CB_std140_0;
 @binding(1) @group(0) var DCTexture2D : texture_2d<f32>;
 
-@binding(7) @group(0) var LinearSampler : sampler;
+@binding(11) @group(0) var LinearSampler : sampler;
 
 @binding(2) @group(0) var DCTexture3D : texture_3d<f32>;
+
+@binding(5) @group(0) var DCTexture2DU8 : texture_2d<f32>;
+
+@binding(6) @group(0) var DCTexture3DU8 : texture_3d<f32>;
 
 @binding(3) @group(0) var SeilerTexture2D : texture_2d<f32>;
 
 @binding(4) @group(0) var SeilerTexture3D : texture_3d<f32>;
+
+@binding(7) @group(0) var SeilerTexture2DU8 : texture_2d<f32>;
+
+@binding(8) @group(0) var SeilerTexture3DU8 : texture_3d<f32>;
+
+fn UseF32_0() -> bool
+{
+    return (_DrawCurves_0CB.TextureFormat_0) == i32(0);
+}
 
 fn DeCasteljauTexture_Read_Linear_0( tex_0 : texture_2d<f32>,  t_0 : f32,  LinearSampler_0 : sampler) -> f32
 {
@@ -123,31 +148,64 @@ fn DeCasteljauTexture_Read_Quintic_0( tex_4 : texture_3d<f32>,  t_4 : f32,  Line
 
 fn EvaluateDeCasteljauTexture_0( t_5 : f32) -> f32
 {
-    switch(_DrawCurves_0CB.CurveOrder_0)
+    if(UseF32_0())
     {
-    case i32(0), :
+        switch(_DrawCurves_0CB.CurveOrder_0)
         {
-            return DeCasteljauTexture_Read_Linear_0(DCTexture2D, t_5, LinearSampler);
+        case i32(0), :
+            {
+                return DeCasteljauTexture_Read_Linear_0(DCTexture2D, t_5, LinearSampler);
+            }
+        case i32(1), :
+            {
+                return DeCasteljauTexture_Read_Quadratic_0(DCTexture2D, t_5, LinearSampler);
+            }
+        case i32(2), :
+            {
+                return DeCasteljauTexture_Read_Cubic_0(DCTexture3D, t_5, LinearSampler);
+            }
+        case i32(3), :
+            {
+                return DeCasteljauTexture_Read_Quartic_0(DCTexture3D, t_5, LinearSampler);
+            }
+        case i32(4), :
+            {
+                return DeCasteljauTexture_Read_Quintic_0(DCTexture3D, t_5, LinearSampler);
+            }
+        case default, :
+            {
+                break;
+            }
         }
-    case i32(1), :
+    }
+    else
+    {
+        switch(_DrawCurves_0CB.CurveOrder_0)
         {
-            return DeCasteljauTexture_Read_Quadratic_0(DCTexture2D, t_5, LinearSampler);
-        }
-    case i32(2), :
-        {
-            return DeCasteljauTexture_Read_Cubic_0(DCTexture3D, t_5, LinearSampler);
-        }
-    case i32(3), :
-        {
-            return DeCasteljauTexture_Read_Quartic_0(DCTexture3D, t_5, LinearSampler);
-        }
-    case i32(4), :
-        {
-            return DeCasteljauTexture_Read_Quintic_0(DCTexture3D, t_5, LinearSampler);
-        }
-    case default, :
-        {
-            break;
+        case i32(0), :
+            {
+                return DeCasteljauTexture_Read_Linear_0(DCTexture2DU8, t_5, LinearSampler);
+            }
+        case i32(1), :
+            {
+                return DeCasteljauTexture_Read_Quadratic_0(DCTexture2DU8, t_5, LinearSampler);
+            }
+        case i32(2), :
+            {
+                return DeCasteljauTexture_Read_Cubic_0(DCTexture3DU8, t_5, LinearSampler);
+            }
+        case i32(3), :
+            {
+                return DeCasteljauTexture_Read_Quartic_0(DCTexture3DU8, t_5, LinearSampler);
+            }
+        case i32(4), :
+            {
+                return DeCasteljauTexture_Read_Quintic_0(DCTexture3DU8, t_5, LinearSampler);
+            }
+        case default, :
+            {
+                break;
+            }
         }
     }
     return 0.0f;
@@ -259,31 +317,157 @@ fn SeilerTexture_Read_Quintic_0( tex_9 : texture_3d<f32>,  t_16 : f32,  LinearSa
 
 fn EvaluateSeilerTexture_0( t_17 : f32) -> f32
 {
-    switch(_DrawCurves_0CB.CurveOrder_0)
+    if(UseF32_0())
     {
-    case i32(0), :
+        switch(_DrawCurves_0CB.CurveOrder_0)
         {
-            return SeilerTexture_Read_Linear_0(SeilerTexture2D, t_17, LinearSampler);
+        case i32(0), :
+            {
+                return SeilerTexture_Read_Linear_0(SeilerTexture2D, t_17, LinearSampler);
+            }
+        case i32(1), :
+            {
+                return SeilerTexture_Read_Quadratic_0(SeilerTexture2D, t_17, LinearSampler);
+            }
+        case i32(2), :
+            {
+                return SeilerTexture_Read_Cubic_0(SeilerTexture2D, t_17, LinearSampler);
+            }
+        case i32(3), :
+            {
+                return SeilerTexture_Read_Quartic_0(SeilerTexture3D, t_17, LinearSampler);
+            }
+        case i32(4), :
+            {
+                return SeilerTexture_Read_Quintic_0(SeilerTexture3D, t_17, LinearSampler);
+            }
+        case default, :
+            {
+                break;
+            }
         }
-    case i32(1), :
+    }
+    else
+    {
+        switch(_DrawCurves_0CB.CurveOrder_0)
         {
-            return SeilerTexture_Read_Quadratic_0(SeilerTexture2D, t_17, LinearSampler);
+        case i32(0), :
+            {
+                return SeilerTexture_Read_Linear_0(SeilerTexture2DU8, t_17, LinearSampler);
+            }
+        case i32(1), :
+            {
+                return SeilerTexture_Read_Quadratic_0(SeilerTexture2DU8, t_17, LinearSampler);
+            }
+        case i32(2), :
+            {
+                return SeilerTexture_Read_Cubic_0(SeilerTexture2DU8, t_17, LinearSampler);
+            }
+        case i32(3), :
+            {
+                return SeilerTexture_Read_Quartic_0(SeilerTexture3DU8, t_17, LinearSampler);
+            }
+        case i32(4), :
+            {
+                return SeilerTexture_Read_Quintic_0(SeilerTexture3DU8, t_17, LinearSampler);
+            }
+        case default, :
+            {
+                break;
+            }
         }
-    case i32(2), :
+    }
+    return 0.0f;
+}
+
+fn DeCasteljauTexture_Read_Linear_Hybrid_0( tex_10 : texture_2d<f32>,  t_18 : f32,  LinearSampler_10 : sampler) -> f32
+{
+    const _S22 : vec3<i32> = vec3<i32>(vec3<u32>(vec2<u32>(u32(0), u32(0)), u32(0)));
+    const _S23 : vec3<i32> = vec3<i32>(vec3<u32>(vec2<u32>(u32(1), u32(0)), u32(0)));
+    return mix((textureLoad((tex_10), ((_S22)).xy, ((_S22)).z).x), (textureLoad((tex_10), ((_S23)).xy, ((_S23)).z).x), t_18);
+}
+
+fn DeCasteljauTexture_Read_Quadratic_Hybrid_0( tex_11 : texture_2d<f32>,  t_19 : f32,  LinearSampler_11 : sampler) -> f32
+{
+    var _S24 : vec2<f32> = vec2<f32>(t_19);
+    return mix((textureSampleLevel((tex_11), (LinearSampler_11), (mix(vec2<f32>(0.25f, 0.25f), vec2<f32>(0.75f, 0.25f), _S24)), (0.0f)).x), (textureSampleLevel((tex_11), (LinearSampler_11), (mix(vec2<f32>(0.25f, 0.75f), vec2<f32>(0.75f, 0.75f), _S24)), (0.0f)).x), t_19);
+}
+
+fn DeCasteljauTexture_Read_Cubic_Hybrid_0( tex_12 : texture_3d<f32>,  t_20 : f32,  LinearSampler_12 : sampler) -> f32
+{
+    var dims_5 : vec3<u32>;
+    var _S25 : u32 = dims_5[i32(0)];
+    var _S26 : u32 = dims_5[i32(1)];
+    var _S27 : u32 = dims_5[i32(2)];
+    {var dim = textureDimensions((tex_12));((_S25)) = dim.x;((_S26)) = dim.y;((_S27)) = dim.z;};
+    dims_5[i32(0)] = _S25;
+    dims_5[i32(1)] = _S26;
+    dims_5[i32(2)] = _S27;
+    var _S28 : vec3<f32> = vec3<f32>(t_20);
+    const _S29 : vec3<f32> = vec3<f32>(0.5f, 0.5f, 0.5f);
+    return mix((textureSampleLevel((tex_12), (LinearSampler_12), ((mix(vec3<f32>(0.0f, 0.0f, 0.0f), vec3<f32>(0.0f, 1.0f, 1.0f), _S28) + _S29) / vec3<f32>(dims_5)), (0.0f)).x), (textureSampleLevel((tex_12), (LinearSampler_12), ((mix(vec3<f32>(1.0f, 0.0f, 0.0f), vec3<f32>(1.0f, 1.0f, 1.0f), _S28) + _S29) / vec3<f32>(dims_5)), (0.0f)).x), t_20);
+}
+
+fn EvaluateHybrid_0( t_21 : f32) -> f32
+{
+    if(UseF32_0())
+    {
+        switch(_DrawCurves_0CB.CurveOrder_0)
         {
-            return SeilerTexture_Read_Cubic_0(SeilerTexture2D, t_17, LinearSampler);
+        case i32(0), :
+            {
+                return DeCasteljauTexture_Read_Linear_Hybrid_0(DCTexture2D, t_21, LinearSampler);
+            }
+        case i32(1), :
+            {
+                return DeCasteljauTexture_Read_Quadratic_Hybrid_0(DCTexture2D, t_21, LinearSampler);
+            }
+        case i32(2), :
+            {
+                return DeCasteljauTexture_Read_Cubic_Hybrid_0(DCTexture3D, t_21, LinearSampler);
+            }
+        case i32(3), :
+            {
+                return DeCasteljauTexture_Read_Quartic_0(DCTexture3D, t_21, LinearSampler);
+            }
+        case i32(4), :
+            {
+                return DeCasteljauTexture_Read_Quintic_0(DCTexture3D, t_21, LinearSampler);
+            }
+        case default, :
+            {
+                break;
+            }
         }
-    case i32(3), :
+    }
+    else
+    {
+        switch(_DrawCurves_0CB.CurveOrder_0)
         {
-            return SeilerTexture_Read_Quartic_0(SeilerTexture3D, t_17, LinearSampler);
-        }
-    case i32(4), :
-        {
-            return SeilerTexture_Read_Quintic_0(SeilerTexture3D, t_17, LinearSampler);
-        }
-    case default, :
-        {
-            break;
+        case i32(0), :
+            {
+                return DeCasteljauTexture_Read_Linear_Hybrid_0(DCTexture2DU8, t_21, LinearSampler);
+            }
+        case i32(1), :
+            {
+                return DeCasteljauTexture_Read_Quadratic_Hybrid_0(DCTexture2DU8, t_21, LinearSampler);
+            }
+        case i32(2), :
+            {
+                return DeCasteljauTexture_Read_Cubic_Hybrid_0(DCTexture3DU8, t_21, LinearSampler);
+            }
+        case i32(3), :
+            {
+                return DeCasteljauTexture_Read_Quartic_0(DCTexture3DU8, t_21, LinearSampler);
+            }
+        case i32(4), :
+            {
+                return DeCasteljauTexture_Read_Quintic_0(DCTexture3DU8, t_21, LinearSampler);
+            }
+        case default, :
+            {
+                break;
+            }
         }
     }
     return 0.0f;
@@ -309,34 +493,34 @@ fn LinearToSRGB_0( linearCol_0 : vec3<f32>) -> vec3<f32>
     var sRGBLo_0 : vec3<f32> = linearCol_0 * vec3<f32>(12.92000007629394531f);
     var sRGBHi_0 : vec3<f32> = pow(abs(linearCol_0), vec3<f32>(0.4166666567325592f, 0.4166666567325592f, 0.4166666567325592f)) * vec3<f32>(1.0549999475479126f) - vec3<f32>(0.05499999970197678f);
     var sRGB_0 : vec3<f32>;
-    var _S22 : f32;
+    var _S30 : f32;
     if((linearCol_0.x) <= 0.00313080009073019f)
     {
-        _S22 = sRGBLo_0.x;
+        _S30 = sRGBLo_0.x;
     }
     else
     {
-        _S22 = sRGBHi_0.x;
+        _S30 = sRGBHi_0.x;
     }
-    sRGB_0[i32(0)] = _S22;
+    sRGB_0[i32(0)] = _S30;
     if((linearCol_0.y) <= 0.00313080009073019f)
     {
-        _S22 = sRGBLo_0.y;
+        _S30 = sRGBLo_0.y;
     }
     else
     {
-        _S22 = sRGBHi_0.y;
+        _S30 = sRGBHi_0.y;
     }
-    sRGB_0[i32(1)] = _S22;
+    sRGB_0[i32(1)] = _S30;
     if((linearCol_0.z) <= 0.00313080009073019f)
     {
-        _S22 = sRGBLo_0.z;
+        _S30 = sRGBLo_0.z;
     }
     else
     {
-        _S22 = sRGBHi_0.z;
+        _S30 = sRGBHi_0.z;
     }
-    sRGB_0[i32(2)] = _S22;
+    sRGB_0[i32(2)] = _S30;
     return sRGB_0;
 }
 
@@ -345,82 +529,94 @@ fn LinearToSRGB_0( linearCol_0 : vec3<f32>) -> vec3<f32>
 fn main(@builtin(global_invocation_id) DTid_0 : vec3<u32>)
 {
     var dimensions_0 : vec2<u32>;
-    var _S23 : u32 = dimensions_0[i32(0)];
-    var _S24 : u32 = dimensions_0[i32(1)];
-    {var dim = textureDimensions((Output));((_S23)) = dim.x;((_S24)) = dim.y;};
-    dimensions_0[i32(0)] = _S23;
-    dimensions_0[i32(1)] = _S24;
+    var _S31 : u32 = dimensions_0[i32(0)];
+    var _S32 : u32 = dimensions_0[i32(1)];
+    {var dim = textureDimensions((Output));((_S31)) = dim.x;((_S32)) = dim.y;};
+    dimensions_0[i32(0)] = _S31;
+    dimensions_0[i32(1)] = _S32;
     var px_0 : vec2<u32> = DTid_0.xy;
-    var _S25 : vec2<f32> = (vec2<f32>(px_0) + vec2<f32>(0.5f, 0.5f)) / vec2<f32>(dimensions_0);
-    var uv_2 : vec2<f32> = _S25;
-    uv_2[i32(1)] = 1.0f - _S25.y;
-    var _S26 : vec2<f32> = vec2<f32>(0.5f);
-    var _S27 : vec2<f32> = (uv_2 - _S26) * vec2<f32>(1.04999995231628418f) + _S26;
-    uv_2 = _S27;
+    var _S33 : vec2<f32> = (vec2<f32>(px_0) + vec2<f32>(0.5f, 0.5f)) / vec2<f32>(dimensions_0);
+    var uv_2 : vec2<f32> = _S33;
+    uv_2[i32(1)] = 1.0f - _S33.y;
+    var _S34 : vec2<f32> = vec2<f32>(0.5f);
+    var _S35 : vec2<f32> = (uv_2 - _S34) * vec2<f32>(1.04999995231628418f) + _S34;
+    uv_2 = _S35;
     var color_1 : vec3<f32> = vec3<f32>(0.20000000298023224f, 0.20000000298023224f, 0.20000000298023224f);
-    var t_18 : f32 = _S27.x;
-    var _S28 : bool;
-    if(t_18 >= 0.0f)
+    var t_22 : f32 = _S35.x;
+    var _S36 : bool;
+    if(t_22 >= 0.0f)
     {
-        _S28 = (uv_2.x) <= 1.0f;
+        _S36 = (uv_2.x) <= 1.0f;
     }
     else
     {
-        _S28 = false;
+        _S36 = false;
     }
-    if(_S28)
+    if(_S36)
     {
-        _S28 = (uv_2.y) >= 0.0f;
+        _S36 = (uv_2.y) >= 0.0f;
     }
     else
     {
-        _S28 = false;
+        _S36 = false;
     }
-    if(_S28)
+    if(_S36)
     {
-        _S28 = (uv_2.y) <= 1.0f;
+        _S36 = (uv_2.y) <= 1.0f;
     }
     else
     {
-        _S28 = false;
+        _S36 = false;
     }
-    if(_S28)
+    if(_S36)
     {
         if(bool(_DrawCurves_0CB.ShowDeCasteljauTexture_0))
         {
-            _S28 = (uv_2.y) < (EvaluateDeCasteljauTexture_0(t_18));
+            _S36 = (uv_2.y) < (EvaluateDeCasteljauTexture_0(t_22));
         }
         else
         {
-            _S28 = false;
+            _S36 = false;
         }
-        if(_S28)
+        if(_S36)
         {
-            color_1[i32(0)] = 1.0f;
+            color_1 = color_1 + _DrawCurves_0CB.DeCasteljauColor_0;
         }
         if(bool(_DrawCurves_0CB.ShowPolynomial_0))
         {
-            _S28 = (uv_2.y) < (EvaluateBezierPolynomial_0(t_18));
+            _S36 = (uv_2.y) < (EvaluateBezierPolynomial_0(t_22));
         }
         else
         {
-            _S28 = false;
+            _S36 = false;
         }
-        if(_S28)
+        if(_S36)
         {
-            color_1[i32(1)] = 1.0f;
+            color_1 = color_1 + _DrawCurves_0CB.PolynomialColor_0;
         }
         if(bool(_DrawCurves_0CB.ShowSeilerTexture_0))
         {
-            _S28 = (uv_2.y) < (EvaluateSeilerTexture_0(t_18));
+            _S36 = (uv_2.y) < (EvaluateSeilerTexture_0(t_22));
         }
         else
         {
-            _S28 = false;
+            _S36 = false;
         }
-        if(_S28)
+        if(_S36)
         {
-            color_1[i32(2)] = 1.0f;
+            color_1 = color_1 + _DrawCurves_0CB.SeilerColor_0;
+        }
+        if(bool(_DrawCurves_0CB.ShowHybrid_0))
+        {
+            _S36 = (uv_2.y) < (EvaluateHybrid_0(t_22));
+        }
+        else
+        {
+            _S36 = false;
+        }
+        if(_S36)
+        {
+            color_1 = color_1 + _DrawCurves_0CB.HybridColor_0;
         }
     }
     if(bool(_DrawCurves_0CB.ShowControlPoints_0))
@@ -689,6 +885,262 @@ fn main(@builtin(global_invocation_id) DTid_0 : vec3<u32>)
 
 `;
 
+// Shader code for Compute shader "MakeCurveTextures_1", node "MakeCurveTexturesU8"
+static ShaderCode_MakeCurveTexturesU8_MakeCurveTextures_1 = `
+struct Struct_MakeCurveTextures_1CB_std140_0
+{
+    @align(16) CP1_0 : f32,
+    @align(4) CP2_0 : f32,
+    @align(8) CP3_0 : f32,
+    @align(4) CP4_0 : f32,
+    @align(16) CP5_0 : f32,
+    @align(4) CP6_0 : f32,
+    @align(8) CurveOrder_0 : i32,
+    @align(4) _padding0_0 : f32,
+};
+
+@binding(8) @group(0) var<uniform> _MakeCurveTextures_1CB : Struct_MakeCurveTextures_1CB_std140_0;
+@binding(0) @group(0) var DCTexture2D : texture_storage_2d</*(DCTexture2D_format)*/, write>;
+
+@binding(2) @group(0) var SeilerTexture2D : texture_storage_2d</*(SeilerTexture2D_format)*/, write>;
+
+@binding(1) @group(0) var DCTexture3D : texture_storage_3d</*(DCTexture3D_format)*/, write>;
+
+@binding(3) @group(0) var SeilerTexture3D : texture_storage_3d</*(SeilerTexture3D_format)*/, write>;
+
+fn DeCasteljauTexture_Write_Linear_0( _S1 : f32,  _S2 : f32)
+{
+    textureStore((DCTexture2D), (vec2<u32>(u32(0), u32(0))), vec4<f32>((_S1), 0, 0, 1));
+    textureStore((DCTexture2D), (vec2<u32>(u32(1), u32(0))), vec4<f32>((_S2), 0, 0, 1));
+    return;
+}
+
+fn SeilerTexture_Write_Linear_0( _S3 : f32,  _S4 : f32)
+{
+    textureStore((SeilerTexture2D), (vec2<u32>(u32(0), u32(0))), vec4<f32>((_S3), 0, 0, 1));
+    textureStore((SeilerTexture2D), (vec2<u32>(u32(1), u32(0))), vec4<f32>((_S4), 0, 0, 1));
+    return;
+}
+
+fn MakeLinear_0()
+{
+    DeCasteljauTexture_Write_Linear_0(_MakeCurveTextures_1CB.CP1_0, _MakeCurveTextures_1CB.CP2_0);
+    SeilerTexture_Write_Linear_0(_MakeCurveTextures_1CB.CP1_0, _MakeCurveTextures_1CB.CP2_0);
+    return;
+}
+
+fn DeCasteljauTexture_Write_Quadratic_0( _S5 : f32,  _S6 : f32,  _S7 : f32)
+{
+    textureStore((DCTexture2D), (vec2<u32>(u32(0), u32(0))), vec4<f32>((_S5), 0, 0, 1));
+    textureStore((DCTexture2D), (vec2<u32>(u32(1), u32(0))), vec4<f32>((_S6), 0, 0, 1));
+    textureStore((DCTexture2D), (vec2<u32>(u32(0), u32(1))), vec4<f32>((_S6), 0, 0, 1));
+    textureStore((DCTexture2D), (vec2<u32>(u32(1), u32(1))), vec4<f32>((_S7), 0, 0, 1));
+    return;
+}
+
+fn SeilerTexture_Write_Quadratic_0( _S8 : f32,  _S9 : f32,  _S10 : f32)
+{
+    var d1_0 : f32 = 2.0f * (_S9 - _S8) - (_S10 - _S8);
+    textureStore((SeilerTexture2D), (vec2<u32>(u32(0), u32(0))), vec4<f32>((_S8), 0, 0, 1));
+    textureStore((SeilerTexture2D), (vec2<u32>(u32(1), u32(0))), vec4<f32>((_S10), 0, 0, 1));
+    textureStore((SeilerTexture2D), (vec2<u32>(u32(0), u32(1))), vec4<f32>((_S8 + d1_0), 0, 0, 1));
+    textureStore((SeilerTexture2D), (vec2<u32>(u32(1), u32(1))), vec4<f32>((_S10 + d1_0), 0, 0, 1));
+    return;
+}
+
+fn MakeQuadratic_0()
+{
+    DeCasteljauTexture_Write_Quadratic_0(_MakeCurveTextures_1CB.CP1_0, _MakeCurveTextures_1CB.CP2_0, _MakeCurveTextures_1CB.CP3_0);
+    SeilerTexture_Write_Quadratic_0(_MakeCurveTextures_1CB.CP1_0, _MakeCurveTextures_1CB.CP2_0, _MakeCurveTextures_1CB.CP3_0);
+    return;
+}
+
+fn DeCasteljauTexture_Write_Cubic_0( _S11 : f32,  _S12 : f32,  _S13 : f32,  _S14 : f32)
+{
+    textureStore((DCTexture3D), (vec3<u32>(u32(0), u32(0), u32(0))), vec4<f32>((_S11), 0, 0, 1));
+    textureStore((DCTexture3D), (vec3<u32>(u32(1), u32(0), u32(0))), vec4<f32>((_S12), 0, 0, 1));
+    textureStore((DCTexture3D), (vec3<u32>(u32(0), u32(1), u32(0))), vec4<f32>((_S12), 0, 0, 1));
+    textureStore((DCTexture3D), (vec3<u32>(u32(1), u32(1), u32(0))), vec4<f32>((_S13), 0, 0, 1));
+    textureStore((DCTexture3D), (vec3<u32>(u32(0), u32(0), u32(1))), vec4<f32>((_S12), 0, 0, 1));
+    textureStore((DCTexture3D), (vec3<u32>(u32(1), u32(0), u32(1))), vec4<f32>((_S13), 0, 0, 1));
+    textureStore((DCTexture3D), (vec3<u32>(u32(0), u32(1), u32(1))), vec4<f32>((_S13), 0, 0, 1));
+    textureStore((DCTexture3D), (vec3<u32>(u32(1), u32(1), u32(1))), vec4<f32>((_S14), 0, 0, 1));
+    return;
+}
+
+fn SeilerTexture_Write_Cubic_0( _S15 : f32,  _S16 : f32,  _S17 : f32,  _S18 : f32)
+{
+    var d1_1 : f32 = 3.0f * (_S16 - _S15) - (_S18 - _S15);
+    var d2_0 : f32 = 3.0f * (_S17 - _S18) - (_S15 - _S18);
+    textureStore((SeilerTexture2D), (vec2<u32>(u32(0), u32(0))), vec4<f32>((_S15), 0, 0, 1));
+    textureStore((SeilerTexture2D), (vec2<u32>(u32(1), u32(0))), vec4<f32>((_S18), 0, 0, 1));
+    textureStore((SeilerTexture2D), (vec2<u32>(u32(0), u32(1))), vec4<f32>((_S15 + d1_1), 0, 0, 1));
+    textureStore((SeilerTexture2D), (vec2<u32>(u32(1), u32(1))), vec4<f32>((_S18 + d2_0), 0, 0, 1));
+    return;
+}
+
+fn MakeCubic_0()
+{
+    DeCasteljauTexture_Write_Cubic_0(_MakeCurveTextures_1CB.CP1_0, _MakeCurveTextures_1CB.CP2_0, _MakeCurveTextures_1CB.CP3_0, _MakeCurveTextures_1CB.CP4_0);
+    SeilerTexture_Write_Cubic_0(_MakeCurveTextures_1CB.CP1_0, _MakeCurveTextures_1CB.CP2_0, _MakeCurveTextures_1CB.CP3_0, _MakeCurveTextures_1CB.CP4_0);
+    return;
+}
+
+fn DeCasteljauTexture_Write_Quartic_0( _S19 : f32,  _S20 : f32,  _S21 : f32,  _S22 : f32,  _S23 : f32)
+{
+    textureStore((DCTexture3D), (vec3<u32>(u32(0), u32(0), u32(0))), vec4<f32>((_S19), 0, 0, 1));
+    textureStore((DCTexture3D), (vec3<u32>(u32(1), u32(0), u32(0))), vec4<f32>((_S20), 0, 0, 1));
+    textureStore((DCTexture3D), (vec3<u32>(u32(0), u32(1), u32(0))), vec4<f32>((_S20), 0, 0, 1));
+    textureStore((DCTexture3D), (vec3<u32>(u32(1), u32(1), u32(0))), vec4<f32>((_S21), 0, 0, 1));
+    textureStore((DCTexture3D), (vec3<u32>(u32(0), u32(0), u32(1))), vec4<f32>((_S20), 0, 0, 1));
+    textureStore((DCTexture3D), (vec3<u32>(u32(1), u32(0), u32(1))), vec4<f32>((_S21), 0, 0, 1));
+    textureStore((DCTexture3D), (vec3<u32>(u32(0), u32(1), u32(1))), vec4<f32>((_S21), 0, 0, 1));
+    textureStore((DCTexture3D), (vec3<u32>(u32(1), u32(1), u32(1))), vec4<f32>((_S22), 0, 0, 1));
+    textureStore((DCTexture3D), (vec3<u32>(u32(0), u32(0), u32(2))), vec4<f32>((_S21), 0, 0, 1));
+    textureStore((DCTexture3D), (vec3<u32>(u32(1), u32(0), u32(2))), vec4<f32>((_S22), 0, 0, 1));
+    textureStore((DCTexture3D), (vec3<u32>(u32(0), u32(1), u32(2))), vec4<f32>((_S22), 0, 0, 1));
+    textureStore((DCTexture3D), (vec3<u32>(u32(1), u32(1), u32(2))), vec4<f32>((_S23), 0, 0, 1));
+    return;
+}
+
+fn SeilerTexture_Write_Quartic_0( _S24 : f32,  _S25 : f32,  _S26 : f32,  _S27 : f32,  _S28 : f32)
+{
+    var _S29 : f32 = _S25 - _S24;
+    var d1_2 : f32 = 4.0f * _S29 - (_S28 - _S24);
+    var _S30 : f32 = _S27 - _S28;
+    var d3_0 : f32 = 4.0f * _S30 - (_S24 - _S28);
+    var d2_1 : f32 = 6.0f * (_S26 - _S25) - _S29 - _S30 - 3.0f * (_S27 - _S25);
+    textureStore((SeilerTexture3D), (vec3<u32>(u32(0), u32(0), u32(0))), vec4<f32>((_S24), 0, 0, 1));
+    textureStore((SeilerTexture3D), (vec3<u32>(u32(1), u32(0), u32(0))), vec4<f32>((_S28), 0, 0, 1));
+    textureStore((SeilerTexture3D), (vec3<u32>(u32(0), u32(1), u32(0))), vec4<f32>((_S24), 0, 0, 1));
+    textureStore((SeilerTexture3D), (vec3<u32>(u32(1), u32(1), u32(0))), vec4<f32>((_S28), 0, 0, 1));
+    var _S31 : f32 = _S24 + d1_2;
+    textureStore((SeilerTexture3D), (vec3<u32>(u32(0), u32(0), u32(1))), vec4<f32>((_S31), 0, 0, 1));
+    var _S32 : f32 = _S28 + d3_0;
+    textureStore((SeilerTexture3D), (vec3<u32>(u32(1), u32(0), u32(1))), vec4<f32>((_S32), 0, 0, 1));
+    textureStore((SeilerTexture3D), (vec3<u32>(u32(0), u32(1), u32(1))), vec4<f32>((_S31 + d2_1), 0, 0, 1));
+    textureStore((SeilerTexture3D), (vec3<u32>(u32(1), u32(1), u32(1))), vec4<f32>((_S32 + d2_1), 0, 0, 1));
+    return;
+}
+
+fn MakeQuartic_0()
+{
+    DeCasteljauTexture_Write_Quartic_0(_MakeCurveTextures_1CB.CP1_0, _MakeCurveTextures_1CB.CP2_0, _MakeCurveTextures_1CB.CP3_0, _MakeCurveTextures_1CB.CP4_0, _MakeCurveTextures_1CB.CP5_0);
+    SeilerTexture_Write_Quartic_0(_MakeCurveTextures_1CB.CP1_0, _MakeCurveTextures_1CB.CP2_0, _MakeCurveTextures_1CB.CP3_0, _MakeCurveTextures_1CB.CP4_0, _MakeCurveTextures_1CB.CP5_0);
+    return;
+}
+
+fn DeCasteljauTexture_Write_Quintic_0( _S33 : f32,  _S34 : f32,  _S35 : f32,  _S36 : f32,  _S37 : f32,  _S38 : f32)
+{
+    textureStore((DCTexture3D), (vec3<u32>(u32(0), u32(0), u32(0))), vec4<f32>((_S33), 0, 0, 1));
+    textureStore((DCTexture3D), (vec3<u32>(u32(1), u32(0), u32(0))), vec4<f32>((_S34), 0, 0, 1));
+    textureStore((DCTexture3D), (vec3<u32>(u32(0), u32(1), u32(0))), vec4<f32>((_S34), 0, 0, 1));
+    textureStore((DCTexture3D), (vec3<u32>(u32(1), u32(1), u32(0))), vec4<f32>((_S35), 0, 0, 1));
+    textureStore((DCTexture3D), (vec3<u32>(u32(0), u32(0), u32(1))), vec4<f32>((_S34), 0, 0, 1));
+    textureStore((DCTexture3D), (vec3<u32>(u32(1), u32(0), u32(1))), vec4<f32>((_S35), 0, 0, 1));
+    textureStore((DCTexture3D), (vec3<u32>(u32(0), u32(1), u32(1))), vec4<f32>((_S35), 0, 0, 1));
+    textureStore((DCTexture3D), (vec3<u32>(u32(1), u32(1), u32(1))), vec4<f32>((_S36), 0, 0, 1));
+    textureStore((DCTexture3D), (vec3<u32>(u32(0), u32(0), u32(2))), vec4<f32>((_S35), 0, 0, 1));
+    textureStore((DCTexture3D), (vec3<u32>(u32(1), u32(0), u32(2))), vec4<f32>((_S36), 0, 0, 1));
+    textureStore((DCTexture3D), (vec3<u32>(u32(0), u32(1), u32(2))), vec4<f32>((_S36), 0, 0, 1));
+    textureStore((DCTexture3D), (vec3<u32>(u32(1), u32(1), u32(2))), vec4<f32>((_S37), 0, 0, 1));
+    textureStore((DCTexture3D), (vec3<u32>(u32(0), u32(0), u32(3))), vec4<f32>((_S36), 0, 0, 1));
+    textureStore((DCTexture3D), (vec3<u32>(u32(1), u32(0), u32(3))), vec4<f32>((_S37), 0, 0, 1));
+    textureStore((DCTexture3D), (vec3<u32>(u32(0), u32(1), u32(3))), vec4<f32>((_S37), 0, 0, 1));
+    textureStore((DCTexture3D), (vec3<u32>(u32(1), u32(1), u32(3))), vec4<f32>((_S38), 0, 0, 1));
+    return;
+}
+
+fn SeilerTexture_Write_Quintic_0( _S39 : f32,  _S40 : f32,  _S41 : f32,  _S42 : f32,  _S43 : f32,  _S44 : f32)
+{
+    var _S45 : f32 = _S40 - _S39;
+    var d1_3 : f32 = 5.0f * _S45 - (_S44 - _S39);
+    var _S46 : f32 = _S43 - _S44;
+    var d4_0 : f32 = 5.0f * _S46 - (_S39 - _S44);
+    var d2_2 : f32 = 10.0f * (_S41 - _S40) - 3.0f * _S45 - 2.0f * _S46 - 3.0f * (_S43 - _S40);
+    var d3_1 : f32 = 10.0f * (_S42 - _S43) - 3.0f * _S46 - 2.0f * _S45 - 3.0f * (_S40 - _S43);
+    textureStore((SeilerTexture3D), (vec3<u32>(u32(0), u32(0), u32(0))), vec4<f32>((_S39), 0, 0, 1));
+    textureStore((SeilerTexture3D), (vec3<u32>(u32(1), u32(0), u32(0))), vec4<f32>((_S44), 0, 0, 1));
+    textureStore((SeilerTexture3D), (vec3<u32>(u32(0), u32(1), u32(0))), vec4<f32>((_S39), 0, 0, 1));
+    textureStore((SeilerTexture3D), (vec3<u32>(u32(1), u32(1), u32(0))), vec4<f32>((_S44), 0, 0, 1));
+    var _S47 : f32 = _S39 + d1_3;
+    textureStore((SeilerTexture3D), (vec3<u32>(u32(0), u32(0), u32(1))), vec4<f32>((_S47), 0, 0, 1));
+    var _S48 : f32 = _S44 + d4_0;
+    textureStore((SeilerTexture3D), (vec3<u32>(u32(1), u32(0), u32(1))), vec4<f32>((_S48), 0, 0, 1));
+    textureStore((SeilerTexture3D), (vec3<u32>(u32(0), u32(1), u32(1))), vec4<f32>((_S47 + d2_2), 0, 0, 1));
+    textureStore((SeilerTexture3D), (vec3<u32>(u32(1), u32(1), u32(1))), vec4<f32>((_S48 + d3_1), 0, 0, 1));
+    return;
+}
+
+fn MakeQuintic_0()
+{
+    DeCasteljauTexture_Write_Quintic_0(_MakeCurveTextures_1CB.CP1_0, _MakeCurveTextures_1CB.CP2_0, _MakeCurveTextures_1CB.CP3_0, _MakeCurveTextures_1CB.CP4_0, _MakeCurveTextures_1CB.CP5_0, _MakeCurveTextures_1CB.CP6_0);
+    SeilerTexture_Write_Quintic_0(_MakeCurveTextures_1CB.CP1_0, _MakeCurveTextures_1CB.CP2_0, _MakeCurveTextures_1CB.CP3_0, _MakeCurveTextures_1CB.CP4_0, _MakeCurveTextures_1CB.CP5_0, _MakeCurveTextures_1CB.CP6_0);
+    return;
+}
+
+@compute
+@workgroup_size(1, 1, 1)
+fn main(@builtin(global_invocation_id) DTid_0 : vec3<u32>)
+{
+    var _S49 : bool;
+    if((DTid_0.x) > u32(0))
+    {
+        _S49 = true;
+    }
+    else
+    {
+        _S49 = (DTid_0.y) > u32(0);
+    }
+    if(_S49)
+    {
+        _S49 = true;
+    }
+    else
+    {
+        _S49 = (DTid_0.z) > u32(0);
+    }
+    if(_S49)
+    {
+        return;
+    }
+    switch(_MakeCurveTextures_1CB.CurveOrder_0)
+    {
+    case i32(0), :
+        {
+            MakeLinear_0();
+            break;
+        }
+    case i32(1), :
+        {
+            MakeQuadratic_0();
+            break;
+        }
+    case i32(2), :
+        {
+            MakeCubic_0();
+            break;
+        }
+    case i32(3), :
+        {
+            MakeQuartic_0();
+            break;
+        }
+    case i32(4), :
+        {
+            MakeQuintic_0();
+            break;
+        }
+    case default, :
+        {
+            break;
+        }
+    }
+    return;
+}
+
+`;
+
 // -------------------- Enums
 
 static Enum_CurveOrders =
@@ -699,6 +1151,13 @@ static Enum_CurveOrders =
     Quartic: 3,
     Quintic: 4,
     _count: 5,
+}
+
+static Enum_TextureFormats =
+{
+    F32: 0,
+    U8: 1,
+    _count: 2,
 }
 
 // -------------------- Private Members
@@ -733,6 +1192,30 @@ texture_SeilerTexture3D_size = [0, 0, 0];
 texture_SeilerTexture3D_format = "";
 texture_SeilerTexture3D_usageFlags = GPUTextureUsage.COPY_DST | GPUTextureUsage.COPY_SRC | GPUTextureUsage.STORAGE_BINDING | GPUTextureUsage.TEXTURE_BINDING;
 
+// Texture DCTexture2DU8
+texture_DCTexture2DU8 = null;
+texture_DCTexture2DU8_size = [0, 0, 0];
+texture_DCTexture2DU8_format = "";
+texture_DCTexture2DU8_usageFlags = GPUTextureUsage.COPY_DST | GPUTextureUsage.COPY_SRC | GPUTextureUsage.STORAGE_BINDING | GPUTextureUsage.TEXTURE_BINDING;
+
+// Texture DCTexture3DU8
+texture_DCTexture3DU8 = null;
+texture_DCTexture3DU8_size = [0, 0, 0];
+texture_DCTexture3DU8_format = "";
+texture_DCTexture3DU8_usageFlags = GPUTextureUsage.COPY_DST | GPUTextureUsage.COPY_SRC | GPUTextureUsage.STORAGE_BINDING | GPUTextureUsage.TEXTURE_BINDING;
+
+// Texture SeilerTexture2DU8
+texture_SeilerTexture2DU8 = null;
+texture_SeilerTexture2DU8_size = [0, 0, 0];
+texture_SeilerTexture2DU8_format = "";
+texture_SeilerTexture2DU8_usageFlags = GPUTextureUsage.COPY_DST | GPUTextureUsage.COPY_SRC | GPUTextureUsage.STORAGE_BINDING | GPUTextureUsage.TEXTURE_BINDING;
+
+// Texture SeilerTexture3DU8
+texture_SeilerTexture3DU8 = null;
+texture_SeilerTexture3DU8_size = [0, 0, 0];
+texture_SeilerTexture3DU8_format = "";
+texture_SeilerTexture3DU8_usageFlags = GPUTextureUsage.COPY_DST | GPUTextureUsage.COPY_SRC | GPUTextureUsage.STORAGE_BINDING | GPUTextureUsage.TEXTURE_BINDING;
+
 // Texture DrawCurves_Output_ReadOnly : This is a read only texture copy to help get around read-write storage texture format limitations.
 texture_DrawCurves_Output_ReadOnly = null;
 texture_DrawCurves_Output_ReadOnly_size = [0, 0, 0];
@@ -763,9 +1246,33 @@ texture_MakeCurveTextures_SeilerTexture3D_ReadOnly_size = [0, 0, 0];
 texture_MakeCurveTextures_SeilerTexture3D_ReadOnly_format = "";
 texture_MakeCurveTextures_SeilerTexture3D_ReadOnly_usageFlags = GPUTextureUsage.COPY_DST | GPUTextureUsage.COPY_SRC | GPUTextureUsage.STORAGE_BINDING;
 
+// Texture MakeCurveTexturesU8_DCTexture2D_ReadOnly : This is a read only texture copy to help get around read-write storage texture format limitations.
+texture_MakeCurveTexturesU8_DCTexture2D_ReadOnly = null;
+texture_MakeCurveTexturesU8_DCTexture2D_ReadOnly_size = [0, 0, 0];
+texture_MakeCurveTexturesU8_DCTexture2D_ReadOnly_format = "";
+texture_MakeCurveTexturesU8_DCTexture2D_ReadOnly_usageFlags = GPUTextureUsage.COPY_DST | GPUTextureUsage.COPY_SRC | GPUTextureUsage.STORAGE_BINDING;
+
+// Texture MakeCurveTexturesU8_DCTexture3D_ReadOnly : This is a read only texture copy to help get around read-write storage texture format limitations.
+texture_MakeCurveTexturesU8_DCTexture3D_ReadOnly = null;
+texture_MakeCurveTexturesU8_DCTexture3D_ReadOnly_size = [0, 0, 0];
+texture_MakeCurveTexturesU8_DCTexture3D_ReadOnly_format = "";
+texture_MakeCurveTexturesU8_DCTexture3D_ReadOnly_usageFlags = GPUTextureUsage.COPY_DST | GPUTextureUsage.COPY_SRC | GPUTextureUsage.STORAGE_BINDING;
+
+// Texture MakeCurveTexturesU8_SeilerTexture2D_ReadOnly : This is a read only texture copy to help get around read-write storage texture format limitations.
+texture_MakeCurveTexturesU8_SeilerTexture2D_ReadOnly = null;
+texture_MakeCurveTexturesU8_SeilerTexture2D_ReadOnly_size = [0, 0, 0];
+texture_MakeCurveTexturesU8_SeilerTexture2D_ReadOnly_format = "";
+texture_MakeCurveTexturesU8_SeilerTexture2D_ReadOnly_usageFlags = GPUTextureUsage.COPY_DST | GPUTextureUsage.COPY_SRC | GPUTextureUsage.STORAGE_BINDING;
+
+// Texture MakeCurveTexturesU8_SeilerTexture3D_ReadOnly : This is a read only texture copy to help get around read-write storage texture format limitations.
+texture_MakeCurveTexturesU8_SeilerTexture3D_ReadOnly = null;
+texture_MakeCurveTexturesU8_SeilerTexture3D_ReadOnly_size = [0, 0, 0];
+texture_MakeCurveTexturesU8_SeilerTexture3D_ReadOnly_format = "";
+texture_MakeCurveTexturesU8_SeilerTexture3D_ReadOnly_usageFlags = GPUTextureUsage.COPY_DST | GPUTextureUsage.COPY_SRC | GPUTextureUsage.STORAGE_BINDING;
+
 // Constant buffer _DrawCurves_0CB
 constantBuffer__DrawCurves_0CB = null;
-constantBuffer__DrawCurves_0CB_size = 48;
+constantBuffer__DrawCurves_0CB_size = 128;
 constantBuffer__DrawCurves_0CB_usageFlags = GPUBufferUsage.COPY_DST | GPUBufferUsage.UNIFORM;
 
 // Constant buffer _MakeCurveTextures_0CB
@@ -780,6 +1287,18 @@ BindGroupLayout_Compute_MakeCurveTextures = null;
 PipelineLayout_Compute_MakeCurveTextures = null;
 Pipeline_Compute_MakeCurveTextures = null;
 
+// Constant buffer _MakeCurveTextures_1CB
+constantBuffer__MakeCurveTextures_1CB = null;
+constantBuffer__MakeCurveTextures_1CB_size = 32;
+constantBuffer__MakeCurveTextures_1CB_usageFlags = GPUBufferUsage.COPY_DST | GPUBufferUsage.UNIFORM;
+
+// Compute Shader MakeCurveTexturesU8
+Hash_Compute_MakeCurveTexturesU8 = 0;
+ShaderModule_Compute_MakeCurveTexturesU8 = null;
+BindGroupLayout_Compute_MakeCurveTexturesU8 = null;
+PipelineLayout_Compute_MakeCurveTexturesU8 = null;
+Pipeline_Compute_MakeCurveTexturesU8 = null;
+
 // Compute Shader DrawCurves
 Hash_Compute_DrawCurves = 0;
 ShaderModule_Compute_DrawCurves = null;
@@ -792,6 +1311,9 @@ Pipeline_Compute_DrawCurves = null;
 variable_CurveOrder = this.constructor.Enum_CurveOrders.Quintic;
 variableDefault_CurveOrder = this.constructor.Enum_CurveOrders.Quintic;
 variableChanged_CurveOrder = false;
+variable_TextureFormat = this.constructor.Enum_TextureFormats.F32;
+variableDefault_TextureFormat = this.constructor.Enum_TextureFormats.F32;
+variableChanged_TextureFormat = false;
 variable_CP1 = 0.;
 variableDefault_CP1 = 0.;
 variableChanged_CP1 = false;
@@ -810,21 +1332,36 @@ variableChanged_CP5 = false;
 variable_CP6 = 1.;
 variableDefault_CP6 = 1.;
 variableChanged_CP6 = false;
-variable_ShowDeCasteljauTexture = true;  // In Red Channel
-variableDefault_ShowDeCasteljauTexture = true;  // In Red Channel
-variableChanged_ShowDeCasteljauTexture = false;
-variable_ShowPolynomial = true;  // In Green Channel
-variableDefault_ShowPolynomial = true;  // In Green Channel
+variable_ShowPolynomial = true;
+variableDefault_ShowPolynomial = true;
 variableChanged_ShowPolynomial = false;
-variable_ShowSeilerTexture = true;  // In Blue Channel
-variableDefault_ShowSeilerTexture = true;  // In Blue Channel
+variable_ShowDeCasteljauTexture = true;
+variableDefault_ShowDeCasteljauTexture = true;
+variableChanged_ShowDeCasteljauTexture = false;
+variable_ShowSeilerTexture = true;
+variableDefault_ShowSeilerTexture = true;
 variableChanged_ShowSeilerTexture = false;
 variable_ShowControlPoints = true;  // In black
 variableDefault_ShowControlPoints = true;  // In black
 variableChanged_ShowControlPoints = false;
+variable_ShowHybrid = false;  // de CastelJau texture, but the last lerp done in shaders at full f32 precision. Quartic and Quintic are already hybrid.
+variableDefault_ShowHybrid = false;  // de CastelJau texture, but the last lerp done in shaders at full f32 precision. Quartic and Quintic are already hybrid.
+variableChanged_ShowHybrid = false;
 variable_RenderSize = [ 512, 512 ];
 variableDefault_RenderSize = [ 512, 512 ];
 variableChanged_RenderSize = [ false, false ];
+variable_PolynomialColor = [ 1., 0., 0. ];
+variableDefault_PolynomialColor = [ 1., 0., 0. ];
+variableChanged_PolynomialColor = [ false, false, false ];
+variable_DeCasteljauColor = [ 0., 1., 0. ];
+variableDefault_DeCasteljauColor = [ 0., 1., 0. ];
+variableChanged_DeCasteljauColor = [ false, false, false ];
+variable_SeilerColor = [ 0., 0., 1. ];
+variableDefault_SeilerColor = [ 0., 0., 1. ];
+variableChanged_SeilerColor = [ false, false, false ];
+variable_HybridColor = [ 0., 0., 1. ];
+variableDefault_HybridColor = [ 0., 0., 1. ];
+variableChanged_HybridColor = [ false, false, false ];
 
 // -------------------- Structs
 
@@ -837,15 +1374,48 @@ static StructOffsets__DrawCurves_0CB =
     CP5: 16,
     CP6: 20,
     CurveOrder: 24,
-    ShowControlPoints: 28,
-    ShowDeCasteljauTexture: 32,
-    ShowPolynomial: 36,
-    ShowSeilerTexture: 40,
-    _padding0: 44,
-    _size: 48,
+    _padding0: 28,
+    DeCasteljauColor_0: 32,
+    DeCasteljauColor_1: 36,
+    DeCasteljauColor_2: 40,
+    _padding1: 44,
+    HybridColor_0: 48,
+    HybridColor_1: 52,
+    HybridColor_2: 56,
+    _padding2: 60,
+    PolynomialColor_0: 64,
+    PolynomialColor_1: 68,
+    PolynomialColor_2: 72,
+    _padding3: 76,
+    SeilerColor_0: 80,
+    SeilerColor_1: 84,
+    SeilerColor_2: 88,
+    ShowControlPoints: 92,
+    ShowDeCasteljauTexture: 96,
+    ShowHybrid: 100,
+    ShowPolynomial: 104,
+    ShowSeilerTexture: 108,
+    TextureFormat: 112,
+    _padding4: 116,
+    _padding5: 120,
+    _padding6: 124,
+    _size: 128,
 }
 
 static StructOffsets__MakeCurveTextures_0CB =
+{
+    CP1: 0,
+    CP2: 4,
+    CP3: 8,
+    CP4: 12,
+    CP5: 16,
+    CP6: 20,
+    CurveOrder: 24,
+    _padding0: 28,
+    _size: 32,
+}
+
+static StructOffsets__MakeCurveTextures_1CB =
 {
     CP1: 0,
     CP2: 4,
@@ -1048,6 +1618,144 @@ async Init(device, encoder, useBlockingAPIs)
         }
     }
 
+    // Handle (re)creation of texture DCTexture2DU8
+    {
+        const baseSize = [ 1, 1, 1 ];
+        const desiredSize = [
+            Math.floor(((parseInt(baseSize[0]) + 0) * 2) / 1) + 0,
+            Math.floor(((parseInt(baseSize[1]) + 0) * 2) / 1) + 0,
+            Math.floor(((parseInt(baseSize[2]) + 0) * 1) / 1) + 0
+        ];
+        const desiredFormat = "rgba8unorm";
+        if (this.texture_DCTexture2DU8 !== null && (this.texture_DCTexture2DU8_format != desiredFormat || this.texture_DCTexture2DU8_size[0] != desiredSize[0] || this.texture_DCTexture2DU8_size[1] != desiredSize[1] || this.texture_DCTexture2DU8_size[2] != desiredSize[2]))
+        {
+            this.texture_DCTexture2DU8.destroy();
+            this.texture_DCTexture2DU8 = null;
+        }
+
+        if (this.texture_DCTexture2DU8 === null)
+        {
+            this.texture_DCTexture2DU8_size = desiredSize.slice();
+            this.texture_DCTexture2DU8_format = desiredFormat;
+
+            let viewFormats = [];
+            if (Shared.IsSRGBFormat(this.texture_DCTexture2DU8_format))
+                viewFormats.push(this.texture_DCTexture2DU8_format);
+
+            this.texture_DCTexture2DU8 = device.createTexture({
+                label: "texture ViewCurves.DCTexture2DU8",
+                size: this.texture_DCTexture2DU8_size,
+                format: Shared.GetNonSRGBFormat(this.texture_DCTexture2DU8_format),
+                usage: this.texture_DCTexture2DU8_usageFlags,
+                viewFormats: viewFormats,
+            });
+        }
+    }
+
+    // Handle (re)creation of texture DCTexture3DU8
+    {
+        const baseSize = [ 1, 1, 1 ];
+        const desiredSize = [
+            Math.floor(((parseInt(baseSize[0]) + 0) * 2) / 1) + 0,
+            Math.floor(((parseInt(baseSize[1]) + 0) * 2) / 1) + 0,
+            Math.floor(((parseInt(baseSize[2]) + 0) * 4) / 1) + 0
+        ];
+        const desiredFormat = this.texture_DCTexture2DU8_format;
+        if (this.texture_DCTexture3DU8 !== null && (this.texture_DCTexture3DU8_format != desiredFormat || this.texture_DCTexture3DU8_size[0] != desiredSize[0] || this.texture_DCTexture3DU8_size[1] != desiredSize[1] || this.texture_DCTexture3DU8_size[2] != desiredSize[2]))
+        {
+            this.texture_DCTexture3DU8.destroy();
+            this.texture_DCTexture3DU8 = null;
+        }
+
+        if (this.texture_DCTexture3DU8 === null)
+        {
+            this.texture_DCTexture3DU8_size = desiredSize.slice();
+            this.texture_DCTexture3DU8_format = desiredFormat;
+
+            let viewFormats = [];
+            if (Shared.IsSRGBFormat(this.texture_DCTexture3DU8_format))
+                viewFormats.push(this.texture_DCTexture3DU8_format);
+
+            this.texture_DCTexture3DU8 = device.createTexture({
+                label: "texture ViewCurves.DCTexture3DU8",
+                size: this.texture_DCTexture3DU8_size,
+                format: Shared.GetNonSRGBFormat(this.texture_DCTexture3DU8_format),
+                usage: this.texture_DCTexture3DU8_usageFlags,
+                viewFormats: viewFormats,
+                dimension: "3d",
+            });
+        }
+    }
+
+    // Handle (re)creation of texture SeilerTexture2DU8
+    {
+        const baseSize = [ 1, 1, 1 ];
+        const desiredSize = [
+            Math.floor(((parseInt(baseSize[0]) + 0) * 2) / 1) + 0,
+            Math.floor(((parseInt(baseSize[1]) + 0) * 2) / 1) + 0,
+            Math.floor(((parseInt(baseSize[2]) + 0) * 1) / 1) + 0
+        ];
+        const desiredFormat = this.texture_DCTexture2DU8_format;
+        if (this.texture_SeilerTexture2DU8 !== null && (this.texture_SeilerTexture2DU8_format != desiredFormat || this.texture_SeilerTexture2DU8_size[0] != desiredSize[0] || this.texture_SeilerTexture2DU8_size[1] != desiredSize[1] || this.texture_SeilerTexture2DU8_size[2] != desiredSize[2]))
+        {
+            this.texture_SeilerTexture2DU8.destroy();
+            this.texture_SeilerTexture2DU8 = null;
+        }
+
+        if (this.texture_SeilerTexture2DU8 === null)
+        {
+            this.texture_SeilerTexture2DU8_size = desiredSize.slice();
+            this.texture_SeilerTexture2DU8_format = desiredFormat;
+
+            let viewFormats = [];
+            if (Shared.IsSRGBFormat(this.texture_SeilerTexture2DU8_format))
+                viewFormats.push(this.texture_SeilerTexture2DU8_format);
+
+            this.texture_SeilerTexture2DU8 = device.createTexture({
+                label: "texture ViewCurves.SeilerTexture2DU8",
+                size: this.texture_SeilerTexture2DU8_size,
+                format: Shared.GetNonSRGBFormat(this.texture_SeilerTexture2DU8_format),
+                usage: this.texture_SeilerTexture2DU8_usageFlags,
+                viewFormats: viewFormats,
+            });
+        }
+    }
+
+    // Handle (re)creation of texture SeilerTexture3DU8
+    {
+        const baseSize = [ 1, 1, 1 ];
+        const desiredSize = [
+            Math.floor(((parseInt(baseSize[0]) + 0) * 2) / 1) + 0,
+            Math.floor(((parseInt(baseSize[1]) + 0) * 2) / 1) + 0,
+            Math.floor(((parseInt(baseSize[2]) + 0) * 2) / 1) + 0
+        ];
+        const desiredFormat = this.texture_DCTexture2DU8_format;
+        if (this.texture_SeilerTexture3DU8 !== null && (this.texture_SeilerTexture3DU8_format != desiredFormat || this.texture_SeilerTexture3DU8_size[0] != desiredSize[0] || this.texture_SeilerTexture3DU8_size[1] != desiredSize[1] || this.texture_SeilerTexture3DU8_size[2] != desiredSize[2]))
+        {
+            this.texture_SeilerTexture3DU8.destroy();
+            this.texture_SeilerTexture3DU8 = null;
+        }
+
+        if (this.texture_SeilerTexture3DU8 === null)
+        {
+            this.texture_SeilerTexture3DU8_size = desiredSize.slice();
+            this.texture_SeilerTexture3DU8_format = desiredFormat;
+
+            let viewFormats = [];
+            if (Shared.IsSRGBFormat(this.texture_SeilerTexture3DU8_format))
+                viewFormats.push(this.texture_SeilerTexture3DU8_format);
+
+            this.texture_SeilerTexture3DU8 = device.createTexture({
+                label: "texture ViewCurves.SeilerTexture3DU8",
+                size: this.texture_SeilerTexture3DU8_size,
+                format: Shared.GetNonSRGBFormat(this.texture_SeilerTexture3DU8_format),
+                usage: this.texture_SeilerTexture3DU8_usageFlags,
+                viewFormats: viewFormats,
+                dimension: "3d",
+            });
+        }
+    }
+
     // Handle (re)creation of texture DrawCurves_Output_ReadOnly
     {
         const baseSize = this.texture_Output_size.slice();
@@ -1220,6 +1928,144 @@ async Init(device, encoder, useBlockingAPIs)
         }
     }
 
+    // Handle (re)creation of texture MakeCurveTexturesU8_DCTexture2D_ReadOnly
+    {
+        const baseSize = this.texture_DCTexture2DU8_size.slice();
+        const desiredSize = [
+            Math.floor(((parseInt(baseSize[0]) + 0) * 1) / 1) + 0,
+            Math.floor(((parseInt(baseSize[1]) + 0) * 1) / 1) + 0,
+            Math.floor(((parseInt(baseSize[2]) + 0) * 1) / 1) + 0
+        ];
+        const desiredFormat = this.texture_DCTexture2DU8_format;
+        if (this.texture_MakeCurveTexturesU8_DCTexture2D_ReadOnly !== null && (this.texture_MakeCurveTexturesU8_DCTexture2D_ReadOnly_format != desiredFormat || this.texture_MakeCurveTexturesU8_DCTexture2D_ReadOnly_size[0] != desiredSize[0] || this.texture_MakeCurveTexturesU8_DCTexture2D_ReadOnly_size[1] != desiredSize[1] || this.texture_MakeCurveTexturesU8_DCTexture2D_ReadOnly_size[2] != desiredSize[2]))
+        {
+            this.texture_MakeCurveTexturesU8_DCTexture2D_ReadOnly.destroy();
+            this.texture_MakeCurveTexturesU8_DCTexture2D_ReadOnly = null;
+        }
+
+        if (this.texture_MakeCurveTexturesU8_DCTexture2D_ReadOnly === null)
+        {
+            this.texture_MakeCurveTexturesU8_DCTexture2D_ReadOnly_size = desiredSize.slice();
+            this.texture_MakeCurveTexturesU8_DCTexture2D_ReadOnly_format = desiredFormat;
+
+            let viewFormats = [];
+            if (Shared.IsSRGBFormat(this.texture_MakeCurveTexturesU8_DCTexture2D_ReadOnly_format))
+                viewFormats.push(this.texture_MakeCurveTexturesU8_DCTexture2D_ReadOnly_format);
+
+            this.texture_MakeCurveTexturesU8_DCTexture2D_ReadOnly = device.createTexture({
+                label: "texture ViewCurves.MakeCurveTexturesU8_DCTexture2D_ReadOnly",
+                size: this.texture_MakeCurveTexturesU8_DCTexture2D_ReadOnly_size,
+                format: Shared.GetNonSRGBFormat(this.texture_MakeCurveTexturesU8_DCTexture2D_ReadOnly_format),
+                usage: this.texture_MakeCurveTexturesU8_DCTexture2D_ReadOnly_usageFlags,
+                viewFormats: viewFormats,
+            });
+        }
+    }
+
+    // Handle (re)creation of texture MakeCurveTexturesU8_DCTexture3D_ReadOnly
+    {
+        const baseSize = this.texture_DCTexture3DU8_size.slice();
+        const desiredSize = [
+            Math.floor(((parseInt(baseSize[0]) + 0) * 1) / 1) + 0,
+            Math.floor(((parseInt(baseSize[1]) + 0) * 1) / 1) + 0,
+            Math.floor(((parseInt(baseSize[2]) + 0) * 1) / 1) + 0
+        ];
+        const desiredFormat = this.texture_DCTexture3DU8_format;
+        if (this.texture_MakeCurveTexturesU8_DCTexture3D_ReadOnly !== null && (this.texture_MakeCurveTexturesU8_DCTexture3D_ReadOnly_format != desiredFormat || this.texture_MakeCurveTexturesU8_DCTexture3D_ReadOnly_size[0] != desiredSize[0] || this.texture_MakeCurveTexturesU8_DCTexture3D_ReadOnly_size[1] != desiredSize[1] || this.texture_MakeCurveTexturesU8_DCTexture3D_ReadOnly_size[2] != desiredSize[2]))
+        {
+            this.texture_MakeCurveTexturesU8_DCTexture3D_ReadOnly.destroy();
+            this.texture_MakeCurveTexturesU8_DCTexture3D_ReadOnly = null;
+        }
+
+        if (this.texture_MakeCurveTexturesU8_DCTexture3D_ReadOnly === null)
+        {
+            this.texture_MakeCurveTexturesU8_DCTexture3D_ReadOnly_size = desiredSize.slice();
+            this.texture_MakeCurveTexturesU8_DCTexture3D_ReadOnly_format = desiredFormat;
+
+            let viewFormats = [];
+            if (Shared.IsSRGBFormat(this.texture_MakeCurveTexturesU8_DCTexture3D_ReadOnly_format))
+                viewFormats.push(this.texture_MakeCurveTexturesU8_DCTexture3D_ReadOnly_format);
+
+            this.texture_MakeCurveTexturesU8_DCTexture3D_ReadOnly = device.createTexture({
+                label: "texture ViewCurves.MakeCurveTexturesU8_DCTexture3D_ReadOnly",
+                size: this.texture_MakeCurveTexturesU8_DCTexture3D_ReadOnly_size,
+                format: Shared.GetNonSRGBFormat(this.texture_MakeCurveTexturesU8_DCTexture3D_ReadOnly_format),
+                usage: this.texture_MakeCurveTexturesU8_DCTexture3D_ReadOnly_usageFlags,
+                viewFormats: viewFormats,
+                dimension: "3d",
+            });
+        }
+    }
+
+    // Handle (re)creation of texture MakeCurveTexturesU8_SeilerTexture2D_ReadOnly
+    {
+        const baseSize = this.texture_SeilerTexture2DU8_size.slice();
+        const desiredSize = [
+            Math.floor(((parseInt(baseSize[0]) + 0) * 1) / 1) + 0,
+            Math.floor(((parseInt(baseSize[1]) + 0) * 1) / 1) + 0,
+            Math.floor(((parseInt(baseSize[2]) + 0) * 1) / 1) + 0
+        ];
+        const desiredFormat = this.texture_SeilerTexture2DU8_format;
+        if (this.texture_MakeCurveTexturesU8_SeilerTexture2D_ReadOnly !== null && (this.texture_MakeCurveTexturesU8_SeilerTexture2D_ReadOnly_format != desiredFormat || this.texture_MakeCurveTexturesU8_SeilerTexture2D_ReadOnly_size[0] != desiredSize[0] || this.texture_MakeCurveTexturesU8_SeilerTexture2D_ReadOnly_size[1] != desiredSize[1] || this.texture_MakeCurveTexturesU8_SeilerTexture2D_ReadOnly_size[2] != desiredSize[2]))
+        {
+            this.texture_MakeCurveTexturesU8_SeilerTexture2D_ReadOnly.destroy();
+            this.texture_MakeCurveTexturesU8_SeilerTexture2D_ReadOnly = null;
+        }
+
+        if (this.texture_MakeCurveTexturesU8_SeilerTexture2D_ReadOnly === null)
+        {
+            this.texture_MakeCurveTexturesU8_SeilerTexture2D_ReadOnly_size = desiredSize.slice();
+            this.texture_MakeCurveTexturesU8_SeilerTexture2D_ReadOnly_format = desiredFormat;
+
+            let viewFormats = [];
+            if (Shared.IsSRGBFormat(this.texture_MakeCurveTexturesU8_SeilerTexture2D_ReadOnly_format))
+                viewFormats.push(this.texture_MakeCurveTexturesU8_SeilerTexture2D_ReadOnly_format);
+
+            this.texture_MakeCurveTexturesU8_SeilerTexture2D_ReadOnly = device.createTexture({
+                label: "texture ViewCurves.MakeCurveTexturesU8_SeilerTexture2D_ReadOnly",
+                size: this.texture_MakeCurveTexturesU8_SeilerTexture2D_ReadOnly_size,
+                format: Shared.GetNonSRGBFormat(this.texture_MakeCurveTexturesU8_SeilerTexture2D_ReadOnly_format),
+                usage: this.texture_MakeCurveTexturesU8_SeilerTexture2D_ReadOnly_usageFlags,
+                viewFormats: viewFormats,
+            });
+        }
+    }
+
+    // Handle (re)creation of texture MakeCurveTexturesU8_SeilerTexture3D_ReadOnly
+    {
+        const baseSize = this.texture_SeilerTexture3DU8_size.slice();
+        const desiredSize = [
+            Math.floor(((parseInt(baseSize[0]) + 0) * 1) / 1) + 0,
+            Math.floor(((parseInt(baseSize[1]) + 0) * 1) / 1) + 0,
+            Math.floor(((parseInt(baseSize[2]) + 0) * 1) / 1) + 0
+        ];
+        const desiredFormat = this.texture_SeilerTexture3DU8_format;
+        if (this.texture_MakeCurveTexturesU8_SeilerTexture3D_ReadOnly !== null && (this.texture_MakeCurveTexturesU8_SeilerTexture3D_ReadOnly_format != desiredFormat || this.texture_MakeCurveTexturesU8_SeilerTexture3D_ReadOnly_size[0] != desiredSize[0] || this.texture_MakeCurveTexturesU8_SeilerTexture3D_ReadOnly_size[1] != desiredSize[1] || this.texture_MakeCurveTexturesU8_SeilerTexture3D_ReadOnly_size[2] != desiredSize[2]))
+        {
+            this.texture_MakeCurveTexturesU8_SeilerTexture3D_ReadOnly.destroy();
+            this.texture_MakeCurveTexturesU8_SeilerTexture3D_ReadOnly = null;
+        }
+
+        if (this.texture_MakeCurveTexturesU8_SeilerTexture3D_ReadOnly === null)
+        {
+            this.texture_MakeCurveTexturesU8_SeilerTexture3D_ReadOnly_size = desiredSize.slice();
+            this.texture_MakeCurveTexturesU8_SeilerTexture3D_ReadOnly_format = desiredFormat;
+
+            let viewFormats = [];
+            if (Shared.IsSRGBFormat(this.texture_MakeCurveTexturesU8_SeilerTexture3D_ReadOnly_format))
+                viewFormats.push(this.texture_MakeCurveTexturesU8_SeilerTexture3D_ReadOnly_format);
+
+            this.texture_MakeCurveTexturesU8_SeilerTexture3D_ReadOnly = device.createTexture({
+                label: "texture ViewCurves.MakeCurveTexturesU8_SeilerTexture3D_ReadOnly",
+                size: this.texture_MakeCurveTexturesU8_SeilerTexture3D_ReadOnly_size,
+                format: Shared.GetNonSRGBFormat(this.texture_MakeCurveTexturesU8_SeilerTexture3D_ReadOnly_format),
+                usage: this.texture_MakeCurveTexturesU8_SeilerTexture3D_ReadOnly_usageFlags,
+                viewFormats: viewFormats,
+                dimension: "3d",
+            });
+        }
+    }
+
     // (Re)create compute shader MakeCurveTextures
     {
         const bindGroupEntries =
@@ -1335,6 +2181,121 @@ async Init(device, encoder, useBlockingAPIs)
         }
     }
 
+    // (Re)create compute shader MakeCurveTexturesU8
+    {
+        const bindGroupEntries =
+        [
+            {
+                // DCTexture2D
+                binding: 0,
+                visibility: GPUShaderStage.COMPUTE,
+                storageTexture : { access: "write-only", format: Shared.GetNonSRGBFormat(this.texture_DCTexture2DU8_format), viewDimension: "2d" }
+            },
+            {
+                // DCTexture3D
+                binding: 1,
+                visibility: GPUShaderStage.COMPUTE,
+                storageTexture : { access: "write-only", format: Shared.GetNonSRGBFormat(this.texture_DCTexture3DU8_format), viewDimension: "3d" }
+            },
+            {
+                // SeilerTexture2D
+                binding: 2,
+                visibility: GPUShaderStage.COMPUTE,
+                storageTexture : { access: "write-only", format: Shared.GetNonSRGBFormat(this.texture_SeilerTexture2DU8_format), viewDimension: "2d" }
+            },
+            {
+                // SeilerTexture3D
+                binding: 3,
+                visibility: GPUShaderStage.COMPUTE,
+                storageTexture : { access: "write-only", format: Shared.GetNonSRGBFormat(this.texture_SeilerTexture3DU8_format), viewDimension: "3d" }
+            },
+            {
+                // DCTexture2DReadOnly
+                binding: 4,
+                visibility: GPUShaderStage.COMPUTE,
+                storageTexture : { access: "read-only", format: Shared.GetNonSRGBFormat(this.texture_MakeCurveTexturesU8_DCTexture2D_ReadOnly_format), viewDimension: "2d" }
+            },
+            {
+                // DCTexture3DReadOnly
+                binding: 5,
+                visibility: GPUShaderStage.COMPUTE,
+                storageTexture : { access: "read-only", format: Shared.GetNonSRGBFormat(this.texture_MakeCurveTexturesU8_DCTexture3D_ReadOnly_format), viewDimension: "3d" }
+            },
+            {
+                // SeilerTexture2DReadOnly
+                binding: 6,
+                visibility: GPUShaderStage.COMPUTE,
+                storageTexture : { access: "read-only", format: Shared.GetNonSRGBFormat(this.texture_MakeCurveTexturesU8_SeilerTexture2D_ReadOnly_format), viewDimension: "2d" }
+            },
+            {
+                // SeilerTexture3DReadOnly
+                binding: 7,
+                visibility: GPUShaderStage.COMPUTE,
+                storageTexture : { access: "read-only", format: Shared.GetNonSRGBFormat(this.texture_MakeCurveTexturesU8_SeilerTexture3D_ReadOnly_format), viewDimension: "3d" }
+            },
+            {
+                // _MakeCurveTextures_1CB
+                binding: 8,
+                visibility: GPUShaderStage.COMPUTE,
+                buffer: { type: "uniform" }
+            },
+        ];
+
+        let hashString = JSON.stringify(bindGroupEntries);
+        const newHash = hashString.hashCode();
+
+        if (this.ShaderModule_Compute_MakeCurveTexturesU8 === null || newHash !== this.Hash_Compute_MakeCurveTexturesU8)
+        {
+            this.Hash_Compute_MakeCurveTexturesU8 = newHash;
+
+            let shaderCode = class_ViewCurves.ShaderCode_MakeCurveTexturesU8_MakeCurveTextures_1;
+            shaderCode = shaderCode.replace("/*(DCTexture2D_format)*/", Shared.GetNonSRGBFormat(this.texture_DCTexture2DU8_format));
+            shaderCode = shaderCode.replace("/*(DCTexture3D_format)*/", Shared.GetNonSRGBFormat(this.texture_DCTexture3DU8_format));
+            shaderCode = shaderCode.replace("/*(SeilerTexture2D_format)*/", Shared.GetNonSRGBFormat(this.texture_SeilerTexture2DU8_format));
+            shaderCode = shaderCode.replace("/*(SeilerTexture3D_format)*/", Shared.GetNonSRGBFormat(this.texture_SeilerTexture3DU8_format));
+            shaderCode = shaderCode.replace("/*(DCTexture2DReadOnly_format)*/", Shared.GetNonSRGBFormat(this.texture_MakeCurveTexturesU8_DCTexture2D_ReadOnly_format));
+            shaderCode = shaderCode.replace("/*(DCTexture3DReadOnly_format)*/", Shared.GetNonSRGBFormat(this.texture_MakeCurveTexturesU8_DCTexture3D_ReadOnly_format));
+            shaderCode = shaderCode.replace("/*(SeilerTexture2DReadOnly_format)*/", Shared.GetNonSRGBFormat(this.texture_MakeCurveTexturesU8_SeilerTexture2D_ReadOnly_format));
+            shaderCode = shaderCode.replace("/*(SeilerTexture3DReadOnly_format)*/", Shared.GetNonSRGBFormat(this.texture_MakeCurveTexturesU8_SeilerTexture3D_ReadOnly_format));
+
+            this.ShaderModule_Compute_MakeCurveTexturesU8 = device.createShaderModule({ code: shaderCode, label: "Compute Shader MakeCurveTexturesU8"});
+            this.BindGroupLayout_Compute_MakeCurveTexturesU8 = device.createBindGroupLayout({
+                label: "Compute Bind Group Layout MakeCurveTexturesU8",
+                entries: bindGroupEntries
+            });
+
+            this.PipelineLayout_Compute_MakeCurveTexturesU8 = device.createPipelineLayout({
+                label: "Compute Pipeline Layout MakeCurveTexturesU8",
+                bindGroupLayouts: [this.BindGroupLayout_Compute_MakeCurveTexturesU8],
+            });
+
+            if (useBlockingAPIs)
+            {
+                this.Pipeline_Compute_MakeCurveTexturesU8 = device.createComputePipeline({
+                    label: "Compute Pipeline MakeCurveTexturesU8",
+                    layout: this.PipelineLayout_Compute_MakeCurveTexturesU8,
+                    compute: {
+                        module: this.ShaderModule_Compute_MakeCurveTexturesU8,
+                        entryPoint: "main",
+                    }
+                });
+            }
+            else
+            {
+                this.loadingPromises.add("MakeCurveTexturesU8");
+
+                device.createComputePipelineAsync({
+                    label: "Compute Pipeline MakeCurveTexturesU8",
+                    layout: this.PipelineLayout_Compute_MakeCurveTexturesU8,
+                    compute: {
+                        module: this.ShaderModule_Compute_MakeCurveTexturesU8,
+                        entryPoint: "main",
+                    }
+                }).then( handle => { this.Pipeline_Compute_MakeCurveTexturesU8 = handle; this.loadingPromises.delete("MakeCurveTexturesU8"); } );
+            }
+        }
+    }
+
     // (Re)create compute shader DrawCurves
     {
         const bindGroupEntries =
@@ -1370,20 +2331,44 @@ async Init(device, encoder, useBlockingAPIs)
                 texture : { viewDimension: "3d", sampleType: Shared.GetTextureFormatInfo(this.texture_SeilerTexture3D_format).sampleType }
             },
             {
-                // OutputReadOnly
+                // DCTexture2DU8
                 binding: 5,
+                visibility: GPUShaderStage.COMPUTE,
+                texture : { viewDimension: "2d", sampleType: Shared.GetTextureFormatInfo(this.texture_DCTexture2DU8_format).sampleType }
+            },
+            {
+                // DCTexture3DU8
+                binding: 6,
+                visibility: GPUShaderStage.COMPUTE,
+                texture : { viewDimension: "3d", sampleType: Shared.GetTextureFormatInfo(this.texture_DCTexture3DU8_format).sampleType }
+            },
+            {
+                // SeilerTexture2DU8
+                binding: 7,
+                visibility: GPUShaderStage.COMPUTE,
+                texture : { viewDimension: "2d", sampleType: Shared.GetTextureFormatInfo(this.texture_SeilerTexture2DU8_format).sampleType }
+            },
+            {
+                // SeilerTexture3DU8
+                binding: 8,
+                visibility: GPUShaderStage.COMPUTE,
+                texture : { viewDimension: "3d", sampleType: Shared.GetTextureFormatInfo(this.texture_SeilerTexture3DU8_format).sampleType }
+            },
+            {
+                // OutputReadOnly
+                binding: 9,
                 visibility: GPUShaderStage.COMPUTE,
                 storageTexture : { access: "read-only", format: Shared.GetNonSRGBFormat(this.texture_DrawCurves_Output_ReadOnly_format), viewDimension: "2d" }
             },
             {
                 // _DrawCurves_0CB
-                binding: 6,
+                binding: 10,
                 visibility: GPUShaderStage.COMPUTE,
                 buffer: { type: "uniform" }
             },
             {
                 // LinearSampler
-                binding: 7,
+                binding: 11,
                 visibility: GPUShaderStage.COMPUTE,
                 sampler: { },
             },
@@ -1461,6 +2446,22 @@ async FillEncoder(device, encoder)
     encoder.pushDebugGroup("ViewCurves.SeilerTexture3D");
 
     encoder.popDebugGroup(); // "ViewCurves.SeilerTexture3D"
+
+    encoder.pushDebugGroup("ViewCurves.DCTexture2DU8");
+
+    encoder.popDebugGroup(); // "ViewCurves.DCTexture2DU8"
+
+    encoder.pushDebugGroup("ViewCurves.DCTexture3DU8");
+
+    encoder.popDebugGroup(); // "ViewCurves.DCTexture3DU8"
+
+    encoder.pushDebugGroup("ViewCurves.SeilerTexture2DU8");
+
+    encoder.popDebugGroup(); // "ViewCurves.SeilerTexture2DU8"
+
+    encoder.pushDebugGroup("ViewCurves.SeilerTexture3DU8");
+
+    encoder.popDebugGroup(); // "ViewCurves.SeilerTexture3DU8"
 
     encoder.pushDebugGroup("ViewCurves.DrawCurves_Output_ReadOnly");
 
@@ -1627,6 +2628,138 @@ async FillEncoder(device, encoder)
 
     encoder.popDebugGroup(); // "ViewCurves.Copy_MakeCurveTextures_SeilerTexture3D"
 
+    encoder.pushDebugGroup("ViewCurves.MakeCurveTexturesU8_DCTexture2D_ReadOnly");
+
+    encoder.popDebugGroup(); // "ViewCurves.MakeCurveTexturesU8_DCTexture2D_ReadOnly"
+
+    encoder.pushDebugGroup("ViewCurves.Copy_MakeCurveTexturesU8_DCTexture2D");
+
+    // Copy texture DCTexture2DU8 to texture MakeCurveTexturesU8_DCTexture2D_ReadOnly
+    {
+        const numMips = Math.min(this.texture_DCTexture2DU8.mipLevelCount, this.texture_MakeCurveTexturesU8_DCTexture2D_ReadOnly.mipLevelCount);
+
+        for (let mipIndex = 0; mipIndex < numMips; ++mipIndex)
+        {
+            const mipWidth = Math.max(this.texture_DCTexture2DU8.width >> mipIndex, 1);
+            const mipHeight = Math.max(this.texture_DCTexture2DU8.height >> mipIndex, 1);
+            let mipDepth = this.texture_DCTexture2DU8.depthOrArrayLayers;
+
+            if (this.texture_DCTexture2DU8.dimension == "3d")
+                mipDepth = Math.max(mipDepth >> mipIndex, 1);
+
+            encoder.copyTextureToTexture(
+                { texture: this.texture_DCTexture2DU8, mipLevel: mipIndex },
+                { texture: this.texture_MakeCurveTexturesU8_DCTexture2D_ReadOnly, mipLevel: mipIndex },
+                {
+                    width: mipWidth,
+                    height: mipHeight,
+                    depthOrArrayLayers: mipDepth,
+                }
+            );
+        }
+    }
+
+    encoder.popDebugGroup(); // "ViewCurves.Copy_MakeCurveTexturesU8_DCTexture2D"
+
+    encoder.pushDebugGroup("ViewCurves.MakeCurveTexturesU8_DCTexture3D_ReadOnly");
+
+    encoder.popDebugGroup(); // "ViewCurves.MakeCurveTexturesU8_DCTexture3D_ReadOnly"
+
+    encoder.pushDebugGroup("ViewCurves.Copy_MakeCurveTexturesU8_DCTexture3D");
+
+    // Copy texture DCTexture3DU8 to texture MakeCurveTexturesU8_DCTexture3D_ReadOnly
+    {
+        const numMips = Math.min(this.texture_DCTexture3DU8.mipLevelCount, this.texture_MakeCurveTexturesU8_DCTexture3D_ReadOnly.mipLevelCount);
+
+        for (let mipIndex = 0; mipIndex < numMips; ++mipIndex)
+        {
+            const mipWidth = Math.max(this.texture_DCTexture3DU8.width >> mipIndex, 1);
+            const mipHeight = Math.max(this.texture_DCTexture3DU8.height >> mipIndex, 1);
+            let mipDepth = this.texture_DCTexture3DU8.depthOrArrayLayers;
+
+            if (this.texture_DCTexture3DU8.dimension == "3d")
+                mipDepth = Math.max(mipDepth >> mipIndex, 1);
+
+            encoder.copyTextureToTexture(
+                { texture: this.texture_DCTexture3DU8, mipLevel: mipIndex },
+                { texture: this.texture_MakeCurveTexturesU8_DCTexture3D_ReadOnly, mipLevel: mipIndex },
+                {
+                    width: mipWidth,
+                    height: mipHeight,
+                    depthOrArrayLayers: mipDepth,
+                }
+            );
+        }
+    }
+
+    encoder.popDebugGroup(); // "ViewCurves.Copy_MakeCurveTexturesU8_DCTexture3D"
+
+    encoder.pushDebugGroup("ViewCurves.MakeCurveTexturesU8_SeilerTexture2D_ReadOnly");
+
+    encoder.popDebugGroup(); // "ViewCurves.MakeCurveTexturesU8_SeilerTexture2D_ReadOnly"
+
+    encoder.pushDebugGroup("ViewCurves.Copy_MakeCurveTexturesU8_SeilerTexture2D");
+
+    // Copy texture SeilerTexture2DU8 to texture MakeCurveTexturesU8_SeilerTexture2D_ReadOnly
+    {
+        const numMips = Math.min(this.texture_SeilerTexture2DU8.mipLevelCount, this.texture_MakeCurveTexturesU8_SeilerTexture2D_ReadOnly.mipLevelCount);
+
+        for (let mipIndex = 0; mipIndex < numMips; ++mipIndex)
+        {
+            const mipWidth = Math.max(this.texture_SeilerTexture2DU8.width >> mipIndex, 1);
+            const mipHeight = Math.max(this.texture_SeilerTexture2DU8.height >> mipIndex, 1);
+            let mipDepth = this.texture_SeilerTexture2DU8.depthOrArrayLayers;
+
+            if (this.texture_SeilerTexture2DU8.dimension == "3d")
+                mipDepth = Math.max(mipDepth >> mipIndex, 1);
+
+            encoder.copyTextureToTexture(
+                { texture: this.texture_SeilerTexture2DU8, mipLevel: mipIndex },
+                { texture: this.texture_MakeCurveTexturesU8_SeilerTexture2D_ReadOnly, mipLevel: mipIndex },
+                {
+                    width: mipWidth,
+                    height: mipHeight,
+                    depthOrArrayLayers: mipDepth,
+                }
+            );
+        }
+    }
+
+    encoder.popDebugGroup(); // "ViewCurves.Copy_MakeCurveTexturesU8_SeilerTexture2D"
+
+    encoder.pushDebugGroup("ViewCurves.MakeCurveTexturesU8_SeilerTexture3D_ReadOnly");
+
+    encoder.popDebugGroup(); // "ViewCurves.MakeCurveTexturesU8_SeilerTexture3D_ReadOnly"
+
+    encoder.pushDebugGroup("ViewCurves.Copy_MakeCurveTexturesU8_SeilerTexture3D");
+
+    // Copy texture SeilerTexture3DU8 to texture MakeCurveTexturesU8_SeilerTexture3D_ReadOnly
+    {
+        const numMips = Math.min(this.texture_SeilerTexture3DU8.mipLevelCount, this.texture_MakeCurveTexturesU8_SeilerTexture3D_ReadOnly.mipLevelCount);
+
+        for (let mipIndex = 0; mipIndex < numMips; ++mipIndex)
+        {
+            const mipWidth = Math.max(this.texture_SeilerTexture3DU8.width >> mipIndex, 1);
+            const mipHeight = Math.max(this.texture_SeilerTexture3DU8.height >> mipIndex, 1);
+            let mipDepth = this.texture_SeilerTexture3DU8.depthOrArrayLayers;
+
+            if (this.texture_SeilerTexture3DU8.dimension == "3d")
+                mipDepth = Math.max(mipDepth >> mipIndex, 1);
+
+            encoder.copyTextureToTexture(
+                { texture: this.texture_SeilerTexture3DU8, mipLevel: mipIndex },
+                { texture: this.texture_MakeCurveTexturesU8_SeilerTexture3D_ReadOnly, mipLevel: mipIndex },
+                {
+                    width: mipWidth,
+                    height: mipHeight,
+                    depthOrArrayLayers: mipDepth,
+                }
+            );
+        }
+    }
+
+    encoder.popDebugGroup(); // "ViewCurves.Copy_MakeCurveTexturesU8_SeilerTexture3D"
+
     encoder.pushDebugGroup("ViewCurves._DrawCurves_0CB");
 
     // Create constant buffer _DrawCurves_0CB
@@ -1650,10 +2783,24 @@ async FillEncoder(device, encoder)
         view.setFloat32(this.constructor.StructOffsets__DrawCurves_0CB.CP5, this.variable_CP5, true);
         view.setFloat32(this.constructor.StructOffsets__DrawCurves_0CB.CP6, this.variable_CP6, true);
         view.setInt32(this.constructor.StructOffsets__DrawCurves_0CB.CurveOrder, this.variable_CurveOrder, true);
+        view.setFloat32(this.constructor.StructOffsets__DrawCurves_0CB.DeCasteljauColor_0, this.variable_DeCasteljauColor[0], true);
+        view.setFloat32(this.constructor.StructOffsets__DrawCurves_0CB.DeCasteljauColor_1, this.variable_DeCasteljauColor[1], true);
+        view.setFloat32(this.constructor.StructOffsets__DrawCurves_0CB.DeCasteljauColor_2, this.variable_DeCasteljauColor[2], true);
+        view.setFloat32(this.constructor.StructOffsets__DrawCurves_0CB.HybridColor_0, this.variable_HybridColor[0], true);
+        view.setFloat32(this.constructor.StructOffsets__DrawCurves_0CB.HybridColor_1, this.variable_HybridColor[1], true);
+        view.setFloat32(this.constructor.StructOffsets__DrawCurves_0CB.HybridColor_2, this.variable_HybridColor[2], true);
+        view.setFloat32(this.constructor.StructOffsets__DrawCurves_0CB.PolynomialColor_0, this.variable_PolynomialColor[0], true);
+        view.setFloat32(this.constructor.StructOffsets__DrawCurves_0CB.PolynomialColor_1, this.variable_PolynomialColor[1], true);
+        view.setFloat32(this.constructor.StructOffsets__DrawCurves_0CB.PolynomialColor_2, this.variable_PolynomialColor[2], true);
+        view.setFloat32(this.constructor.StructOffsets__DrawCurves_0CB.SeilerColor_0, this.variable_SeilerColor[0], true);
+        view.setFloat32(this.constructor.StructOffsets__DrawCurves_0CB.SeilerColor_1, this.variable_SeilerColor[1], true);
+        view.setFloat32(this.constructor.StructOffsets__DrawCurves_0CB.SeilerColor_2, this.variable_SeilerColor[2], true);
         view.setUint32(this.constructor.StructOffsets__DrawCurves_0CB.ShowControlPoints, (this.variable_ShowControlPoints === true ? 1 : 0), true);
         view.setUint32(this.constructor.StructOffsets__DrawCurves_0CB.ShowDeCasteljauTexture, (this.variable_ShowDeCasteljauTexture === true ? 1 : 0), true);
+        view.setUint32(this.constructor.StructOffsets__DrawCurves_0CB.ShowHybrid, (this.variable_ShowHybrid === true ? 1 : 0), true);
         view.setUint32(this.constructor.StructOffsets__DrawCurves_0CB.ShowPolynomial, (this.variable_ShowPolynomial === true ? 1 : 0), true);
         view.setUint32(this.constructor.StructOffsets__DrawCurves_0CB.ShowSeilerTexture, (this.variable_ShowSeilerTexture === true ? 1 : 0), true);
+        view.setInt32(this.constructor.StructOffsets__DrawCurves_0CB.TextureFormat, this.variable_TextureFormat, true);
         device.queue.writeBuffer(this.constantBuffer__DrawCurves_0CB, 0, bufferCPU);
     }
 
@@ -1763,6 +2910,110 @@ async FillEncoder(device, encoder)
 
     encoder.popDebugGroup(); // "ViewCurves.MakeCurveTextures"
 
+    encoder.pushDebugGroup("ViewCurves._MakeCurveTextures_1CB");
+
+    // Create constant buffer _MakeCurveTextures_1CB
+    if (this.constantBuffer__MakeCurveTextures_1CB === null)
+    {
+        this.constantBuffer__MakeCurveTextures_1CB = device.createBuffer({
+            label: "ViewCurves._MakeCurveTextures_1CB",
+            size: Shared.Align(16, this.constructor.StructOffsets__MakeCurveTextures_1CB._size),
+            usage: this.constantBuffer__MakeCurveTextures_1CB_usageFlags,
+        });
+    }
+
+    // Upload values to constant buffer _MakeCurveTextures_1CB
+    {
+        const bufferCPU = new ArrayBuffer(Shared.Align(16, this.constructor.StructOffsets__MakeCurveTextures_1CB._size));
+        const view = new DataView(bufferCPU);
+        view.setFloat32(this.constructor.StructOffsets__MakeCurveTextures_1CB.CP1, this.variable_CP1, true);
+        view.setFloat32(this.constructor.StructOffsets__MakeCurveTextures_1CB.CP2, this.variable_CP2, true);
+        view.setFloat32(this.constructor.StructOffsets__MakeCurveTextures_1CB.CP3, this.variable_CP3, true);
+        view.setFloat32(this.constructor.StructOffsets__MakeCurveTextures_1CB.CP4, this.variable_CP4, true);
+        view.setFloat32(this.constructor.StructOffsets__MakeCurveTextures_1CB.CP5, this.variable_CP5, true);
+        view.setFloat32(this.constructor.StructOffsets__MakeCurveTextures_1CB.CP6, this.variable_CP6, true);
+        view.setInt32(this.constructor.StructOffsets__MakeCurveTextures_1CB.CurveOrder, this.variable_CurveOrder, true);
+        device.queue.writeBuffer(this.constantBuffer__MakeCurveTextures_1CB, 0, bufferCPU);
+    }
+
+    encoder.popDebugGroup(); // "ViewCurves._MakeCurveTextures_1CB"
+
+    encoder.pushDebugGroup("ViewCurves.MakeCurveTexturesU8");
+
+    // Run compute shader MakeCurveTexturesU8
+    {
+        const bindGroup = device.createBindGroup({
+            label: "Compute Bind Group MakeCurveTexturesU8",
+            layout: this.BindGroupLayout_Compute_MakeCurveTexturesU8,
+            entries: [
+                {
+                    // DCTexture2D
+                    binding: 0,
+                    resource: this.texture_DCTexture2DU8.createView({ dimension: "2d", mipLevelCount: 1, baseMipLevel: 0 })
+                },
+                {
+                    // DCTexture3D
+                    binding: 1,
+                    resource: this.texture_DCTexture3DU8.createView({ dimension: "3d", mipLevelCount: 1, baseMipLevel: 0 })
+                },
+                {
+                    // SeilerTexture2D
+                    binding: 2,
+                    resource: this.texture_SeilerTexture2DU8.createView({ dimension: "2d", mipLevelCount: 1, baseMipLevel: 0 })
+                },
+                {
+                    // SeilerTexture3D
+                    binding: 3,
+                    resource: this.texture_SeilerTexture3DU8.createView({ dimension: "3d", mipLevelCount: 1, baseMipLevel: 0 })
+                },
+                {
+                    // DCTexture2DReadOnly
+                    binding: 4,
+                    resource: this.texture_MakeCurveTexturesU8_DCTexture2D_ReadOnly.createView({ dimension: "2d", mipLevelCount: 1, baseMipLevel: 0 })
+                },
+                {
+                    // DCTexture3DReadOnly
+                    binding: 5,
+                    resource: this.texture_MakeCurveTexturesU8_DCTexture3D_ReadOnly.createView({ dimension: "3d", mipLevelCount: 1, baseMipLevel: 0 })
+                },
+                {
+                    // SeilerTexture2DReadOnly
+                    binding: 6,
+                    resource: this.texture_MakeCurveTexturesU8_SeilerTexture2D_ReadOnly.createView({ dimension: "2d", mipLevelCount: 1, baseMipLevel: 0 })
+                },
+                {
+                    // SeilerTexture3DReadOnly
+                    binding: 7,
+                    resource: this.texture_MakeCurveTexturesU8_SeilerTexture3D_ReadOnly.createView({ dimension: "3d", mipLevelCount: 1, baseMipLevel: 0 })
+                },
+                {
+                    // _MakeCurveTextures_1CB
+                    binding: 8,
+                    resource: { buffer: this.constantBuffer__MakeCurveTextures_1CB }
+                },
+            ]
+        });
+
+        // Calculate dispatch size
+        const baseDispatchSize = [1, 1, 1];
+        const dispatchSize = [
+            Math.floor((Math.floor(((parseInt(baseDispatchSize[0]) + 0) * 1) / 1) + 0 + 1 - 1) / 1),
+            Math.floor((Math.floor(((parseInt(baseDispatchSize[1]) + 0) * 1) / 1) + 0 + 1 - 1) / 1),
+            Math.floor((Math.floor(((parseInt(baseDispatchSize[2]) + 0) * 1) / 1) + 0 + 1 - 1) / 1)
+        ];
+
+        if (this.Pipeline_Compute_MakeCurveTexturesU8 !== null)
+        {
+            const computePass = encoder.beginComputePass();
+                computePass.setPipeline(this.Pipeline_Compute_MakeCurveTexturesU8);
+                computePass.setBindGroup(0, bindGroup);
+                computePass.dispatchWorkgroups(dispatchSize[0], dispatchSize[1], dispatchSize[2]);
+            computePass.end();
+        }
+    }
+
+    encoder.popDebugGroup(); // "ViewCurves.MakeCurveTexturesU8"
+
     encoder.pushDebugGroup("ViewCurves.DrawCurves");
 
     // Run compute shader DrawCurves
@@ -1797,18 +3048,38 @@ async FillEncoder(device, encoder)
                     resource: this.texture_SeilerTexture3D.createView({ dimension: "3d", format: this.texture_SeilerTexture3D_format, usage: GPUTextureUsage.TEXTURE_BINDING })
                 },
                 {
-                    // OutputReadOnly
+                    // DCTexture2DU8
                     binding: 5,
+                    resource: this.texture_DCTexture2DU8.createView({ dimension: "2d", format: this.texture_DCTexture2DU8_format, usage: GPUTextureUsage.TEXTURE_BINDING })
+                },
+                {
+                    // DCTexture3DU8
+                    binding: 6,
+                    resource: this.texture_DCTexture3DU8.createView({ dimension: "3d", format: this.texture_DCTexture3DU8_format, usage: GPUTextureUsage.TEXTURE_BINDING })
+                },
+                {
+                    // SeilerTexture2DU8
+                    binding: 7,
+                    resource: this.texture_SeilerTexture2DU8.createView({ dimension: "2d", format: this.texture_SeilerTexture2DU8_format, usage: GPUTextureUsage.TEXTURE_BINDING })
+                },
+                {
+                    // SeilerTexture3DU8
+                    binding: 8,
+                    resource: this.texture_SeilerTexture3DU8.createView({ dimension: "3d", format: this.texture_SeilerTexture3DU8_format, usage: GPUTextureUsage.TEXTURE_BINDING })
+                },
+                {
+                    // OutputReadOnly
+                    binding: 9,
                     resource: this.texture_DrawCurves_Output_ReadOnly.createView({ dimension: "2d", mipLevelCount: 1, baseMipLevel: 0 })
                 },
                 {
                     // _DrawCurves_0CB
-                    binding: 6,
+                    binding: 10,
                     resource: { buffer: this.constantBuffer__DrawCurves_0CB }
                 },
                 {
                     // LinearSampler
-                    binding: 7,
+                    binding: 11,
                     resource: device.createSampler({
                         label: "Sampler LinearSampler",
                         addressModeU: "repeat",

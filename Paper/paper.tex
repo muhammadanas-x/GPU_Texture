@@ -38,7 +38,8 @@
     \includegraphics[width=\textwidth]{title_image.pdf}
   \end{center}
   \caption{A 3d cubic Bézier curve is encoded in the RGB channels of a 2x2 texture and decoded using a single texture lookup using Seiler interpolation. The curve control points are
-  $b_0$, $b_1$, $b_2$, $b_3$,and the Seiler points are $s_0$ and $s_1$. This formulation allows computation to be offloaded to the GPU's fixed-function texture interpolation hardware.}
+  $b_0$, $b_1$, $b_2$, $b_3$,and the Seiler points are $s_0$ and $s_1$. This formulation extends to curves of higher and lower degrees, and  allows computation to be offloaded to the
+  GPU's fixed-function texture interpolation hardware.}
   \label{fig:teaser}
 }
 
@@ -138,7 +139,7 @@ format, leading to unavoidable quantization errors \cite{CUDA_PG}.  If this is a
 32 bit float precision.
 
 \AW{Show jaggies from X.8 interpolation in one of the diagrams}
-\AW{Does Seiler stay within 0 to 1 if the control points are between 0 and 1? if not, we should talk about those limitations in the Seiler section too}
+\AW{Does Seiler stay within 0 to 1 if the control points are between 0 and 1? if not, we should talk about those limitations in the Seiler section too. It does not!}
 
 \section{Seiler Interpolation Using Linear Texture Interpolation}
 Seiler interpolation provides a more efficient method for evaluating cubic Bézier curves, requiring only \textbf{three linear interpolations} instead of the six needed by the classical De Casteljau algorithm. This efficiency is achieved through the introduction of \textbf{difference terms}.

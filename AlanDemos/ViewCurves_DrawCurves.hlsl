@@ -6,6 +6,11 @@
 #include "DeCasteljauTexture.hlsli"
 #include "SeilerTexture.hlsli"
 
+static const bool UseF32()
+{
+    return /*$(Variable:TextureFormat)*/ == TextureFormats::F32;
+}
+
 float EvaluateBezierPolynomial(float t)
 {
     switch (/*$(Variable:CurveOrder)*/)
@@ -21,26 +26,85 @@ float EvaluateBezierPolynomial(float t)
 
 float EvaluateSeilerTexture(float t)
 {
-    switch (/*$(Variable:CurveOrder)*/)
+    if (UseF32())
     {
-        case CurveOrders::Linear: return SeilerTexture_Read_Linear(SeilerTexture2D, t, LinearSampler);
-        case CurveOrders::Quadratic: return SeilerTexture_Read_Quadratic(SeilerTexture2D, t, LinearSampler);
-        case CurveOrders::Cubic: return SeilerTexture_Read_Cubic(SeilerTexture2D, t, LinearSampler);
-        case CurveOrders::Quartic: return SeilerTexture_Read_Quartic(SeilerTexture3D, t, LinearSampler);
-        case CurveOrders::Quintic: return SeilerTexture_Read_Quintic(SeilerTexture3D, t, LinearSampler);
+        switch (/*$(Variable:CurveOrder)*/)
+        {
+            case CurveOrders::Linear: return SeilerTexture_Read_Linear(SeilerTexture2D, t, LinearSampler);
+            case CurveOrders::Quadratic: return SeilerTexture_Read_Quadratic(SeilerTexture2D, t, LinearSampler);
+            case CurveOrders::Cubic: return SeilerTexture_Read_Cubic(SeilerTexture2D, t, LinearSampler);
+            case CurveOrders::Quartic: return SeilerTexture_Read_Quartic(SeilerTexture3D, t, LinearSampler);
+            case CurveOrders::Quintic: return SeilerTexture_Read_Quintic(SeilerTexture3D, t, LinearSampler);
+        }
+    }
+    else
+    {
+        switch (/*$(Variable:CurveOrder)*/)
+        {
+            case CurveOrders::Linear: return SeilerTexture_Read_Linear(SeilerTexture2DU8, t, LinearSampler);
+            case CurveOrders::Quadratic: return SeilerTexture_Read_Quadratic(SeilerTexture2DU8, t, LinearSampler);
+            case CurveOrders::Cubic: return SeilerTexture_Read_Cubic(SeilerTexture2DU8, t, LinearSampler);
+            case CurveOrders::Quartic: return SeilerTexture_Read_Quartic(SeilerTexture3DU8, t, LinearSampler);
+            case CurveOrders::Quintic: return SeilerTexture_Read_Quintic(SeilerTexture3DU8, t, LinearSampler);
+        }
     }
     return 0.0f;
 }
 
 float EvaluateDeCasteljauTexture(float t)
 {
-    switch (/*$(Variable:CurveOrder)*/)
+    if (UseF32())
     {
-        case CurveOrders::Linear: return DeCasteljauTexture_Read_Linear(DCTexture2D, t, LinearSampler);
-        case CurveOrders::Quadratic: return DeCasteljauTexture_Read_Quadratic(DCTexture2D, t, LinearSampler);
-        case CurveOrders::Cubic: return DeCasteljauTexture_Read_Cubic(DCTexture3D, t, LinearSampler);
-        case CurveOrders::Quartic: return DeCasteljauTexture_Read_Quartic(DCTexture3D, t, LinearSampler);
-        case CurveOrders::Quintic: return DeCasteljauTexture_Read_Quintic(DCTexture3D, t, LinearSampler);
+        switch (/*$(Variable:CurveOrder)*/)
+        {
+            case CurveOrders::Linear: return DeCasteljauTexture_Read_Linear(DCTexture2D, t, LinearSampler);
+            case CurveOrders::Quadratic: return DeCasteljauTexture_Read_Quadratic(DCTexture2D, t, LinearSampler);
+            case CurveOrders::Cubic: return DeCasteljauTexture_Read_Cubic(DCTexture3D, t, LinearSampler);
+            case CurveOrders::Quartic: return DeCasteljauTexture_Read_Quartic(DCTexture3D, t, LinearSampler);
+            case CurveOrders::Quintic: return DeCasteljauTexture_Read_Quintic(DCTexture3D, t, LinearSampler);
+        }
+    }
+    else
+    {
+        switch (/*$(Variable:CurveOrder)*/)
+        {
+            case CurveOrders::Linear: return DeCasteljauTexture_Read_Linear(DCTexture2DU8, t, LinearSampler);
+            case CurveOrders::Quadratic: return DeCasteljauTexture_Read_Quadratic(DCTexture2DU8, t, LinearSampler);
+            case CurveOrders::Cubic: return DeCasteljauTexture_Read_Cubic(DCTexture3DU8, t, LinearSampler);
+            case CurveOrders::Quartic: return DeCasteljauTexture_Read_Quartic(DCTexture3DU8, t, LinearSampler);
+            case CurveOrders::Quintic: return DeCasteljauTexture_Read_Quintic(DCTexture3DU8, t, LinearSampler);
+        }
+    }
+    return 0.0f;
+}
+
+float EvaluateHybrid(float t)
+{
+    if (UseF32())
+    {
+        switch (/*$(Variable:CurveOrder)*/)
+        {
+            case CurveOrders::Linear: return DeCasteljauTexture_Read_Linear_Hybrid(DCTexture2D, t, LinearSampler);
+            case CurveOrders::Quadratic: return DeCasteljauTexture_Read_Quadratic_Hybrid(DCTexture2D, t, LinearSampler);
+            case CurveOrders::Cubic: return DeCasteljauTexture_Read_Cubic_Hybrid(DCTexture3D, t, LinearSampler);
+
+            // Already hybrid!
+            case CurveOrders::Quartic: return DeCasteljauTexture_Read_Quartic(DCTexture3D, t, LinearSampler);
+            case CurveOrders::Quintic: return DeCasteljauTexture_Read_Quintic(DCTexture3D, t, LinearSampler);
+        }
+    }
+    else
+    {
+        switch (/*$(Variable:CurveOrder)*/)
+        {
+            case CurveOrders::Linear: return DeCasteljauTexture_Read_Linear_Hybrid(DCTexture2DU8, t, LinearSampler);
+            case CurveOrders::Quadratic: return DeCasteljauTexture_Read_Quadratic_Hybrid(DCTexture2DU8, t, LinearSampler);
+            case CurveOrders::Cubic: return DeCasteljauTexture_Read_Cubic_Hybrid(DCTexture3DU8, t, LinearSampler);
+
+            // Already hybrid!
+            case CurveOrders::Quartic: return DeCasteljauTexture_Read_Quartic(DCTexture3DU8, t, LinearSampler);
+            case CurveOrders::Quintic: return DeCasteljauTexture_Read_Quintic(DCTexture3DU8, t, LinearSampler);
+        }
     }
     return 0.0f;
 }
@@ -87,13 +151,16 @@ void ShowControlPoints(inout float3 color, float2 uv)
     if (uv.x >= 0.0f && uv.x <= 1.0f && uv.y >= 0.0f && uv.y <= 1.0f)
     {
         if (/*$(Variable:ShowDeCasteljauTexture)*/ && uv.y < EvaluateDeCasteljauTexture(t))
-            color.r = 1.0f;
+            color += /*$(Variable:DeCasteljauColor)*/;
 
         if (/*$(Variable:ShowPolynomial)*/ && uv.y < EvaluateBezierPolynomial(t))
-            color.g = 1.0f;
+            color += /*$(Variable:PolynomialColor)*/;
 
         if (/*$(Variable:ShowSeilerTexture)*/ && uv.y < EvaluateSeilerTexture(t))
-            color.b = 1.0f;
+            color += /*$(Variable:SeilerColor)*/;
+
+        if (/*$(Variable:ShowHybrid)*/ && uv.y < EvaluateHybrid(t))
+            color += /*$(Variable:HybridColor)*/;
     }
 
     if (/*$(Variable:ShowControlPoints)*/)
@@ -109,4 +176,8 @@ Shader Resources:
     Texture DCTexture3D (as SRV)
     Texture SeilerTexture2D (as SRV)
     Texture SeilerTexture3D (as SRV)
+    Texture DCTexture2DU8 (as SRV)
+    Texture DCTexture3DU8 (as SRV)
+    Texture SeilerTexture2DU8 (as SRV)
+    Texture SeilerTexture3DU8 (as SRV)
 */

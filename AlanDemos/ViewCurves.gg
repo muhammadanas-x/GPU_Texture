@@ -10,6 +10,12 @@
             "Enum": "CurveOrders"
         },
         {
+            "name": "TextureFormat",
+            "type": "Int",
+            "visibility": "User",
+            "Enum": "TextureFormats"
+        },
+        {
             "name": "CP1",
             "type": "Float",
             "dflt": "0",
@@ -76,22 +82,19 @@
             }
         },
         {
-            "name": "ShowDeCasteljauTexture",
-            "comment": "In Red Channel",
+            "name": "ShowPolynomial",
             "type": "Bool",
             "dflt": "true",
             "visibility": "User"
         },
         {
-            "name": "ShowPolynomial",
-            "comment": "In Green Channel",
+            "name": "ShowDeCasteljauTexture",
             "type": "Bool",
             "dflt": "true",
             "visibility": "User"
         },
         {
             "name": "ShowSeilerTexture",
-            "comment": "In Blue Channel",
             "type": "Bool",
             "dflt": "true",
             "visibility": "User"
@@ -104,10 +107,53 @@
             "visibility": "User"
         },
         {
+            "name": "ShowHybrid",
+            "comment": "de CastelJau texture, but the last lerp done in shaders at full f32 precision. Quartic and Quintic are already hybrid.",
+            "type": "Bool",
+            "dflt": "false",
+            "visibility": "User"
+        },
+        {
             "name": "RenderSize",
             "type": "Uint2",
             "dflt": "512, 512",
             "visibility": "User"
+        },
+        {
+            "name": "PolynomialColor",
+            "type": "Float3",
+            "dflt": "1, 0, 0",
+            "visibility": "User",
+            "UISettings": {
+                "UIHint": "Color"
+            }
+        },
+        {
+            "name": "DeCasteljauColor",
+            "type": "Float3",
+            "dflt": "0, 1, 0",
+            "visibility": "User",
+            "UISettings": {
+                "UIHint": "Color"
+            }
+        },
+        {
+            "name": "SeilerColor",
+            "type": "Float3",
+            "dflt": "0, 0, 1",
+            "visibility": "User",
+            "UISettings": {
+                "UIHint": "Color"
+            }
+        },
+        {
+            "name": "HybridColor",
+            "type": "Float3",
+            "dflt": "0, 0, 1",
+            "visibility": "User",
+            "UISettings": {
+                "UIHint": "Color"
+            }
         }
     ],
     "shaders": [
@@ -147,6 +193,40 @@
                 },
                 {
                     "name": "SeilerTexture3D",
+                    "access": "SRV",
+                    "type": "Texture",
+                    "texture": {
+                        "dimension": "Texture3D",
+                        "viewType": "Float"
+                    }
+                },
+                {
+                    "name": "DCTexture2DU8",
+                    "access": "SRV",
+                    "type": "Texture",
+                    "texture": {
+                        "viewType": "Float"
+                    }
+                },
+                {
+                    "name": "DCTexture3DU8",
+                    "access": "SRV",
+                    "type": "Texture",
+                    "texture": {
+                        "dimension": "Texture3D",
+                        "viewType": "Float"
+                    }
+                },
+                {
+                    "name": "SeilerTexture2DU8",
+                    "access": "SRV",
+                    "type": "Texture",
+                    "texture": {
+                        "viewType": "Float"
+                    }
+                },
+                {
+                    "name": "SeilerTexture3DU8",
                     "access": "SRV",
                     "type": "Texture",
                     "texture": {
@@ -248,9 +328,13 @@
                 "name": "DrawCurves",
                 "editorPos": [
                     309.0,
-                    89.0
+                    102.0
                 ],
                 "linkProperties": [
+                    {},
+                    {},
+                    {},
+                    {},
                     {},
                     {},
                     {},
@@ -282,6 +366,26 @@
                         "srcPin": "SeilerTexture3D",
                         "dstNode": "MakeCurveTextures",
                         "dstPin": "SeilerTexture3D"
+                    },
+                    {
+                        "srcPin": "DCTexture2DU8",
+                        "dstNode": "MakeCurveTexturesU8",
+                        "dstPin": "DCTexture2D"
+                    },
+                    {
+                        "srcPin": "DCTexture3DU8",
+                        "dstNode": "MakeCurveTexturesU8",
+                        "dstPin": "DCTexture3D"
+                    },
+                    {
+                        "srcPin": "SeilerTexture2DU8",
+                        "dstNode": "MakeCurveTexturesU8",
+                        "dstPin": "SeilerTexture2D"
+                    },
+                    {
+                        "srcPin": "SeilerTexture3DU8",
+                        "dstNode": "MakeCurveTexturesU8",
+                        "dstPin": "SeilerTexture3D"
                     }
                 ],
                 "shader": {
@@ -298,8 +402,8 @@
             "resourceTexture": {
                 "name": "DCTexture2D",
                 "editorPos": [
-                    -40.0,
-                    66.0
+                    -72.0,
+                    2.0
                 ],
                 "format": {
                     "format": "R32_Float"
@@ -317,8 +421,8 @@
             "resourceTexture": {
                 "name": "DCTexture3D",
                 "editorPos": [
-                    -40.0,
-                    114.0
+                    -72.0,
+                    50.0
                 ],
                 "format": {
                     "node": {
@@ -339,8 +443,8 @@
             "resourceTexture": {
                 "name": "SeilerTexture2D",
                 "editorPos": [
-                    -57.0,
-                    162.0
+                    -89.0,
+                    98.0
                 ],
                 "format": {
                     "node": {
@@ -360,8 +464,8 @@
             "resourceTexture": {
                 "name": "SeilerTexture3D",
                 "editorPos": [
-                    -59.0,
-                    210.0
+                    -91.0,
+                    146.0
                 ],
                 "format": {
                     "node": {
@@ -417,6 +521,130 @@
                     "name": "MakeCurveTextures"
                 }
             }
+        },
+        {
+            "resourceTexture": {
+                "name": "DCTexture2DU8",
+                "editorPos": [
+                    -88.0,
+                    226.0
+                ],
+                "format": {
+                    "format": "RGBA8_Unorm"
+                },
+                "size": {
+                    "multiply": [
+                        2,
+                        2,
+                        1
+                    ]
+                }
+            }
+        },
+        {
+            "resourceTexture": {
+                "name": "DCTexture3DU8",
+                "editorPos": [
+                    -88.0,
+                    274.0
+                ],
+                "format": {
+                    "node": {
+                        "name": "DCTexture2DU8"
+                    }
+                },
+                "size": {
+                    "multiply": [
+                        2,
+                        2,
+                        4
+                    ]
+                },
+                "dimension": "Texture3D"
+            }
+        },
+        {
+            "resourceTexture": {
+                "name": "SeilerTexture2DU8",
+                "editorPos": [
+                    -105.0,
+                    322.0
+                ],
+                "format": {
+                    "node": {
+                        "name": "DCTexture2DU8"
+                    }
+                },
+                "size": {
+                    "multiply": [
+                        2,
+                        2,
+                        1
+                    ]
+                }
+            }
+        },
+        {
+            "resourceTexture": {
+                "name": "SeilerTexture3DU8",
+                "editorPos": [
+                    -105.0,
+                    370.0
+                ],
+                "format": {
+                    "node": {
+                        "name": "DCTexture2DU8"
+                    }
+                },
+                "size": {
+                    "multiply": [
+                        2,
+                        2,
+                        2
+                    ]
+                },
+                "dimension": "Texture3D"
+            }
+        },
+        {
+            "actionComputeShader": {
+                "name": "MakeCurveTexturesU8",
+                "editorPos": [
+                    117.0,
+                    210.0
+                ],
+                "linkProperties": [
+                    {},
+                    {},
+                    {},
+                    {}
+                ],
+                "connections": [
+                    {
+                        "srcPin": "DCTexture2D",
+                        "dstNode": "DCTexture2DU8",
+                        "dstPin": "resource"
+                    },
+                    {
+                        "srcPin": "DCTexture3D",
+                        "dstNode": "DCTexture3DU8",
+                        "dstPin": "resource"
+                    },
+                    {
+                        "srcPin": "SeilerTexture2D",
+                        "dstNode": "SeilerTexture2DU8",
+                        "dstPin": "resource"
+                    },
+                    {
+                        "srcPin": "SeilerTexture3D",
+                        "dstNode": "SeilerTexture3DU8",
+                        "dstPin": "resource"
+                    }
+                ],
+                "shader": {
+                    "name": "MakeCurveTextures"
+                }
+            }
         }
     ],
     "enums": [
@@ -439,6 +667,17 @@
                     "label": "Quintic"
                 }
             ]
+        },
+        {
+            "name": "TextureFormats",
+            "items": [
+                {
+                    "label": "F32"
+                },
+                {
+                    "label": "U8"
+                }
+            ]
         }
     ],
     "settings": {
@@ -452,6 +691,7 @@
         }
     },
     "buildSettings": {
+        "outDX12": "ViewCurvesDX12/",
         "outWebGPU": "ViewCurvesWebGPU/"
     },
     "PrimaryOutput": {

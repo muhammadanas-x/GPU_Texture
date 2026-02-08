@@ -255,51 +255,93 @@
 
             // Hook up the on change events for UI
             document.getElementById('inputBox_CurveOrder').addEventListener('change',(event) => {event.target.value=event.target.value; ViewCurves.variable_CurveOrder=event.target.value;});
+            document.getElementById('inputBox_TextureFormat').addEventListener('change',(event) => {event.target.value=event.target.value; ViewCurves.variable_TextureFormat=event.target.value;});
             document.getElementById('inputBox_CP1').addEventListener('change',(event) => {event.target.value=parseFloat(event.target.value); ViewCurves.variable_CP1=event.target.value;});
             document.getElementById('inputBox_CP2').addEventListener('change',(event) => {event.target.value=parseFloat(event.target.value); ViewCurves.variable_CP2=event.target.value;});
             document.getElementById('inputBox_CP3').addEventListener('change',(event) => {event.target.value=parseFloat(event.target.value); ViewCurves.variable_CP3=event.target.value;});
             document.getElementById('inputBox_CP4').addEventListener('change',(event) => {event.target.value=parseFloat(event.target.value); ViewCurves.variable_CP4=event.target.value;});
             document.getElementById('inputBox_CP5').addEventListener('change',(event) => {event.target.value=parseFloat(event.target.value); ViewCurves.variable_CP5=event.target.value;});
             document.getElementById('inputBox_CP6').addEventListener('change',(event) => {event.target.value=parseFloat(event.target.value); ViewCurves.variable_CP6=event.target.value;});
-            document.getElementById('inputBox_ShowDeCasteljauTexture').addEventListener('change',(event) => {ViewCurves.variable_ShowDeCasteljauTexture=event.target.checked;});
             document.getElementById('inputBox_ShowPolynomial').addEventListener('change',(event) => {ViewCurves.variable_ShowPolynomial=event.target.checked;});
+            document.getElementById('inputBox_ShowDeCasteljauTexture').addEventListener('change',(event) => {ViewCurves.variable_ShowDeCasteljauTexture=event.target.checked;});
             document.getElementById('inputBox_ShowSeilerTexture').addEventListener('change',(event) => {ViewCurves.variable_ShowSeilerTexture=event.target.checked;});
             document.getElementById('inputBox_ShowControlPoints').addEventListener('change',(event) => {ViewCurves.variable_ShowControlPoints=event.target.checked;});
+            document.getElementById('inputBox_ShowHybrid').addEventListener('change',(event) => {ViewCurves.variable_ShowHybrid=event.target.checked;});
             document.getElementById('inputBox_RenderSize0').addEventListener('change',(event) => {event.target.value=parseUint(event.target.value); ViewCurves.variable_RenderSize[0]=event.target.value;});
             document.getElementById('inputBox_RenderSize1').addEventListener('change',(event) => {event.target.value=parseUint(event.target.value); ViewCurves.variable_RenderSize[1]=event.target.value;});
+            document.getElementById('inputBox_PolynomialColor0').addEventListener('change',(event) => {event.target.value=parseFloat(event.target.value); ViewCurves.variable_PolynomialColor[0]=event.target.value;});
+            document.getElementById('inputBox_PolynomialColor1').addEventListener('change',(event) => {event.target.value=parseFloat(event.target.value); ViewCurves.variable_PolynomialColor[1]=event.target.value;});
+            document.getElementById('inputBox_PolynomialColor2').addEventListener('change',(event) => {event.target.value=parseFloat(event.target.value); ViewCurves.variable_PolynomialColor[2]=event.target.value;});
+            document.getElementById('inputBox_DeCasteljauColor0').addEventListener('change',(event) => {event.target.value=parseFloat(event.target.value); ViewCurves.variable_DeCasteljauColor[0]=event.target.value;});
+            document.getElementById('inputBox_DeCasteljauColor1').addEventListener('change',(event) => {event.target.value=parseFloat(event.target.value); ViewCurves.variable_DeCasteljauColor[1]=event.target.value;});
+            document.getElementById('inputBox_DeCasteljauColor2').addEventListener('change',(event) => {event.target.value=parseFloat(event.target.value); ViewCurves.variable_DeCasteljauColor[2]=event.target.value;});
+            document.getElementById('inputBox_SeilerColor0').addEventListener('change',(event) => {event.target.value=parseFloat(event.target.value); ViewCurves.variable_SeilerColor[0]=event.target.value;});
+            document.getElementById('inputBox_SeilerColor1').addEventListener('change',(event) => {event.target.value=parseFloat(event.target.value); ViewCurves.variable_SeilerColor[1]=event.target.value;});
+            document.getElementById('inputBox_SeilerColor2').addEventListener('change',(event) => {event.target.value=parseFloat(event.target.value); ViewCurves.variable_SeilerColor[2]=event.target.value;});
+            document.getElementById('inputBox_HybridColor0').addEventListener('change',(event) => {event.target.value=parseFloat(event.target.value); ViewCurves.variable_HybridColor[0]=event.target.value;});
+            document.getElementById('inputBox_HybridColor1').addEventListener('change',(event) => {event.target.value=parseFloat(event.target.value); ViewCurves.variable_HybridColor[1]=event.target.value;});
+            document.getElementById('inputBox_HybridColor2').addEventListener('change',(event) => {event.target.value=parseFloat(event.target.value); ViewCurves.variable_HybridColor[2]=event.target.value;});
 
             function ResetVariables()
             {
                     ViewCurves.variable_CurveOrder = ViewCurves.variableDefault_CurveOrder;
+                    ViewCurves.variable_TextureFormat = ViewCurves.variableDefault_TextureFormat;
                     ViewCurves.variable_CP1 = ViewCurves.variableDefault_CP1;
                     ViewCurves.variable_CP2 = ViewCurves.variableDefault_CP2;
                     ViewCurves.variable_CP3 = ViewCurves.variableDefault_CP3;
                     ViewCurves.variable_CP4 = ViewCurves.variableDefault_CP4;
                     ViewCurves.variable_CP5 = ViewCurves.variableDefault_CP5;
                     ViewCurves.variable_CP6 = ViewCurves.variableDefault_CP6;
-                    ViewCurves.variable_ShowDeCasteljauTexture = ViewCurves.variableDefault_ShowDeCasteljauTexture;
                     ViewCurves.variable_ShowPolynomial = ViewCurves.variableDefault_ShowPolynomial;
+                    ViewCurves.variable_ShowDeCasteljauTexture = ViewCurves.variableDefault_ShowDeCasteljauTexture;
                     ViewCurves.variable_ShowSeilerTexture = ViewCurves.variableDefault_ShowSeilerTexture;
                     ViewCurves.variable_ShowControlPoints = ViewCurves.variableDefault_ShowControlPoints;
+                    ViewCurves.variable_ShowHybrid = ViewCurves.variableDefault_ShowHybrid;
                     ViewCurves.variable_RenderSize[0] = ViewCurves.variableDefault_RenderSize[0];
                     ViewCurves.variable_RenderSize[1] = ViewCurves.variableDefault_RenderSize[1];
+                    ViewCurves.variable_PolynomialColor[0] = ViewCurves.variableDefault_PolynomialColor[0];
+                    ViewCurves.variable_PolynomialColor[1] = ViewCurves.variableDefault_PolynomialColor[1];
+                    ViewCurves.variable_PolynomialColor[2] = ViewCurves.variableDefault_PolynomialColor[2];
+                    ViewCurves.variable_DeCasteljauColor[0] = ViewCurves.variableDefault_DeCasteljauColor[0];
+                    ViewCurves.variable_DeCasteljauColor[1] = ViewCurves.variableDefault_DeCasteljauColor[1];
+                    ViewCurves.variable_DeCasteljauColor[2] = ViewCurves.variableDefault_DeCasteljauColor[2];
+                    ViewCurves.variable_SeilerColor[0] = ViewCurves.variableDefault_SeilerColor[0];
+                    ViewCurves.variable_SeilerColor[1] = ViewCurves.variableDefault_SeilerColor[1];
+                    ViewCurves.variable_SeilerColor[2] = ViewCurves.variableDefault_SeilerColor[2];
+                    ViewCurves.variable_HybridColor[0] = ViewCurves.variableDefault_HybridColor[0];
+                    ViewCurves.variable_HybridColor[1] = ViewCurves.variableDefault_HybridColor[1];
+                    ViewCurves.variable_HybridColor[2] = ViewCurves.variableDefault_HybridColor[2];
             }
 
             function SetUIToVariables()
             {
                     document.getElementById('inputBox_CurveOrder').value = ViewCurves.variable_CurveOrder;
+                    document.getElementById('inputBox_TextureFormat').value = ViewCurves.variable_TextureFormat;
                     document.getElementById('inputBox_CP1').value = ViewCurves.variable_CP1;
                     document.getElementById('inputBox_CP2').value = ViewCurves.variable_CP2;
                     document.getElementById('inputBox_CP3').value = ViewCurves.variable_CP3;
                     document.getElementById('inputBox_CP4').value = ViewCurves.variable_CP4;
                     document.getElementById('inputBox_CP5').value = ViewCurves.variable_CP5;
                     document.getElementById('inputBox_CP6').value = ViewCurves.variable_CP6;
-                    document.getElementById('inputBox_ShowDeCasteljauTexture').checked = Boolean(ViewCurves.variable_ShowDeCasteljauTexture);
                     document.getElementById('inputBox_ShowPolynomial').checked = Boolean(ViewCurves.variable_ShowPolynomial);
+                    document.getElementById('inputBox_ShowDeCasteljauTexture').checked = Boolean(ViewCurves.variable_ShowDeCasteljauTexture);
                     document.getElementById('inputBox_ShowSeilerTexture').checked = Boolean(ViewCurves.variable_ShowSeilerTexture);
                     document.getElementById('inputBox_ShowControlPoints').checked = Boolean(ViewCurves.variable_ShowControlPoints);
+                    document.getElementById('inputBox_ShowHybrid').checked = Boolean(ViewCurves.variable_ShowHybrid);
                     document.getElementById('inputBox_RenderSize0').value = ViewCurves.variable_RenderSize[0];
                     document.getElementById('inputBox_RenderSize1').value = ViewCurves.variable_RenderSize[1];
+                    document.getElementById('inputBox_PolynomialColor0').value = ViewCurves.variable_PolynomialColor[0];
+                    document.getElementById('inputBox_PolynomialColor1').value = ViewCurves.variable_PolynomialColor[1];
+                    document.getElementById('inputBox_PolynomialColor2').value = ViewCurves.variable_PolynomialColor[2];
+                    document.getElementById('inputBox_DeCasteljauColor0').value = ViewCurves.variable_DeCasteljauColor[0];
+                    document.getElementById('inputBox_DeCasteljauColor1').value = ViewCurves.variable_DeCasteljauColor[1];
+                    document.getElementById('inputBox_DeCasteljauColor2').value = ViewCurves.variable_DeCasteljauColor[2];
+                    document.getElementById('inputBox_SeilerColor0').value = ViewCurves.variable_SeilerColor[0];
+                    document.getElementById('inputBox_SeilerColor1').value = ViewCurves.variable_SeilerColor[1];
+                    document.getElementById('inputBox_SeilerColor2').value = ViewCurves.variable_SeilerColor[2];
+                    document.getElementById('inputBox_HybridColor0').value = ViewCurves.variable_HybridColor[0];
+                    document.getElementById('inputBox_HybridColor1').value = ViewCurves.variable_HybridColor[1];
+                    document.getElementById('inputBox_HybridColor2').value = ViewCurves.variable_HybridColor[2];
             }
 
             // Set variables to their defaults
@@ -311,17 +353,23 @@
             provide imported resources or variable values to the technique that only need to be set once:
                 User Variables (These show in the UI):
                     ViewCurves.variable_CurveOrder = this.constructor.Enum_CurveOrders.Quintic; // (Int)
+                    ViewCurves.variable_TextureFormat = this.constructor.Enum_TextureFormats.F32; // (Int)
                     ViewCurves.variable_CP1 = 0.; // (Float)
                     ViewCurves.variable_CP2 = 1.; // (Float)
                     ViewCurves.variable_CP3 = 0.; // (Float)
                     ViewCurves.variable_CP4 = 1.; // (Float)
                     ViewCurves.variable_CP5 = 0.; // (Float)
                     ViewCurves.variable_CP6 = 1.; // (Float)
-                    ViewCurves.variable_ShowDeCasteljauTexture = true; // (Bool) In Red Channel
-                    ViewCurves.variable_ShowPolynomial = true; // (Bool) In Green Channel
-                    ViewCurves.variable_ShowSeilerTexture = true; // (Bool) In Blue Channel
+                    ViewCurves.variable_ShowPolynomial = true; // (Bool)
+                    ViewCurves.variable_ShowDeCasteljauTexture = true; // (Bool)
+                    ViewCurves.variable_ShowSeilerTexture = true; // (Bool)
                     ViewCurves.variable_ShowControlPoints = true; // (Bool) In black
+                    ViewCurves.variable_ShowHybrid = false; // (Bool) de CastelJau texture, but the last lerp done in shaders at full f32 precision. Quartic and Quintic are already hybrid.
                     ViewCurves.variable_RenderSize = 512, 512; // (Uint2)
+                    ViewCurves.variable_PolynomialColor = 1., 0., 0.; // (Float3)
+                    ViewCurves.variable_DeCasteljauColor = 0., 1., 0.; // (Float3)
+                    ViewCurves.variable_SeilerColor = 0., 0., 1.; // (Float3)
+                    ViewCurves.variable_HybridColor = 0., 0., 1.; // (Float3)
 
                 An example of how to load a texture:
                     const loadedTexture = await Shared.CreateTextureWithPNG(device, "cabinsmall.png", ViewCurves.texture_someTexture_usageFlags);
@@ -361,17 +409,23 @@
             provide imported resources or variable values to the technique that need to change every frame:
                 User Variables (These show in the UI):
                     ViewCurves.variable_CurveOrder = this.constructor.Enum_CurveOrders.Quintic; // (Int)
+                    ViewCurves.variable_TextureFormat = this.constructor.Enum_TextureFormats.F32; // (Int)
                     ViewCurves.variable_CP1 = 0.; // (Float)
                     ViewCurves.variable_CP2 = 1.; // (Float)
                     ViewCurves.variable_CP3 = 0.; // (Float)
                     ViewCurves.variable_CP4 = 1.; // (Float)
                     ViewCurves.variable_CP5 = 0.; // (Float)
                     ViewCurves.variable_CP6 = 1.; // (Float)
-                    ViewCurves.variable_ShowDeCasteljauTexture = true; // (Bool) In Red Channel
-                    ViewCurves.variable_ShowPolynomial = true; // (Bool) In Green Channel
-                    ViewCurves.variable_ShowSeilerTexture = true; // (Bool) In Blue Channel
+                    ViewCurves.variable_ShowPolynomial = true; // (Bool)
+                    ViewCurves.variable_ShowDeCasteljauTexture = true; // (Bool)
+                    ViewCurves.variable_ShowSeilerTexture = true; // (Bool)
                     ViewCurves.variable_ShowControlPoints = true; // (Bool) In black
+                    ViewCurves.variable_ShowHybrid = false; // (Bool) de CastelJau texture, but the last lerp done in shaders at full f32 precision. Quartic and Quintic are already hybrid.
                     ViewCurves.variable_RenderSize = 512, 512; // (Uint2)
+                    ViewCurves.variable_PolynomialColor = 1., 0., 0.; // (Float3)
+                    ViewCurves.variable_DeCasteljauColor = 0., 1., 0.; // (Float3)
+                    ViewCurves.variable_SeilerColor = 0., 0., 1.; // (Float3)
+                    ViewCurves.variable_HybridColor = 0., 0., 1.; // (Float3)
 
                 An example of how to load a texture:
                     const loadedTexture = await Shared.CreateTextureWithPNG(device, "cabinsmall.png", ViewCurves.texture_someTexture_usageFlags);
@@ -423,6 +477,12 @@
                     ViewCurves.variableChanged_CurveOrder = false;
                 }
 
+                if (ViewCurves.variableChanged_TextureFormat)
+                {
+                    document.getElementById('inputBox_TextureFormat').value = ViewCurves.variable_TextureFormat;
+                    ViewCurves.variableChanged_TextureFormat = false;
+                }
+
                 if (ViewCurves.variableChanged_CP1)
                 {
                     document.getElementById('inputBox_CP1').value = ViewCurves.variable_CP1;
@@ -459,16 +519,16 @@
                     ViewCurves.variableChanged_CP6 = false;
                 }
 
-                if (ViewCurves.variableChanged_ShowDeCasteljauTexture)
-                {
-                    document.getElementById('inputBox_ShowDeCasteljauTexture').checked=Boolean(ViewCurves.variable_ShowDeCasteljauTexture);
-                    ViewCurves.variableChanged_ShowDeCasteljauTexture = false;
-                }
-
                 if (ViewCurves.variableChanged_ShowPolynomial)
                 {
                     document.getElementById('inputBox_ShowPolynomial').checked=Boolean(ViewCurves.variable_ShowPolynomial);
                     ViewCurves.variableChanged_ShowPolynomial = false;
+                }
+
+                if (ViewCurves.variableChanged_ShowDeCasteljauTexture)
+                {
+                    document.getElementById('inputBox_ShowDeCasteljauTexture').checked=Boolean(ViewCurves.variable_ShowDeCasteljauTexture);
+                    ViewCurves.variableChanged_ShowDeCasteljauTexture = false;
                 }
 
                 if (ViewCurves.variableChanged_ShowSeilerTexture)
@@ -483,6 +543,12 @@
                     ViewCurves.variableChanged_ShowControlPoints = false;
                 }
 
+                if (ViewCurves.variableChanged_ShowHybrid)
+                {
+                    document.getElementById('inputBox_ShowHybrid').checked=Boolean(ViewCurves.variable_ShowHybrid);
+                    ViewCurves.variableChanged_ShowHybrid = false;
+                }
+
                 if (ViewCurves.variableChanged_RenderSize[0])
                 {
                     document.getElementById('inputBox_RenderSize0').value = ViewCurves.variable_RenderSize[0];
@@ -493,6 +559,78 @@
                 {
                     document.getElementById('inputBox_RenderSize1').value = ViewCurves.variable_RenderSize[1];
                     ViewCurves.variableChanged_RenderSize[1] = false;
+                }
+
+                if (ViewCurves.variableChanged_PolynomialColor[0])
+                {
+                    document.getElementById('inputBox_PolynomialColor0').value = ViewCurves.variable_PolynomialColor[0];
+                    ViewCurves.variableChanged_PolynomialColor[0] = false;
+                }
+
+                if (ViewCurves.variableChanged_PolynomialColor[1])
+                {
+                    document.getElementById('inputBox_PolynomialColor1').value = ViewCurves.variable_PolynomialColor[1];
+                    ViewCurves.variableChanged_PolynomialColor[1] = false;
+                }
+
+                if (ViewCurves.variableChanged_PolynomialColor[2])
+                {
+                    document.getElementById('inputBox_PolynomialColor2').value = ViewCurves.variable_PolynomialColor[2];
+                    ViewCurves.variableChanged_PolynomialColor[2] = false;
+                }
+
+                if (ViewCurves.variableChanged_DeCasteljauColor[0])
+                {
+                    document.getElementById('inputBox_DeCasteljauColor0').value = ViewCurves.variable_DeCasteljauColor[0];
+                    ViewCurves.variableChanged_DeCasteljauColor[0] = false;
+                }
+
+                if (ViewCurves.variableChanged_DeCasteljauColor[1])
+                {
+                    document.getElementById('inputBox_DeCasteljauColor1').value = ViewCurves.variable_DeCasteljauColor[1];
+                    ViewCurves.variableChanged_DeCasteljauColor[1] = false;
+                }
+
+                if (ViewCurves.variableChanged_DeCasteljauColor[2])
+                {
+                    document.getElementById('inputBox_DeCasteljauColor2').value = ViewCurves.variable_DeCasteljauColor[2];
+                    ViewCurves.variableChanged_DeCasteljauColor[2] = false;
+                }
+
+                if (ViewCurves.variableChanged_SeilerColor[0])
+                {
+                    document.getElementById('inputBox_SeilerColor0').value = ViewCurves.variable_SeilerColor[0];
+                    ViewCurves.variableChanged_SeilerColor[0] = false;
+                }
+
+                if (ViewCurves.variableChanged_SeilerColor[1])
+                {
+                    document.getElementById('inputBox_SeilerColor1').value = ViewCurves.variable_SeilerColor[1];
+                    ViewCurves.variableChanged_SeilerColor[1] = false;
+                }
+
+                if (ViewCurves.variableChanged_SeilerColor[2])
+                {
+                    document.getElementById('inputBox_SeilerColor2').value = ViewCurves.variable_SeilerColor[2];
+                    ViewCurves.variableChanged_SeilerColor[2] = false;
+                }
+
+                if (ViewCurves.variableChanged_HybridColor[0])
+                {
+                    document.getElementById('inputBox_HybridColor0').value = ViewCurves.variable_HybridColor[0];
+                    ViewCurves.variableChanged_HybridColor[0] = false;
+                }
+
+                if (ViewCurves.variableChanged_HybridColor[1])
+                {
+                    document.getElementById('inputBox_HybridColor1').value = ViewCurves.variable_HybridColor[1];
+                    ViewCurves.variableChanged_HybridColor[1] = false;
+                }
+
+                if (ViewCurves.variableChanged_HybridColor[2])
+                {
+                    document.getElementById('inputBox_HybridColor2').value = ViewCurves.variable_HybridColor[2];
+                    ViewCurves.variableChanged_HybridColor[2] = false;
                 }
 
 
@@ -545,15 +683,23 @@
                         <option value="Output">Output</option><br/>
                         <option value="">----- Internal Textures -----</option><br/>
                         <option value="DCTexture2D">DCTexture2D</option><br/>
+                        <option value="DCTexture2DU8">DCTexture2DU8</option><br/>
                         <option value="DCTexture3D">DCTexture3D</option><br/>
+                        <option value="DCTexture3DU8">DCTexture3DU8</option><br/>
                         <option value="DrawCurves_Output_ReadOnly">DrawCurves_Output_ReadOnly</option><br/>
+                        <option value="MakeCurveTexturesU8_DCTexture2D_ReadOnly">MakeCurveTexturesU8_DCTexture2D_ReadOnly</option><br/>
+                        <option value="MakeCurveTexturesU8_DCTexture3D_ReadOnly">MakeCurveTexturesU8_DCTexture3D_ReadOnly</option><br/>
+                        <option value="MakeCurveTexturesU8_SeilerTexture2D_ReadOnly">MakeCurveTexturesU8_SeilerTexture2D_ReadOnly</option><br/>
+                        <option value="MakeCurveTexturesU8_SeilerTexture3D_ReadOnly">MakeCurveTexturesU8_SeilerTexture3D_ReadOnly</option><br/>
                         <option value="MakeCurveTextures_DCTexture2D_ReadOnly">MakeCurveTextures_DCTexture2D_ReadOnly</option><br/>
                         <option value="MakeCurveTextures_DCTexture3D_ReadOnly">MakeCurveTextures_DCTexture3D_ReadOnly</option><br/>
                         <option value="MakeCurveTextures_SeilerTexture2D_ReadOnly">MakeCurveTextures_SeilerTexture2D_ReadOnly</option><br/>
                         <option value="MakeCurveTextures_SeilerTexture3D_ReadOnly">MakeCurveTextures_SeilerTexture3D_ReadOnly</option><br/>
                         <option value="Output">Output</option><br/>
                         <option value="SeilerTexture2D">SeilerTexture2D</option><br/>
+                        <option value="SeilerTexture2DU8">SeilerTexture2DU8</option><br/>
                         <option value="SeilerTexture3D">SeilerTexture3D</option><br/>
+                        <option value="SeilerTexture3DU8">SeilerTexture3DU8</option><br/>
                     </select>
                 </td>
                 <td>&nbsp;</td>
@@ -570,6 +716,15 @@
                                     <option value="2">Cubic</option>
                                     <option value="3">Quartic</option>
                                     <option value="4">Quintic</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td valign="top">TextureFormat&nbsp;</td>
+                            <td>
+                                <select id="inputBox_TextureFormat">
+                                    <option value="0">F32</option>
+                                    <option value="1">U8</option>
                                 </select>
                             </td>
                         </tr>
@@ -610,19 +765,19 @@
                             </td>
                         </tr>
                         <tr>
-                            <td valign="top"><div class="tooltip">ShowDeCasteljauTexture&nbsp;<span class="tooltiptext">In Red Channel</span></div></td>
-                            <td>
-                                <input type="checkbox" id="inputBox_ShowDeCasteljauTexture">
-                            </td>
-                        </tr>
-                        <tr>
-                            <td valign="top"><div class="tooltip">ShowPolynomial&nbsp;<span class="tooltiptext">In Green Channel</span></div></td>
+                            <td valign="top">ShowPolynomial&nbsp;</td>
                             <td>
                                 <input type="checkbox" id="inputBox_ShowPolynomial">
                             </td>
                         </tr>
                         <tr>
-                            <td valign="top"><div class="tooltip">ShowSeilerTexture&nbsp;<span class="tooltiptext">In Blue Channel</span></div></td>
+                            <td valign="top">ShowDeCasteljauTexture&nbsp;</td>
+                            <td>
+                                <input type="checkbox" id="inputBox_ShowDeCasteljauTexture">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td valign="top">ShowSeilerTexture&nbsp;</td>
                             <td>
                                 <input type="checkbox" id="inputBox_ShowSeilerTexture">
                             </td>
@@ -634,10 +789,48 @@
                             </td>
                         </tr>
                         <tr>
+                            <td valign="top"><div class="tooltip">ShowHybrid&nbsp;<span class="tooltiptext">de CastelJau texture, but the last lerp done in shaders at full f32 precision. Quartic and Quintic are already hybrid.</span></div></td>
+                            <td>
+                                <input type="checkbox" id="inputBox_ShowHybrid">
+                            </td>
+                        </tr>
+                        <tr>
                             <td valign="top">RenderSize&nbsp;</td>
                             <td>
                                 <input type="text" id="inputBox_RenderSize0">
                                 <input type="text" id="inputBox_RenderSize1">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td valign="top">PolynomialColor&nbsp;</td>
+                            <td>
+                                <input type="text" id="inputBox_PolynomialColor0">
+                                <input type="text" id="inputBox_PolynomialColor1">
+                                <input type="text" id="inputBox_PolynomialColor2">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td valign="top">DeCasteljauColor&nbsp;</td>
+                            <td>
+                                <input type="text" id="inputBox_DeCasteljauColor0">
+                                <input type="text" id="inputBox_DeCasteljauColor1">
+                                <input type="text" id="inputBox_DeCasteljauColor2">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td valign="top">SeilerColor&nbsp;</td>
+                            <td>
+                                <input type="text" id="inputBox_SeilerColor0">
+                                <input type="text" id="inputBox_SeilerColor1">
+                                <input type="text" id="inputBox_SeilerColor2">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td valign="top">HybridColor&nbsp;</td>
+                            <td>
+                                <input type="text" id="inputBox_HybridColor0">
+                                <input type="text" id="inputBox_HybridColor1">
+                                <input type="text" id="inputBox_HybridColor2">
                             </td>
                         </tr>
                     </table>

@@ -22,17 +22,23 @@ let numExecutions = 1;
 provide imported resources or variable values to the technique:
                 User Variables (These show in the UI):
                     ViewCurves.variable_CurveOrder = this.constructor.Enum_CurveOrders.Quintic; // (Int)
+                    ViewCurves.variable_TextureFormat = this.constructor.Enum_TextureFormats.F32; // (Int)
                     ViewCurves.variable_CP1 = 0.; // (Float)
                     ViewCurves.variable_CP2 = 1.; // (Float)
                     ViewCurves.variable_CP3 = 0.; // (Float)
                     ViewCurves.variable_CP4 = 1.; // (Float)
                     ViewCurves.variable_CP5 = 0.; // (Float)
                     ViewCurves.variable_CP6 = 1.; // (Float)
-                    ViewCurves.variable_ShowDeCasteljauTexture = true; // (Bool) In Red Channel
-                    ViewCurves.variable_ShowPolynomial = true; // (Bool) In Green Channel
-                    ViewCurves.variable_ShowSeilerTexture = true; // (Bool) In Blue Channel
+                    ViewCurves.variable_ShowPolynomial = true; // (Bool)
+                    ViewCurves.variable_ShowDeCasteljauTexture = true; // (Bool)
+                    ViewCurves.variable_ShowSeilerTexture = true; // (Bool)
                     ViewCurves.variable_ShowControlPoints = true; // (Bool) In black
+                    ViewCurves.variable_ShowHybrid = false; // (Bool) de CastelJau texture, but the last lerp done in shaders at full f32 precision. Quartic and Quintic are already hybrid.
                     ViewCurves.variable_RenderSize = 512, 512; // (Uint2)
+                    ViewCurves.variable_PolynomialColor = 1., 0., 0.; // (Float3)
+                    ViewCurves.variable_DeCasteljauColor = 0., 1., 0.; // (Float3)
+                    ViewCurves.variable_SeilerColor = 0., 0., 1.; // (Float3)
+                    ViewCurves.variable_HybridColor = 0., 0., 1.; // (Float3)
 
                 An example of how to load a texture:
                     const loadedTexture = await Shared.CreateTextureWithPNG(device, "cabinsmall.png", ViewCurves.texture_someTexture_usageFlags);

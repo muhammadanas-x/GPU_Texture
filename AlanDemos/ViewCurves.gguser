@@ -2,6 +2,10 @@
     "version": "2.0",
     "snapshot": {
         "resourceViewNodeIndex": 1,
-        "resourceViewResourceIndex": 6
+        "resourceViewResourceIndex": 10,
+        "cameraAltitudeAzimuth": [
+            -0.16172009706497193,
+            6.263995170593262
+        ]
     }
 }
