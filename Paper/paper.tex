@@ -140,7 +140,7 @@ format, leading to unavoidable quantization errors \cite{CUDA_PG}.  If this is a
 \AW{Show jaggies from X.8 interpolation in one of the diagrams}
 \AW{Does Seiler stay within 0 to 1 if the control points are between 0 and 1? if not, we should talk about those limitations in the Seiler section too}
 
-\section{Extending to Seiler interpolation}
+\section{Seiler Interpolation Using Linear Texture Interpolation}
 Seiler interpolation provides a more efficient method for evaluating cubic Bézier curves, requiring only \textbf{three linear interpolations} instead of the six needed by the classical De Casteljau algorithm. This efficiency is achieved through the introduction of \textbf{difference terms}.
 
 For a cubic curve $C(t)$ defined by control points $b_0, b_1, b_2, b_3$, two difference vectors are defined as:
@@ -250,18 +250,18 @@ Bernstein         & 6.9\,ms & 13.9\,ms & 23.2\,ms \\
 \label{tab:seiler_comparison}
 \end{table}
 
-\subsection{Conclusions or Future work}
+\section{Conclusions and Future work}
 
-\AW{Alan to fill this in? It will probably be obvious to put here as we progress.}
-
-\subsection{Future work}
+We have shown that certain types of operations can be offloaded to the GPU's fixed-function texture interpolation hardware, to improve performance in compute-bound GPU workloads.
+While the quality of those calculations can degrade by being done at a low bit count quantized precision, the option to offload only some of the work allows a sliding scale of
+performance benefits versus quality.
 
 We show how to evaluate curves, surfaces, and volumes using the GPU texture interpolator to perform the de Casteljau algorithm, but only show curves for Seiler interpolation.
 Exploring surfaces and volumes with Seiler interpolation in the GPU texture interpolator could be fruitful.
 
 Yuksel's paper provides formulas for Seiler interpolation up to degree 5, which has 6 control points.  We believe that for a 3d volume texture with 8 pixels as 2x2x2, degree
-7 with 8 control points should be possible, much like cubic Bézier curves with 4 control points can be evaluated with a 2d texture with 4 pixels as 2x2. We do not know
-the appropriate formulas to test that, however.
+7 with 8 control points should be possible, much like cubic Bézier curves with 4 control points can be evaluated with a 2d texture with 4 pixels as 2x2. It may also be possible
+to make higher order curves in the same texture sizes by putting constraints on the control points. Exploring these avenues may lead to more usage cases.
 
 \subsection*{Acknowledgements}
 
