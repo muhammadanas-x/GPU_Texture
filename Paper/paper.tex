@@ -130,15 +130,17 @@ and B splines can be converted to piecewise Bézier curves using Boehm's algorit
 Lastly, as power basis polynomials can be converted to and from Bernstein basis (Bézier) polynomials, this technique can be used to evaluate general polynomials as well.
 
 \subsection{limitations}
+
+\input{Diagrams/CurveAccuracy/figure.tex}
+
 If using a low bit depth texture format, the values the control points can take are limited - such as 8 bit textures being limited to 255 values, or being limited to $[0,1]$ if using
 a unorm format. Furthermore, the values read from the curves are also limited to the same range and discretization as the texture format! To deal with this limitation, it is possible to
 rescale the curves to fit within the range. However, higher bit depth textures can be used, which can also help if 8 bit discretization of control points is too coarse.
 
 Another source of discretization error is in the texture sampling itself. When performing interpolation, the (u,v) coordinates themselves are commonly converted to a fixed point X.8 bit
 format, leading to unavoidable quantization errors \cite{CUDA_PG}.  If this is a problem, doing some of the interpolation levels in the shader can help reduce the error, since shaders run at full
-32 bit float precision.
+32 bit float precision. These details can be seen in figure \ref{fig_curve_accuracy}.
 
-\AW{Show jaggies from X.8 interpolation in one of the diagrams}
 \AW{Does Seiler stay within 0 to 1 if the control points are between 0 and 1? if not, we should talk about those limitations in the Seiler section too. It does not!}
 
 \section{Seiler Interpolation Using Linear Texture Interpolation}
