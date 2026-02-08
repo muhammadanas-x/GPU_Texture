@@ -69,7 +69,7 @@ interpolation could be used for the initial linear interpolations, with the othe
 In this paper, we present the details of evaluating Bézier curves using hardware-accelerated linear texture interpolation and show how to perform all interpolations on the hardware,
 whether using the de Casteljau algorithm or Seiler interpolation. We also compare performance and visual quality against standard GPU curve evaluation methods.
 
-\section{Evaluating Bézier Curves Using Linear Texture Interpolation}
+\section{De Casteljau Using Linear Texture Interpolation}
 
 \input{Diagrams/BezDecasteljau/figure.tex}
 
@@ -80,7 +80,7 @@ $AB$ and $BC$ to get the final point $ABC$, all with the same interpolation time
 Similarly, we can make a 2x2 texture that has a row of pixels with values $A$, $B$, and a row with values $B$, $C$. When this texture is linearly sampled at $(t, t)$, there
 are effectively two horizontal interpolations which make $AB$ and $BC$ and then a vertical interpolation between them which makes $ABC$.
 
-Extending this to a cubic curve, the de Casteljau algorithm linearly interpolates between two quadratic curve points $ABC$ and $BCD$ to make cubic curve point $ABCD$. If we make a 2x2x2 volume
+For a cubic curve, the de Casteljau algorithm linearly interpolates between two quadratic curve points $ABC$ and $BCD$ to make cubic curve point $ABCD$. If we make a 2x2x2 volume
 texture which has a front slice encoding the quadratic Bézier curve $ABC$ and a back slice encoding $BCD$, sampling at $(t,t,t)$ gives point $ABCD$.  For higher order curves, Further
 interpolations levels can be done in the shader after the texture reads, since 4D and higher textures are not supported on modern GPUs.
 
@@ -107,8 +107,8 @@ Doing the same for a texture with rows $A, E$ and $E, D$, we get:
 AS^2 + 2Est + Dt^2
 \end{equation}
 
-The curves are equal when $2E = B+C$ which can be rewritten as $E = (B+C)/2$.  Thus, when the diagonal values mismatch, the control point is defined as their average. If we use this fact
-while also reading in a zig zag pattern, we can add two pixels for each additional quadratic Bézier segment, instead of four. This is shown in figure \ref{fig_ZigZag}.
+These are equal when $2E = B+C$ or equivalently when $E = (B+C)/2$.  Thus, when the diagonal values mismatch, the control point is defined as their average. If we use this fact
+while also reading in a zig zag pattern, we can add two pixels for each additional quadratic Bézier segment, instead of four, which reduces redundant memory storage. This is shown in figure \ref{fig_ZigZag}.
 
 Since a 2d texture is able to store arbitrary $C0$ continuous quadratic Bézier curves, we can put two of them side by side into a 3d texture and interpolate to make a cubic curve. The pattern would
 continue for higher order curves if higher dimensional textures were supported.
@@ -121,10 +121,10 @@ is sampling a 2D texture at coordinate $(t, u)$ to evaluate a bilinear Bézier s
 a Bézier volume. The pattern continues for hypervolumes as well.
 
 If needing to evaluate multiple curves at once, you can use multiple color channels. A nice coincidence is that a bicubic surface can fit into an 2x2x2 RGBA 3D texture. Reading the texture
-using coordinate $u$ gives four control points for a Cubic Bezies curve to be evaluated with $v$ to get the final point on the surface.
+using coordinate $u$ gives four control points for a Cubic Bézier curve to be evaluated with $v$ in the shader to get the final point on the surface.
 
-With some pre-processing, it is also possible to evaluate NURBS. Rational splines can be achieved by dividing one integral spline by another, and B splines can be converted to piecewise
-Bézier curves using Boehm's algorithm.
+With some pre-processing, it is also possible to evaluate NURBS. Rational splines can be achieved by dividing one integral spline by another in the shader after doing the texture reads,
+and B splines can be converted to piecewise Bézier curves using Boehm's algorithm.
 
 Lastly, as power basis polynomials can be converted to and from Bernstein basis (Bézier) polynomials, this technique can be used to evaluate general polynomials as well.
 
@@ -138,6 +138,7 @@ format, leading to unavoidable quantization errors \cite{CUDA_PG}.  If this is a
 32 bit float precision.
 
 \AW{Show jaggies from X.8 interpolation in one of the diagrams}
+\AW{Does Seiler stay within 0 to 1 if the control points are between 0 and 1? if not, we should talk about those limitations in the Seiler section too}
 
 \section{Extending to Seiler interpolation}
 Seiler interpolation provides a more efficient method for evaluating cubic Bézier curves, requiring only \textbf{three linear interpolations} instead of the six needed by the classical De Casteljau algorithm. This efficiency is achieved through the introduction of \textbf{difference terms}.
@@ -249,15 +250,23 @@ Bernstein         & 6.9\,ms & 13.9\,ms & 23.2\,ms \\
 \label{tab:seiler_comparison}
 \end{table}
 
-
 \subsection{Conclusions or Future work}
 
 \AW{Alan to fill this in? It will probably be obvious to put here as we progress.}
 
-\subsection*{Acknowledgements}
-Authors may provide a brief acknowledgements section if desired. 
+\subsection{Future work}
 
-\AW{We can put people in here, or remove the section}
+We show how to evaluate curves, surfaces, and volumes using the GPU texture interpolator to perform the de Casteljau algorithm, but only show curves for Seiler interpolation.
+Exploring surfaces and volumes with Seiler interpolation in the GPU texture interpolator could be fruitful.
+
+Yuksel's paper provides formulas for Seiler interpolation up to degree 5, which has 6 control points.  We believe that for a 3d volume texture with 8 pixels as 2x2x2, degree
+7 with 8 control points should be possible, much like cubic Bézier curves with 4 control points can be evaluated with a 2d texture with 4 pixels as 2x2. We do not know
+the appropriate formulas to test that, however.
+
+\subsection*{Acknowledgements}
+
+We would like to thank the Rendering Engineering Special Interest Group (\#rendering-engineering-sig) chat room at Electronic arts for helping find and understand when
+these techniques would and would not be useful.
 
 \small
 \bibliographystyle{jcgt}
@@ -270,16 +279,13 @@ When supplemental materials such as video, data sets, and source code are provid
 
 \section*{Author Contact Information}
 
-\AW{we should fill this out}
-
 \hspace{-2mm}\begin{tabular}{p{0.5\textwidth}p{0.5\textwidth}}
 Muhammad Anas \newline
 \href{mailto:hanas.bscs22seecs@seecs.edu.pk}{hanas.bscs22seecs@seecs.edu.pk}
 &
 
 Alan Wolfe \newline
-\href{mailto:alan.wolfe@gmail.com}{alan.wolfe@gmail.com} \newline
-\href{https://blog.demofox.org/}{https://blog.demofox.org/}
+\href{mailto:awolfe@ea.com}{awolfe@ea.com}
 
 \end{tabular}
 
