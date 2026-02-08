@@ -141,9 +141,11 @@ Another source of discretization error is in the texture sampling itself. When p
 format, leading to unavoidable quantization errors \cite{CUDA_PG}.  If this is a problem, doing some of the interpolation levels in the shader can help reduce the error, since shaders run at full
 32 bit float precision. These details can be seen in figure \ref{fig_curve_accuracy}.
 
-\AW{Does Seiler stay within 0 to 1 if the control points are between 0 and 1? if not, we should talk about those limitations in the Seiler section too. It does not!}
-
 \section{Seiler Interpolation Using Linear Texture Interpolation}
+
+\AW{We should also explain how we implement Seiler as texture interpolations}
+\AW{Seiler textures do not stay within the convex hull of the control points, so we should mention this and say that you basically can't use U8 textures for them, unlike the de casteljau textures which can use u8 if your control points are withing the 0 to 1 range.}
+
 Seiler interpolation provides a more efficient method for evaluating cubic Bézier curves, requiring only \textbf{three linear interpolations} instead of the six needed by the classical De Casteljau algorithm. This efficiency is achieved through the introduction of \textbf{difference terms}.
 
 For a cubic curve $C(t)$ defined by control points $b_0, b_1, b_2, b_3$, two difference vectors are defined as:
@@ -237,6 +239,10 @@ B_0 & B_5
 
 Seiler interpolation has not yet been extended beyond degree $5$, so a fully generalized formula for higher-degree polynomials does not exist. Note the \textbf{redundant storage} in the quartic and quintic textures; if new difference rules are discovered, higher-degree curves could potentially be encoded efficiently using this approach.
 \section{Results}
+
+\AW{we should explain our testing methodology and resutls here.}
+\AW{we should also explain when this is useful vs not. Compute bound, and being able to move this to texture units, while still having compute work to overlap with, else it serializes the work and stalls.}
+
 \begin{table}[h]
 \centering
 \renewcommand{\arraystretch}{1.3}
