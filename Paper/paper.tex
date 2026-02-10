@@ -54,7 +54,7 @@
 We present a texture-based technique for evaluating Bézier curves on the GPU that leverages fixed-function linear texture interpolation hardware. By offloading curve
 evaluation to the texture interpolator, this approach can improve performance in compute-bound GPU workloads. The method naturally can also be used for Bézier
 surfaces and volumes and extends to advanced curve types such as B‑splines, NURBS, and both integral and rational polynomials. We show how Seiler interpolation fits into
-this framework to improve efficiency. We also compare performance and visual quality against standard GPU curve-evaluation methods.
+this framework to improve efficiency. We also compare performance and accuracy against curves evaluated as polynomials in shader code.
 \end{abstract}
 
 %-------------------------------------------------------------------------
@@ -69,18 +69,18 @@ Yuksel explained how Seiler’s interpolation can be used to evaluate polynomial
 interpolation could be used for the initial linear interpolations, with the other interpolations done in shader code.
 
 In this paper, we present the details of evaluating Bézier curves using hardware-accelerated linear texture interpolation and show how to perform all interpolations on the hardware,
-whether using the de Casteljau algorithm or Seiler interpolation. We also compare performance and visual quality against standard GPU curve evaluation methods.
+using both the de Casteljau algorithm and Seiler interpolation. We also compare performance and accuracy against curves evaluated as polynomials in shader code.
 
 \section{De Casteljau Using Linear Texture Interpolation}
 
 \input{Diagrams/BezDecasteljau/figure.tex}
 
-The link between Bézier curves and linear texture interpolation lies in the de Casteljau algorithm which is based on recursive linear interpolation as shown in figure \ref{fig_tex_decasteljau}.
-For a quadratic curve with control points $A$, $B$ and $C$, the de Casteljau algorithm linearly interpolates between $A$ and $B$ to get point $AB$, between $B$ and $C$ to get point $BC$, and between
-$AB$ and $BC$ to get the final point $ABC$, all with the same interpolation time $t$.
+The link between Bézier curves and linear texture interpolation lies in the de Casteljau algorithm which is based on recursive linear interpolation. For a quadratic curve with control points
+$A$, $B$ and $C$, the de Casteljau algorithm linearly interpolates between $A$ and $B$ to get point $AB$, between $B$ and $C$ to get point $BC$, and between $AB$ and $BC$ to get the final
+point $ABC$, all with the same interpolation time $t$.
 
 Similarly, we can make a 2x2 texture that has a row of pixels with values $A$, $B$, and a row with values $B$, $C$. When this texture is linearly sampled at $(t, t)$, there
-are effectively two horizontal interpolations which make $AB$ and $BC$ and then a vertical interpolation between them which makes $ABC$.
+are effectively two horizontal interpolations which make $AB$ and $BC$ and then a vertical interpolation between them which makes $ABC$.  This equivalence is shown in figure \ref{fig_tex_decasteljau}.
 
 For a cubic curve, the de Casteljau algorithm linearly interpolates between two quadratic curve points $ABC$ and $BCD$ to make cubic curve point $ABCD$. If we make a 2x2x2 volume
 texture which has a front slice encoding the quadratic Bézier curve $ABC$ and a back slice encoding $BCD$, sampling at $(t,t,t)$ gives point $ABCD$.  For higher order curves, Further
@@ -94,8 +94,7 @@ $[0,1]$ range. For a 2x2 texture, that means that $t$ is in the range $[0.25, 0.
 \input{Diagrams/ZigZag/figure.tex}
 
 To store multiple quadratic curves in a single texture, we would naively need a 2x2 group of pixels for each curve. However, it can be observed that the diagonal texels
-don't need to store $B$ exactly, and only need to average to $B$. If we have a 2x2 texture with rows $A, B$ and $C, D$, and we define $s = 1 - t$, a bilinear interpolation is written as
-and expanded to:
+only need to average to $B$. If we have a 2x2 texture with rows $A, B$ and $C, D$, and we define $s = 1 - t$, a bilinear interpolation is written as and expanded to:
 
 \begin{equation}
 \begin{split}
@@ -125,8 +124,8 @@ a Bézier volume. The pattern continues for hypervolumes as well.
 If needing to evaluate multiple curves at once, you can use multiple color channels. A nice coincidence is that a bicubic surface can fit into an 2x2x2 RGBA 3D texture. Reading the texture
 using coordinate $u$ gives four control points for a Cubic Bézier curve to be evaluated with $v$ in the shader to get the final point on the surface.
 
-With some pre-processing, it is also possible to evaluate NURBS. Rational splines can be achieved by dividing one integral spline by another in the shader after doing the texture reads,
-and B splines can be converted to piecewise Bézier curves using Boehm's algorithm.
+With some pre-processing, it is also possible to evaluate NURBS. Rational splines can be achieved by dividing one integral spline point by another in the shader, and B splines can be converted
+to piecewise Bézier curves using Boehm's algorithm.
 
 Lastly, as power basis polynomials can be converted to and from Bernstein basis (Bézier) polynomials, this technique can be used to evaluate general polynomials as well.
 
@@ -140,7 +139,9 @@ rescale the curves to fit within the range. However, higher bit depth textures c
 
 Another source of discretization error is in the texture sampling itself. When performing interpolation, the (u,v) coordinates themselves are commonly converted to a fixed point X.8 bit
 format, leading to unavoidable quantization errors \cite{CUDA_PG}.  If this is a problem, doing some of the interpolation levels in the shader can help reduce the error, since shaders run at full
-32 bit float precision. These details can be seen in figure \ref{fig_curve_accuracy}.
+32 bit float precision. The quantization errors are shown in figure \ref{fig_curve_accuracy}.
+
+\AW{Maybe change the qunaitzation figure to show a neutral color for the curve and show red where the curve is too high and green where the curve is too low. Something like that could be more readable.}
 
 \section{Seiler Interpolation Using Linear Texture Interpolation}
 
@@ -164,6 +165,7 @@ s_{12} = L(s_1, s_2, t), \quad
 C(t) = L(b_{03}, s_{12}, (1-t)t),
 \]
 where $L(A,B,t)$ denotes linear interpolation between $A$ and $B$ with parameter $t$.
+
 
 \AW{maybe bring this to lerps and then to textures as an example. Then show the other curve formulations and texture configurations below}
 
