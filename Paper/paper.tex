@@ -144,9 +144,6 @@ format, leading to unavoidable quantization errors \cite{CUDA_PG}.  If this is a
 
 \section{Seiler Interpolation Using Linear Texture Interpolation}
 
-\AW{We should also explain how we implement Seiler as texture interpolations}
-\AW{Seiler textures do not stay within the convex hull of the control points, so we should mention this and say that you basically can't use U8 textures for them, unlike the de casteljau textures which can use u8 if your control points are withing the 0 to 1 range.}
-
 Seiler interpolation provides a more efficient method for evaluating cubic Bézier curves, requiring only \textbf{three linear interpolations} instead of the six needed by the classical De Casteljau algorithm. This efficiency is achieved through the introduction of \textbf{difference terms}.
 
 For a cubic curve $C(t)$ defined by control points $b_0, b_1, b_2, b_3$, two difference vectors are defined as:
@@ -167,6 +164,9 @@ s_{12} = L(s_1, s_2, t), \quad
 C(t) = L(b_{03}, s_{12}, (1-t)t),
 \]
 where $L(A,B,t)$ denotes linear interpolation between $A$ and $B$ with parameter $t$.
+
+\AW{maybe bring this to lerps and then to textures as an example. Then show the other curve formulations and texture configurations below}
+
 
 \subsection*{Generalization to Higher-Degree Curves}
 
@@ -236,13 +236,43 @@ B_0 & B_5
 \end{array}
 \]
 
-\subsection*{Notes}
-
 Seiler interpolation has not yet been extended beyond degree $5$, so a fully generalized formula for higher-degree polynomials does not exist. Note the \textbf{redundant storage} in the quartic and quintic textures; if new difference rules are discovered, higher-degree curves could potentially be encoded efficiently using this approach.
-\section{Results}
 
-\AW{we should explain our testing methodology and resutls here.}
-\AW{we should also explain when this is useful vs not. Compute bound, and being able to move this to texture units, while still having compute work to overlap with, else it serializes the work and stalls.}
+\AW{Show how a multiply add can be rewritten as a lerp}
+
+\AW{We should also explain how we implement Seiler as texture interpolations}
+\AW{Seiler textures do not stay within the convex hull of the control points, so we should mention this and say that you basically can't use U8 textures for them, unlike the de casteljau textures which can use u8 if your control points are withing the 0 to 1 range.}
+
+\section{Performance Analysis}
+
+Modern GPUs hide memory latency by suspending the active thread and switching to another thread while waiting on memory reads. This allows memory and computation to happen in parallel but GPU workloads are often unbalanced and end up either compute-bound or memory-bound. Our technique offloads
+computational work from the shader program to the texture sampling unit, effectively trading compute for cache friendly memory access of small textures. A necessary condition for our technique to provide a performance boost is that the workload must be compute-bound.
+That condition isn't sufficient, though, because not all memory reads can be parallelized with all compute.
+
+As a benchmark, we wrote a simple path tracer that traces N rays per pixel per frame, has no textures, and uses hardcoded geometry. After rendering, we use curves to color grade the result.  The first part of the work is fully compute, and the second part is entirely memory
+reads when using our texture interpolation method. When profiling that workload, we found that performance decreased when using our texture interpolation method instead of compute, because this work was inherently serial and was difficult for the GPU to parallelize.
+
+When modifying the path tracer to color grade the result of each ray before accumulation, we see a performance improvement because the next ray can start calculations while the previous ray is color grading.  This work has more opportunity to parallelize memory and compute,
+so the overall wall-clock time is reduced. These results are shown in table \ref{tab:ColorGradePerf}.
+
+\begin{table}[h]
+\centering
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{lccc}
+\hline
+\textbf{Method} & \textbf{RTX 4090} & \textbf{RTX 3070} \\
+\hline
+Polynomial         & 12.96\,ms & 60.33\,ms \\
+\textbf{Seiler Texture (Ours)} & \textbf{12.89}\,ms &  \textbf{59.97}\,ms \\
+\hline
+\end{tabular}
+\caption{Frame times when path tracing a textureless scene of hard coded geometry with 16 rays per pixel at 1920x1080 and using quintic curves for color grading each ray result. Averaged over 1000 frames. Polynomial evaluates the curve as shader instructions, Seiler Texture
+uses the GPU texture interpolator to evaluate the curve. The total wall clock time is reduced when parallelizable work can be offloaded to the texture interpolator in compute bound work loads.}
+\label{tab:ColorGradePerf}
+\end{table}
+
+\AW{explain the particle sim usage case in the caption and/or text}
+\AW{We should get my GPU results in the table below, and your GPU results in the table above}
 
 \begin{table}[h]
 \centering
