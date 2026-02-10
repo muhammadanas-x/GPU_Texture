@@ -143,7 +143,9 @@ format, leading to unavoidable quantization errors \cite{CUDA_PG}.  If this is a
 
 \AW{Maybe change the qunaitzation figure to show a neutral color for the curve and show red where the curve is too high and green where the curve is too low. Something like that could be more readable.}
 
-\section{Seiler Interpolation Using Linear Texture Interpolation}
+\section{Seiler Interpolation}
+
+\AW{I think we should make this section explain Seiler interpolation with the formulas from Cem's paper, but nothing about textures here. Then in the next section, we can show how to implement it using lerps, and thus the texture interpolator}
 
 Seiler interpolation provides a more efficient method for evaluating cubic Bézier curves, requiring only \textbf{three linear interpolations} instead of the six needed by the classical De Casteljau algorithm. This efficiency is achieved through the introduction of \textbf{difference terms}.
 
@@ -165,10 +167,6 @@ s_{12} = L(s_1, s_2, t), \quad
 C(t) = L(b_{03}, s_{12}, (1-t)t),
 \]
 where $L(A,B,t)$ denotes linear interpolation between $A$ and $B$ with parameter $t$.
-
-
-\AW{maybe bring this to lerps and then to textures as an example. Then show the other curve formulations and texture configurations below}
-
 
 \subsection*{Generalization to Higher-Degree Curves}
 
@@ -240,10 +238,65 @@ B_0 & B_5
 
 Seiler interpolation has not yet been extended beyond degree $5$, so a fully generalized formula for higher-degree polynomials does not exist. Note the \textbf{redundant storage} in the quartic and quintic textures; if new difference rules are discovered, higher-degree curves could potentially be encoded efficiently using this approach.
 
-\AW{Show how a multiply add can be rewritten as a lerp}
+\section{Seiler Interpolation Using Linear Texture Interpolation}
 
-\AW{We should also explain how we implement Seiler as texture interpolations}
+Using Seiler interpolation, a cubic Bézier curve is written as the below.
+
+\begin{equation}
+C(t) = L(b_0, b_3, t) + L(d_1, d_2, t) * st
+\end{equation}
+
+Where $L(a,b,t)$ is linear interpolation from $a$ to $b$ at parameter $t$, and $s = 1-t$.  Observing that $A+Bt$ (a multiply add) can be reformulated as a linear interpolation $L(A, A+B, t)$, allows us to rewrite the equation as only lerps.
+
+\begin{equation}
+C(t) = L( L(b_0, b_3, t) + L(d_1 + b_0, d_2 + b_3, t), st)
+\end{equation}
+
+That is equivalent to the "pure lerp" form in Yuksel \cite{10.1145/3641233.3664331} where $d_1 + b_0$ and $d_2 + b_3$ are replaced with $s_1$ and $s_2$ respectively.
+
+\begin{equation}
+C(t) = L( L(b_0, b_3, t) + L(s_1, s_2, t), st)
+\end{equation}
+
+This allows us to make a 2x2 texture where the top row of pixels contains $b_0$ and $b_3$, and the bottom row contains $d_1 + b_0$ and $d_2 + b_3$.  Sampling that texture at coordinate $(t, st)$ gives the final point on the curve.  This is shown in figure \ref{fig:teaser}.
+
+Using Seiler in this way allows us to store a cubic curve in a 2x2 texture, where the de Casteljau texture formulation would require a 2x2x2 texture. A cubic curve has 4 control points, and a 2x2 texture has the same number of degrees of freedom with 4 pixels, so 
+there is no redundant storage, unlike the de Casteljau formulation which requires 8 pixels.
+
+The highest order curve known in Seiler interpolation is a quintic curve, which has 6 control points.  The pure lerp form is be written as:
+
+\begin{equation}
+    \begin{split}
+    C(t) = L(b_{05}, L(b_{05} + d_{14}, b_{05} + d_{14} + d_{23}, st), st) \\
+    \text{where } \\
+    b_{05} = L(b_0, b_5, t) \\
+    d_{14} = L(d_1, d_4, t) \\
+    d_{23} = L(d_2, d_3, t)
+    \end{split}
+\end{equation}
+
+The second parameter of the outer most linear interpolation can be realized with a 2d texture that is read at location $(t, st)$:
+
+\[
+\begin{bmatrix}
+b_0 + d_1 & b_5 + d_4 \\
+b_0 + d_1 + d_2 & b_5 + d_4 + d_3
+\end{bmatrix}
+\]
+
+Knowing that we have to interpolate from $b_{05}$ to this value in the outer most lerp, we need a 2d texture that when read at $(t, st)$ gives us $b_{05}$.  We can do that with this texture:
+
+\[
+\begin{bmatrix}
+b_0 & b_5\\
+b_0 & b_5
+\end{bmatrix}
+\]
+
+When this texture is the first slice of a volume texture, and the previous texture is the second slice, we can sample the volume texture at $(t, st, st)$ to get the point on the quintic curve at time $t$, using a single trilinear texture read.
+
 \AW{Seiler textures do not stay within the convex hull of the control points, so we should mention this and say that you basically can't use U8 textures for them, unlike the de casteljau textures which can use u8 if your control points are withing the 0 to 1 range.}
+\AW{Show the full list of curve degrees, how to store them in textures, and where to read from. A simple table that is easy to use as reference would be nice.}
 
 \section{Performance Analysis}
 
@@ -255,7 +308,9 @@ As a benchmark, we wrote a simple path tracer that traces N rays per pixel per f
 reads when using our texture interpolation method. When profiling that workload, we found that performance decreased when using our texture interpolation method instead of compute, because this work was inherently serial and was difficult for the GPU to parallelize.
 
 When modifying the path tracer to color grade the result of each ray before accumulation, we see a performance improvement because the next ray can start calculations while the previous ray is color grading.  This work has more opportunity to parallelize memory and compute,
-so the overall wall-clock time is reduced. These results are shown in table \ref{tab:ColorGradePerf}.
+so the overall wall clock time is reduced. These results are shown in table \ref{tab:ColorGradePerf}.
+
+\AW{The perf difference isn't very big. I wonder if there's a way we can make the offloaded work a bigger portion of the total work. Either modifying the path tracer, or a different use case? Maybe a simpler scene - like the cornell box?}
 
 \begin{table}[h]
 \centering
