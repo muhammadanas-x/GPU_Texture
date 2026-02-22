@@ -144,100 +144,113 @@ format, leading to unavoidable quantization errors \cite{CUDA_PG}.  If this is a
 \AW{Maybe change the qunaitzation figure to show a neutral color for the curve and show red where the curve is too high and green where the curve is too low. Something like that could be more readable.}
 
 \section{Seiler Interpolation}
-
 \AW{I think we should make this section explain Seiler interpolation with the formulas from Cem's paper, but nothing about textures here. Then in the next section, we can show how to implement it using lerps, and thus the texture interpolator}
 
-Seiler interpolation provides a more efficient method for evaluating cubic Bézier curves, requiring only \textbf{three linear interpolations} instead of the six needed by the classical De Casteljau algorithm. This efficiency is achieved through the introduction of \textbf{difference terms}.
+Seiler interpolation provides an efficient method for evaluating polynomial curves using a reduced number of linear interpolations. 
+For cubic Bézier curves, it requires only \textbf{three linear interpolations}, compared to the six required by the classical de Casteljau algorithm. 
+This efficiency is achieved through the introduction of carefully constructed \textbf{difference terms}.
 
-For a cubic curve $C(t)$ defined by control points $b_0, b_1, b_2, b_3$, two difference vectors are defined as:
+Let $C(t)$ be a cubic Bézier curve defined by control points $b_0, b_1, b_2, b_3$. 
+Define the difference terms:
 \[
-d_1 = 3(b_1 - b_0) - (b_3 - b_0), \quad 
+d_1 = 3(b_1 - b_0) - (b_3 - b_0),
+\]
+\[
 d_2 = 3(b_2 - b_3) - (b_0 - b_3).
 \]
 
-From these, two auxiliary \textbf{Seiler points} are constructed:
+The curve evaluation proceeds as follows. First interpolate the endpoints:
 \[
-s_1 = b_0 + d_1, \quad s_2 = b_3 + d_2.
+b_{03} = L(b_0, b_3, t),
+\]
+and interpolate the difference terms:
+\[
+d_{12} = L(d_1, d_2, t).
 \]
 
-The curve is then evaluated using three linear interpolations:
+The final curve position is then
 \[
-b_{03} = L(b_0, b_3, t), \quad 
-s_{12} = L(s_1, s_2, t), \quad 
-C(t) = L(b_{03}, s_{12}, (1-t)t),
+C(t) = b_{03} + (1 - t)t \, d_{12},
 \]
-where $L(A,B,t)$ denotes linear interpolation between $A$ and $B$ with parameter $t$.
-
-\subsection*{Generalization to Higher-Degree Curves}
-
-For curves of degree less than $6$, this approach can be extended to an $n$-dimensional hypercube with $2^n$ pixels ($n>1$), allowing the construction of a $(N-1)$-degree curve using $N$ control points.
-
-\paragraph{Second- and Third-Degree Polynomials}
-
-For second- and third-degree polynomials, a $2\times2$ texture can be used. Sampling is performed at
+where
 \[
-uv = (t, s t), \quad \text{where } s = 1-t.
+L(a,b,t) = (1-t)a + tb
 \]
+denotes linear interpolation.
 
-For a quadratic (2nd-degree):
+\subsection*{Pure Lerp Formulation}
+
+A purely interpolation-based formulation can be obtained by defining the 
+\textbf{Seiler points}
 \[
-\begin{bmatrix}
-B_0 & B_2 \\
-B_0 + d_1 & B_2 + d_1
-\end{bmatrix}
+s_1 = b_0 + d_1, \qquad s_2 = b_3 + d_2.
 \]
 
-For a cubic (3rd-degree):
+We then compute
 \[
-\begin{bmatrix}
-B_0 & B_3 \\
-B_0 + d_1 & B_3 + d_2
-\end{bmatrix}
+b_{03} = L(b_0, b_3, t), \qquad
+s_{12} = L(s_1, s_2, t),
+\]
+and evaluate
+\[
+C(t) = L\!\left(b_{03}, s_{12}, (1-t)t\right).
 \]
 
-\paragraph{Fourth- and Fifth-Degree Polynomials}
+This form uses only three lerps.
 
-For fourth- and fifth-degree polynomials, a $2 \times 2 \times 2$ volume texture is used, with sampling at
+\subsection*{General Polynomial Curves}
+
+For a polynomial curve of degree $d$ with control points 
+$b_0, b_1, \dots, b_d$, Seiler interpolation can be written recursively as
+
 \[
-uvw = (t, s t, s t), \quad s = 1-t.
+C(t) = L(b_0, b_d, t) + (1 - t)t \, D_1(t),
 \]
 
-For a quartic (4th-degree):
+where the recursive term is defined as
+
 \[
-\begin{array}{c|c}
-z=0 & 
-\begin{bmatrix}
-B_0 + d_1 & B_4 + d_3 \\
-B_0 + d_1 + d_2 & B_4 + d_3 + d_2
-\end{bmatrix} \\
-\hline
-z=1 & 
-\begin{bmatrix}
-B_0 & B_4 \\
-B_0 & B_4
-\end{bmatrix}
-\end{array}
+D_i(t) =
+\begin{cases}
+0, & \text{if } 2i = d + 1, \\[6pt]
+d_i, & \text{if } 2i = d, \\[6pt]
+L(d_i, d_{d-i}, t) + (1 - t)t \, D_{i+1}(t), & \text{otherwise}.
+\end{cases}
 \]
 
-For a quintic (5th-degree):
+The difference terms are computed from the Bézier control points. 
+For general degree $d$:
+
 \[
-\begin{array}{c|c}
-z=0 & 
-\begin{bmatrix}
-B_0 + d_1 & B_5 + d_4 \\
-B_0 + d_1 + d_2 & B_5 + d_4 + d_3
-\end{bmatrix} \\
-\hline
-z=1 & 
-\begin{bmatrix}
-B_0 & B_5 \\
-B_0 & B_5
-\end{bmatrix}
-\end{array}
+d_1 = d(b_1 - b_0) - (b_d - b_0),
+\]
+\[
+d_{d-1} = d(b_{d-1} - b_d) - (b_0 - b_d).
 \]
 
-Seiler interpolation has not yet been extended beyond degree $5$, so a fully generalized formula for higher-degree polynomials does not exist. Note the \textbf{redundant storage} in the quartic and quintic textures; if new difference rules are discovered, higher-degree curves could potentially be encoded efficiently using this approach.
+For degrees up to $5$, additional terms can be computed as:
 
+\[
+d_2 =
+\binom{d}{2}(b_2 - b_1)
+- \binom{d-2}{2}(b_1 - b_0)
+- (d-3)(b_{d-1} - b_d)
+- 3(b_{d-1} - b_1),
+\]
+
+\[
+d_{d-2} =
+\binom{d}{2}(b_{d-2} - b_{d-1})
+- \binom{d-2}{2}(b_{d-1} - b_d)
+- (d-3)(b_1 - b_0)
+- 3(b_1 - b_{d-1}).
+\]
+
+For a degree-$d$ polynomial, Seiler interpolation requires $d$ linear 
+interpolations, $\lceil d/2 \rceil$ of which can be computed in parallel, 
+since they operate on disjoint pairs of difference terms.
+
+Explicit closed-form difference rules are currently known up to degree $5$.
 \section{Seiler Interpolation Using Linear Texture Interpolation}
 
 Using Seiler interpolation, a cubic Bézier curve is written as the below.
