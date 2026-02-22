@@ -311,6 +311,80 @@ When this texture is the first slice of a volume texture, and the previous textu
 \AW{Seiler textures do not stay within the convex hull of the control points, so we should mention this and say that you basically can't use U8 textures for them, unlike the de casteljau textures which can use u8 if your control points are withing the 0 to 1 range.}
 \AW{Show the full list of curve degrees, how to store them in textures, and where to read from. A simple table that is easy to use as reference would be nice.}
 
+\subsection*{Structured Difference Layout for Degrees 2--5}
+
+\begin{table}[h]
+\centering
+\renewcommand{\arraystretch}{1.5}
+
+% ---------------- 2D CASES ----------------
+\textbf{Quadratic and Cubic (2D Structure)}
+
+\begin{tabular}{|c|c|}
+\hline
+\textbf{Degree} & \textbf{Structured Layout} \\
+\hline
+
+Quadratic ($d=2$) &
+$\begin{bmatrix}
+B_0 & B_2 \\
+B_0 + d_1 & B_2 + d_1
+\end{bmatrix}$
+\\
+\hline
+
+Cubic ($d=3$) &
+$\begin{bmatrix}
+B_0 & B_3 \\
+B_0 + d_1 & B_3 + d_2
+\end{bmatrix}$
+\\
+\hline
+\end{tabular}
+
+\vspace{1em}
+
+% ---------------- 3D CASES ----------------
+\textbf{Quartic and Quintic (3D Structure)}
+
+\begin{tabular}{|c|c|c|}
+\hline
+\textbf{Degree} & \textbf{$z=0$ Layer} & \textbf{$z=1$ Layer} \\
+\hline
+
+Quartic ($d=4$) &
+$\begin{bmatrix}
+B_0 + d_1 & B_4 + d_3 \\
+B_0 + d_1 + d_2 & B_4 + d_3 + d_2
+\end{bmatrix}$
+&
+$\begin{bmatrix}
+B_0 & B_4 \\
+B_0 & B_4
+\end{bmatrix}$
+\\
+\hline
+
+Quintic ($d=5$) &
+$\begin{bmatrix}
+B_0 + d_1 & B_5 + d_4 \\
+B_0 + d_1 + d_2 & B_5 + d_4 + d_3
+\end{bmatrix}$
+&
+$\begin{bmatrix}
+B_0 & B_5 \\
+B_0 & B_5
+\end{bmatrix}$
+\\
+\hline
+
+\end{tabular}
+
+\caption{Structured arrangement of Seiler difference terms for polynomial degrees 2 through 5.}
+\end{table}
+
+
+
 \section{Performance Analysis}
 
 Modern GPUs hide memory latency by suspending the active thread and switching to another thread while waiting on memory reads. This allows memory and computation to happen in parallel but GPU workloads are often unbalanced and end up either compute-bound or memory-bound. Our technique offloads
