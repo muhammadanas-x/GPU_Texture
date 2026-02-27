@@ -30,7 +30,7 @@
 % More detailed affiliations can appear in the contact blocks at the end of the paper
 \author
        {Muhammad Anas~\href{https://orcid.org/0009-0007-7348-9934}{\includegraphics[width=8pt]{ORCIDlogo}}
-        \and Alan Wolfe~\href{https://orcid.org/0000-0001-9100-4928}{\includegraphics[width=8pt]{ORCIDlogo}}
+        \and Alan Wolfe~\href{https://orcid.org/0000-0001-9100-4928}{\includegraphics[width=8pt]{ORCIDlogo}}\\SEED - Electronic Arts, USA
        }
 
 \teaser{
@@ -46,8 +46,7 @@
 \maketitle
 \thispagestyle{firstpagestyle}
 
-\AW{Yukel's paper uses s1 and s2, not s0 and s1. We should change the figure and caption above to match that.}
-\AW{It would be neat to have the formula for s1 and s2 on the diagram, or in the caption, so that from our teaser image, people have enough information to implement it.}
+\AW{You can add your affiliation (school) if you want to}
 
 \begin{abstract}
 \small
@@ -144,7 +143,6 @@ format, leading to unavoidable quantization errors \cite{CUDA_PG}.  If this is a
 \AW{Maybe change the qunaitzation figure to show a neutral color for the curve and show red where the curve is too high and green where the curve is too low. Something like that could be more readable.}
 
 \section{Seiler Interpolation}
-\AW{I think we should make this section explain Seiler interpolation with the formulas from Cem's paper, but nothing about textures here. Then in the next section, we can show how to implement it using lerps, and thus the texture interpolator}
 
 Seiler interpolation provides an efficient method for evaluating polynomial curves using a reduced number of linear interpolations. 
 For cubic Bézier curves, it requires only \textbf{three linear interpolations}, compared to the six required by the classical de Casteljau algorithm. 
@@ -308,9 +306,6 @@ b_0 & b_5
 
 When this texture is the first slice of a volume texture, and the previous texture is the second slice, we can sample the volume texture at $(t, st, st)$ to get the point on the quintic curve at time $t$, using a single trilinear texture read.
 
-\AW{Seiler textures do not stay within the convex hull of the control points, so we should mention this and say that you basically can't use U8 textures for them, unlike the de casteljau textures which can use u8 if your control points are withing the 0 to 1 range.}
-\AW{Show the full list of curve degrees, how to store them in textures, and where to read from. A simple table that is easy to use as reference would be nice.}
-
 \subsection*{Structured Difference Layout for Degrees 2--5}
 
 \begin{table}[h]
@@ -380,7 +375,7 @@ B_0 & B_5
 
 \end{tabular}
 
-\caption{Structured arrangement of Seiler difference terms for polynomial degrees 2 through 5.}
+\caption{Structured arrangement of Seiler difference terms for polynomial degrees 2 through 5. The 2D textures are read using coordinates $(t, st)$, while the 3D textures are read using coordinates $(t, st, st)$. This layout allows for efficient evaluation of the curves using the GPU's texture interpolation hardware.}
 \end{table}
 
 
