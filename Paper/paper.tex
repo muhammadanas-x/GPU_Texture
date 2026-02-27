@@ -147,36 +147,6 @@ Seiler interpolation provides an efficient method for evaluating polynomial curv
 For cubic Bézier curves, it requires only \textbf{three linear interpolations}, compared to the six required by the classical de Casteljau algorithm. 
 This efficiency is achieved through the introduction of carefully constructed \textbf{difference terms}.
 
-Let $C(t)$ be a cubic Bézier curve defined by control points $b_0, b_1, b_2, b_3$. 
-Define the difference terms:
-\[
-d_1 = 3(b_1 - b_0) - (b_3 - b_0),
-\]
-\[
-d_2 = 3(b_2 - b_3) - (b_0 - b_3).
-\]
-
-The curve evaluation proceeds as follows. First interpolate the endpoints:
-\[
-b_{03} = L(b_0, b_3, t),
-\]
-and interpolate the difference terms:
-\[
-d_{12} = L(d_1, d_2, t).
-\]
-
-The final curve position is then
-\[
-C(t) = b_{03} + (1 - t)t \, d_{12},
-\]
-where
-\[
-L(a,b,t) = (1-t)a + tb
-\]
-denotes linear interpolation.
-
-\subsection*{Pure Lerp Formulation}
-
 A purely interpolation-based formulation can be obtained by defining the 
 \textbf{Seiler points}
 \[
