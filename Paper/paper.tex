@@ -350,26 +350,27 @@ B_0 + d_1 & B_3 + d_2
 
 Quartic ($d=4$) &
 $\begin{bmatrix}
-B_0 + d_1 & B_4 + d_3 \\
-B_0 + d_1 + d_2 & B_4 + d_3 + d_2
-\end{bmatrix}$
-&
-$\begin{bmatrix}
 B_0 & B_4 \\
 B_0 & B_4
 \end{bmatrix}$
+&
+$\begin{bmatrix}
+B_0 + d_1 & B_4 + d_3 \\
+B_0 + d_1 + d_2 & B_4 + d_3 + d_2
+\end{bmatrix}$
+
 \\
 \hline
 
 Quintic ($d=5$) &
 $\begin{bmatrix}
-B_0 + d_1 & B_5 + d_4 \\
-B_0 + d_1 + d_2 & B_5 + d_4 + d_3
+B_0 & B_5 \\
+B_0 & B_5
 \end{bmatrix}$
 &
 $\begin{bmatrix}
-B_0 & B_5 \\
-B_0 & B_5
+B_0 + d_1 & B_5 + d_4 \\
+B_0 + d_1 + d_2 & B_5 + d_4 + d_3
 \end{bmatrix}$
 \\
 \hline
@@ -378,8 +379,6 @@ B_0 & B_5
 
 \caption{Structured arrangement of Seiler difference terms for polynomial degrees 2 through 5. The 2D textures are read using coordinates $(t, st)$, while the 3D textures are read using coordinates $(t, st, st)$. This layout allows for efficient evaluation of the curves using the GPU's texture interpolation hardware.}
 \end{table}
-
-
 
 \section{Performance Analysis}
 
