@@ -47,7 +47,7 @@
 \maketitle
 \thispagestyle{firstpagestyle}
 
-\AW{You can add your affiliation (school) if you want to}
+\AW{You can add your affiliation (school) under your name like i added my company}
 
 \begin{abstract}
 \small
@@ -140,8 +140,6 @@ rescale the curves to fit within the range. However, higher bit depth textures c
 Another source of discretization error is in the texture sampling itself. When performing interpolation, the (u,v) coordinates themselves are commonly converted to a fixed point X.8 bit
 format, leading to unavoidable quantization errors \cite{CUDA_PG}.  If this is a problem, doing some of the interpolation levels in the shader can help reduce the error, since shaders run at full
 32 bit float precision. The quantization errors are shown in figure \ref{fig_curve_accuracy}.
-
-\AW{Maybe change the qunaitzation figure to show a neutral color for the curve and show red where the curve is too high and green where the curve is too low. Something like that could be more readable.}
 
 \section{Seiler Interpolation}
 

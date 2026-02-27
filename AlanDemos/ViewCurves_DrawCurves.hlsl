@@ -150,17 +150,46 @@ void ShowControlPoints(inout float3 color, float2 uv)
 
     if (uv.x >= 0.0f && uv.x <= 1.0f && uv.y >= 0.0f && uv.y <= 1.0f)
     {
-        if (/*$(Variable:ShowDeCasteljauTexture)*/ && uv.y < EvaluateDeCasteljauTexture(t))
-            color += /*$(Variable:DeCasteljauColor)*/;
+        if (/*$(Variable:ComparisonMode)*/)
+        {
+            float actual = EvaluateBezierPolynomial(t);
 
-        if (/*$(Variable:ShowPolynomial)*/ && uv.y < EvaluateBezierPolynomial(t))
-            color += /*$(Variable:PolynomialColor)*/;
+            float estimated = actual;
+            if (/*$(Variable:ShowDeCasteljauTexture)*/)
+                estimated = EvaluateDeCasteljauTexture(t);
+            else if (/*$(Variable:ShowSeilerTexture)*/)
+                estimated = EvaluateSeilerTexture(t);
+            else if (/*$(Variable:ShowHybrid)*/)
+                estimated = EvaluateHybrid(t);
 
-        if (/*$(Variable:ShowSeilerTexture)*/ && uv.y < EvaluateSeilerTexture(t))
-            color += /*$(Variable:SeilerColor)*/;
+            if (uv.y > actual)
+            {
+                if (uv.y < estimated)
+                    color = float3(0.0f, 1.0f, 0.0f);
+            }
+            else // if (uv.y <= actual)
+            {
+                if (uv.y > estimated)
+                    color = float3(1.0f, 0.0f, 0.0f);
+                else
+                    color = float3(1.0f, 1.0f, 1.0f);
+            }
 
-        if (/*$(Variable:ShowHybrid)*/ && uv.y < EvaluateHybrid(t))
-            color += /*$(Variable:HybridColor)*/;
+        }
+        else
+        {
+            if (/*$(Variable:ShowDeCasteljauTexture)*/ && uv.y < EvaluateDeCasteljauTexture(t))
+                color += /*$(Variable:DeCasteljauColor)*/;
+
+            if (/*$(Variable:ShowPolynomial)*/ && uv.y < EvaluateBezierPolynomial(t))
+                color += /*$(Variable:PolynomialColor)*/;
+
+            if (/*$(Variable:ShowSeilerTexture)*/ && uv.y < EvaluateSeilerTexture(t))
+                color += /*$(Variable:SeilerColor)*/;
+
+            if (/*$(Variable:ShowHybrid)*/ && uv.y < EvaluateHybrid(t))
+                color += /*$(Variable:HybridColor)*/;
+        }
     }
 
     if (/*$(Variable:ShowControlPoints)*/)

@@ -100,6 +100,13 @@
             "visibility": "User"
         },
         {
+            "name": "ShowHybrid",
+            "comment": "de CastelJau texture, but the last lerp done in shaders at full f32 precision. Quartic and Quintic are already hybrid.",
+            "type": "Bool",
+            "dflt": "false",
+            "visibility": "User"
+        },
+        {
             "name": "ShowControlPoints",
             "comment": "In black",
             "type": "Bool",
@@ -107,8 +114,8 @@
             "visibility": "User"
         },
         {
-            "name": "ShowHybrid",
-            "comment": "de CastelJau texture, but the last lerp done in shaders at full f32 precision. Quartic and Quintic are already hybrid.",
+            "name": "ComparisonMode",
+            "comment": "Colors the output for a better comparison between two curve types",
             "type": "Bool",
             "dflt": "false",
             "visibility": "User"

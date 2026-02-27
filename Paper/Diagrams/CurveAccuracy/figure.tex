@@ -2,9 +2,10 @@
     \centering
     \includegraphics[width=\textwidth]{Diagrams/CurveAccuracy/diagram.png}
     \caption{Using the texture interpolator to evaluate Bézier curves suffers from quantization errors due to fixed point quantization of the $(u,v)$ coordinates.
-    Here a cubic curve is shown evaluated using the de Casteljau texture method which samples a 2x2x2 volume texture with a single texture read. A hybrid mode is shown
-    which evaluates two quadratic curves with the texture interpolator and then does the final lerp in the shader at full 32 bit floating point precision to reduce the error.
-    Lastly the Seiler method is shown which takes a single sample of a 2x2 texture. In all images, yellow is the ground truth evaluated as a polynomial in the shader, and blue is
-    added in for the comparison curve to show the error. The full sized image shows the de Casteljau method compared to the ground truth.}
+    Here a cubic curve is shown evaluated using the de Casteljau texture method which samples a 2x2x2 volume texture with a single trilinear texture read. A hybrid mode is shown
+    which evaluates two quadratic curves with the texture interpolator (two bilinear reads) and then does the final lerp in the shader at full 32 bit floating point precision to reduce the error.
+    Lastly the Seiler method is shown which takes a single bilinear sample of a 2x2 texture. In all images, the polynomial ground truth is shown in white. Where the curve being evaluated
+    is less than the ground truth, the curve is shown in red, and where it is greater than the ground truth, it is shown in green. The full sized image shows the de Casteljau method compared to the ground truth.
+    Seiler is most affected by quantization error, but uses the fewest texels.}
     \label{fig_curve_accuracy}
 \end{figure}
