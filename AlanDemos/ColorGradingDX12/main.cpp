@@ -32,7 +32,7 @@
 
 #define MAKE_PIX_CAPTURE() false // if true, will emit a pix capture for every frame the unit tests run.
 
-static const unsigned int c_renderSize[2] = { 1920, 1080 };
+static const unsigned int c_renderSize[2] = { 1024, 768 };
 // Gigi Modification End
 
 #ifdef DX12_ENABLE_DEBUG_LAYER
@@ -259,8 +259,8 @@ uint8_t* g_keyStatesLastFrame = &g_keyStates[256];
 float g_mouseState[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
 float g_mouseStateLastFrame[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
 
-float g_cameraPos[3] = { -66.5f, 44.5f, 165.0f };
-float g_cameraAltitudeAzimuth[2] = { 0.2f, 0.26f };
+float g_cameraPos[3] = { 39.462f, 31.251f, -92.672f };
+float g_cameraAltitudeAzimuth[2] = { -0.366f, 0.578f };
 
 bool g_vsyncOn = true;
 
@@ -515,6 +515,7 @@ int main(int, char**)
 
             m_ColorGrading->m_input.variable_iFrame = g_frameIndex;
 
+            g_camera.m_leftHanded = true;
             g_camera.m_mouseSensitivity = 0.01f;
             m_ColorGrading->m_input.variable_CameraChanged = false;
             g_camera.Update(g_keyStates, g_mouseState, g_mouseStateLastFrame, 1.0f / 60.0f, g_cameraPos, g_cameraAltitudeAzimuth, m_ColorGrading->m_input.variable_CameraChanged);

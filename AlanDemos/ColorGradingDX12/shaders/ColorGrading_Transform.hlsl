@@ -118,6 +118,10 @@ void ColorGrade(inout float3 color)
     }
 }
 
+
+// The minimal scene doesn't have ray marching, or the mountains in the distance.
+#define MINIMAL_SCENE true
+
 // =======================================================================
 // Constants
 // =======================================================================
@@ -756,6 +760,7 @@ void RayTraceScene(in float3 rayPos, in float3 rayDir, inout SRayHitInfo hitInfo
     }
 
     // Cylinders with mountain cutouts - draw front to back
+    if (!MINIMAL_SCENE)
     {
         RayTraceMountainCylinders(rayPos, rayDir, hitInfo, 284.0f, 700.0f, 50.0f);
         RayTraceMountainCylinders(rayPos, rayDir, hitInfo, 1337.0f, 800.0f, 150.0f);
@@ -1043,7 +1048,8 @@ float3 GetColorForRay(in float3 startRayPos, in float3 startRayDir, inout uint r
 
         // ray trace first, which also gives a maximum distance for ray marching
         RayTraceScene(rayPos, rayDir, hitInfo);
-        RayMarchScene(rayPos, rayDir, hitInfo, rayMarchSteps, minStepDistance);
+        if (!MINIMAL_SCENE)
+            RayMarchScene(rayPos, rayDir, hitInfo, rayMarchSteps, minStepDistance);
 
         if (!hitInfo.hitAnObject)
         {
@@ -1187,7 +1193,7 @@ float3 RenderScene(uint2 px)
 }
 
 [numthreads(8, 8, 1)]
-#line 1127
+#line 1133
 void main(uint3 DTid : SV_DispatchThreadID)
 {
     uint2 px = DTid.xy;

@@ -145,6 +145,13 @@ float DeCasteljauTexture_Read_Linear(in Texture2D<float> tex, float t, in Sample
     return tex.SampleLevel(LinearSampler, uv, 0);
 }
 
+float DeCasteljauTexture_Read_Linear_Hybrid(in Texture2D<float> tex, float t, in SamplerState LinearSampler)
+{
+    float A = tex[uint2(0, 0)];
+    float B = tex[uint2(1, 0)];
+    return lerp(A, B, t);
+}
+
 float3 DeCasteljauTexture_Read_Linear(in Texture2D<float4> tex, float3 t, in SamplerState LinearSampler)
 {
     return float3(
@@ -159,6 +166,16 @@ float DeCasteljauTexture_Read_Quadratic(in Texture2D<float> tex, float t, in Sam
     // change percentage into uv
     float2 uv = lerp(float2(0.25f, 0.25f), float2(0.75f, 0.75f), t);
     return tex.SampleLevel(LinearSampler, uv, 0);
+}
+
+float DeCasteljauTexture_Read_Quadratic_Hybrid(in Texture2D<float> tex, float t, in SamplerState LinearSampler)
+{
+    // change percentage into uv
+    float2 uvA = lerp(float2(0.25f, 0.25f), float2(0.75f, 0.25f), t);
+    float2 uvB = lerp(float2(0.25f, 0.75f), float2(0.75f, 0.75f), t);
+    float A = tex.SampleLevel(LinearSampler, uvA, 0);
+    float B = tex.SampleLevel(LinearSampler, uvB, 0);
+    return lerp(A, B, t);
 }
 
 float3 DeCasteljauTexture_Read_Quadratic(in Texture2D<float4> tex, float3 t, in SamplerState LinearSampler)
@@ -179,6 +196,21 @@ float DeCasteljauTexture_Read_Cubic(in Texture3D<float> tex, float t, in Sampler
     float3 samplePosPx = lerp(float3(0.0f, 0.0f, 0.0f), float3(1.0f, 1.0f, 1.0f), t);
     float3 uvw = (samplePosPx + float3(0.5f, 0.5f, 0.5f)) / float3(dims);
     return tex.SampleLevel(LinearSampler, uvw, 0);
+}
+
+float DeCasteljauTexture_Read_Cubic_Hybrid(in Texture3D<float> tex, float t, in SamplerState LinearSampler)
+{
+    uint3 dims;
+    tex.GetDimensions(dims.x, dims.y, dims.z);
+
+    // change percentage into uv
+    float3 samplePosPxA = lerp(float3(0.0f, 0.0f, 0.0f), float3(0.0f, 1.0f, 1.0f), t);
+    float3 uvwA = (samplePosPxA + float3(0.5f, 0.5f, 0.5f)) / float3(dims);
+    float3 samplePosPxB = lerp(float3(1.0f, 0.0f, 0.0f), float3(1.0f, 1.0f, 1.0f), t);
+    float3 uvwB = (samplePosPxB + float3(0.5f, 0.5f, 0.5f)) / float3(dims);
+    float A = tex.SampleLevel(LinearSampler, uvwA, 0);
+    float B = tex.SampleLevel(LinearSampler, uvwB, 0);
+    return lerp(A, B, t);
 }
 
 float3 DeCasteljauTexture_Read_Cubic(in Texture3D<float4> tex, float3 t, in SamplerState LinearSampler)
