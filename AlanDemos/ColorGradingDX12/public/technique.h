@@ -45,7 +45,7 @@ namespace ColorGrading
         {
 
             // Variables
-            uint2 variable_RenderSize = {1024, 768};
+            uint2 variable_RenderSize = {1920, 1080};
             CurveTypes variable_CurveType = CurveTypes::Polynomial;
             CurveOrders variable_CurveOrder = CurveOrders::Quintic;
             float3 variable_CP1 = {0.f, 0.f, 0.f};

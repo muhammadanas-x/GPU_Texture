@@ -1558,8 +1558,8 @@ Pipeline_Compute_Transform = null;
 
 // -------------------- Public Variables
 
-variable_RenderSize = [ 1024, 768 ];
-variableDefault_RenderSize = [ 1024, 768 ];
+variable_RenderSize = [ 1920, 1080 ];
+variableDefault_RenderSize = [ 1920, 1080 ];
 variableChanged_RenderSize = [ false, false ];
 variable_CurveType = this.constructor.Enum_CurveTypes.Polynomial;
 variableDefault_CurveType = this.constructor.Enum_CurveTypes.Polynomial;

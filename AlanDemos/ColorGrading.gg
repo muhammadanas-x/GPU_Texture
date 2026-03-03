@@ -5,7 +5,7 @@
         {
             "name": "RenderSize",
             "type": "Uint2",
-            "dflt": "1024, 768",
+            "dflt": "1920, 1080",
             "visibility": "User"
         },
         {

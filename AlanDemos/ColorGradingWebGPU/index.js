@@ -27,7 +27,7 @@ provide imported resources or variable values to the technique:
                     ColorGrading.variable_InvViewProjMtx = 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.; // (Float4x4)
                     ColorGrading.variable_CameraPos = 0., 0., 0.; // (Float3)
                 User Variables (These show in the UI):
-                    ColorGrading.variable_RenderSize = 1024, 768; // (Uint2)
+                    ColorGrading.variable_RenderSize = 1920, 1080; // (Uint2)
                     ColorGrading.variable_CurveType = this.constructor.Enum_CurveTypes.Polynomial; // (Int)
                     ColorGrading.variable_CurveOrder = this.constructor.Enum_CurveOrders.Quintic; // (Int)
                     ColorGrading.variable_CP1 = 0., 0., 0.; // (Float3)
