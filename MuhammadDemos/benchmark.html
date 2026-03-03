@@ -463,6 +463,8 @@
         // State
         let scene, camera, renderer, controls;
         let particles = null;
+        let particleGeometry = null;
+        let geometryCacheKey = null;
         let frameTimes = [];
         let lastTime = performance.now();
         let results = {};
@@ -965,12 +967,30 @@
 
         // Update particles
         function updateParticles() {
-            if (particles) {
-                scene.remove(particles);
+            const controlPoints = generateControlPoints();
+            const nextGeometryKey = `${config.numParticles}-${config.numSegments}`;
+
+            if (!particleGeometry || geometryCacheKey !== nextGeometryKey) {
+                if (particleGeometry) {
+                    particleGeometry.dispose();
+                }
+                particleGeometry = createParticleGeometry();
+                geometryCacheKey = nextGeometryKey;
             }
 
-            const controlPoints = generateControlPoints();
-            const particleGeometry = createParticleGeometry();
+            if (particles) {
+                scene.remove(particles);
+
+                if (particles.material) {
+                    const oldMaterial = particles.material;
+                    const oldAtlas = oldMaterial.uniforms?.uCurveAtlas?.value;
+                    if (oldAtlas && oldAtlas.isTexture) {
+                        oldAtlas.dispose();
+                    }
+                    oldMaterial.dispose();
+                }
+            }
+
             const shaderMaterial = createShaderMaterial(controlPoints, particleGeometry);
 
             particles = new THREE.Points(particleGeometry, shaderMaterial);
@@ -1067,9 +1087,10 @@
 
         // Update comparison section
         function updateComparison() {
+            const keySuffix = `-${config.numParticles}-${config.numSegments}`;
             const currentResults = Object.entries(results)
-                .filter(([key]) => key.endsWith(`-${config.numParticles}-${config.numSegments}`))
-                .map(([key, val]) => [key.split('-')[0], val]);
+                .filter(([key]) => key.endsWith(keySuffix))
+                .map(([key, val]) => [key.slice(0, key.lastIndexOf(keySuffix)), val]);
 
             // Clear crowns
             textureCrown.textContent = '';
@@ -1099,6 +1120,7 @@
                 ['texture', 'seiler-math', 'math'].forEach(method => {
                     const result = currentResults.find(([m]) => m === method);
                     const fps = result ? result[1].fps : 0;
+                    const ms = result ? (1000.0 / fps) : 0;
                     const isBest = method === bestMethod;
                     
                     const div = document.createElement('div');
@@ -1107,7 +1129,7 @@
                         <span>${method === 'texture' ? "Seiler's (GPU)" : 
                                  method === 'seiler-math' ? "Seiler's (Math)" : 
                                  "Polynomial"}</span>
-                        <span class="metric-value">${fps.toFixed(1)} FPS</span>
+                        <span class="metric-value">${fps.toFixed(1)} FPS (${ms.toFixed(1)}ms)</span>
                     `;
                     comparisonResults.appendChild(div);
                 });
