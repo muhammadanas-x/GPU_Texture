@@ -360,21 +360,29 @@ reads when using our texture interpolation method. When profiling that workload,
 When modifying the path tracer to color grade the result of each ray before accumulation, we see a performance improvement because the next ray can start calculations while the previous ray is color grading.  This work has more opportunity to parallelize memory and compute,
 so the overall wall clock time is reduced. These results are shown in table \ref{tab:ColorGradePerf}.
 
-\AW{The perf difference isn't very big. I wonder if there's a way we can make the offloaded work a bigger portion of the total work. Either modifying the path tracer, or a different use case? Maybe a simpler scene - like the cornell box?}
-
 \begin{table}[h]
 \centering
 \renewcommand{\arraystretch}{1.3}
+\begin{minipage}[t]{0.38\linewidth}
+\vspace{0pt}
+\centering
+\includegraphics[width=\linewidth]{PT.png}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.58\linewidth}
+\vspace{0pt}
+\centering
 \begin{tabular}{lccc}
 \hline
 \textbf{Method} & \textbf{RTX 4090} & \textbf{RTX 3070} \\
 \hline
-Polynomial         & 12.96\,ms & 60.33\,ms \\
-\textbf{Seiler Texture (Ours)} & \textbf{12.89}\,ms &  \textbf{59.97}\,ms \\
+Polynomial         & 2.087\,ms & 11.755\,ms \\
+\textbf{Seiler Texture (Ours)} & \textbf{2.054\,ms} &  \textbf{11.532}\,ms \\
 \hline
 \end{tabular}
-\caption{Frame times when path tracing a textureless scene of hard coded geometry with 16 rays per pixel at 1920x1080 and using quintic curves for color grading each ray result. Averaged over 1000 frames. Polynomial evaluates the curve as shader instructions, Seiler Texture
-uses the GPU texture interpolator to evaluate the curve. The total wall clock time is reduced when parallelizable work can be offloaded to the texture interpolator in compute bound work loads.}
+\end{minipage}
+\caption{Frame times when path tracing a textureless scene of hard coded geometry with 16 rays per pixel at 1920x1080 and using quintic curves for color grading each ray result. Averaged over 1000 frames. 3070 used stable power state to get consistent results.
+Polynomial evaluates the curve as shader instructions, Seiler Texture uses the GPU texture interpolator to evaluate the curve. The total wall clock time is reduced when parallelizable work can be offloaded to the texture interpolator in compute bound work loads.}
 \label{tab:ColorGradePerf}
 \end{table}
 
