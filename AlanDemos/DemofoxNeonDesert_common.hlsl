@@ -616,26 +616,35 @@ void RayTraceScene(in float3 rayPos, in float3 rayDir, inout SRayHitInfo hitInfo
             float3 brightPurple = pow(float3(0.73f, 0.06f, 0.99f), float3(2.2f, 2.2f, 2.2f));
             brightPurple = lerp(brightPurple, float3(0.0625f, 0.0f, 1.0f), len2d);
 
-            float3 darkPurple = pow(float3(0.12f, 0.02f, 0.09f), float3(2.2f, 2.2f, 2.2f));
+            float3 darkPurple = float3(0.0f, 0.0f, 0.0f);//pow(float3(0.12f, 0.02f, 0.09f), float3(2.2f, 2.2f, 2.2f));
 
             hitInfo.material.emissive = lerp(darkPurple, brightPurple, dist);
-            hitInfo.material.specular = lerp(float3(0.33f, 0.33f, 0.33f), float3(0.0f, 0.0f, 0.0f), dist);
+            hitInfo.material.specular = float3(1.0f, 1.0f, 1.0f) * 0.4f;// lerp(float3(0.33f, 0.33f, 0.33f), float3(0.0f, 0.0f, 0.0f), dist);
         }
     }
 
     // reflective balls
     {
         SMaterial material;
-        material.diffuse = float3(0.5f, 0.5f, 0.5f);
-        material.specular = float3(1.0f, 1.0f, 1.0f);
+        material.specular = float3(0.0f, 0.0f, 0.0f);
         material.roughness = 0.035f;
+
         material.emissive = float3(0.0f, 0.0f, 0.0f);
+
+        material.diffuse = float3(0.9f, 0.1f, 0.1f);
+        //material.emissive = material.diffuse * 0.1f;
         TestSphereTrace(rayPos, rayDir, hitInfo, float4(20.0f, 5.0f, -20.0f, 10.0f), material);
 
+        material.diffuse = float3(0.1f, 0.9f, 0.1f);
+        //material.emissive = material.diffuse * 0.1f;
         TestSphereTrace(rayPos, rayDir, hitInfo, float4(-60.0f, 0.0f, 20.0f, 10.0f), material);
 
+        material.diffuse = float3(0.1f, 0.1f, 0.9f);
+        //material.emissive = material.diffuse * 0.1f;
         TestSphereTrace(rayPos, rayDir, hitInfo, float4(0.0f, 5.0f, -65.0f, 10.0f), material);
 
+        material.diffuse = float3(0.9f, 0.9f, 0.1f);
+        //material.emissive = material.diffuse * 0.1df;
         TestSphereTrace(rayPos, rayDir, hitInfo, float4(15.0f, -3.0f, 65.0f, 2.0f), material);
     }
 
@@ -738,7 +747,7 @@ void RayTraceScene(in float3 rayPos, in float3 rayDir, inout SRayHitInfo hitInfo
         material.diffuse = float3(0.0f, 0.0f, 0.0f);
         material.specular = float3(0.0f, 0.0f, 0.0f);
         material.roughness = 0.0f;
-        material.emissive = pow(float3(0.29f, 0.03f, 0.42f) * 0.55f, float3(2.2f, 2.2f, 2.2f));
+        material.emissive = float3(0.53f, 0.81f, 0.92f) * 0.2f;
         if (TestSphereTrace(rayPos, rayDir, hitInfo, float4(0.0f, 0.0f, 0.0f, 2000.0f), material))
         {
             const float c_skyStarCells = 45.0f;
