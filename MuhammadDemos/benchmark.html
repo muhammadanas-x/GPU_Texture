@@ -351,16 +351,16 @@
             <div class="section">
                 <h3 class="section-title">Evaluation Method</h3>
                 <button class="method-button" data-method="texture">
-                    <div class="method-title">Seiler's (GPU Hardware) <span id="textureCrown"></span></div>
-                    <div class="method-desc">Texture atlas + hardware lerp filtering</div>
+                    <div class="method-title">Seiler Texture <span id="textureCrown"></span></div>
+                    <div class="method-desc">Seiler's interpolation with texture + bilinear sampling</div>
                 </button>
                 <button class="method-button" data-method="seiler-math">
-                    <div class="method-title">Seiler's (Manual Lerp) <span id="seilerMathCrown"></span></div>
-                    <div class="method-desc">Seiler's algorithm with manual calculations</div>
+                    <div class="method-title">Seiler <span id="seilerMathCrown"></span></div>
+                    <div class="method-desc">Seiler's interpolation in shader</div>
                 </button>
                 <button class="method-button" data-method="math">
-                    <div class="method-title">Traditional Polynomial <span id="mathCrown"></span></div>
-                    <div class="method-desc">De Casteljau / polynomial form</div>
+                    <div class="method-title">Polynomial <span id="mathCrown"></span></div>
+                    <div class="method-desc">Bernstein polynomial in shader</div>
                 </button>
             </div>
 
@@ -402,11 +402,11 @@
                 <h3 class="section-title">Comparison</h3>
                 <div id="comparisonResults">
                     <div class="comparison-item">
-                        <span>Seiler's (GPU)</span>
+                        <span>Seiler Texture</span>
                         <span class="metric-value">0.0 FPS</span>
                     </div>
                     <div class="comparison-item">
-                        <span>Seiler's (Math)</span>
+                        <span>Seiler</span>
                         <span class="metric-value">0.0 FPS</span>
                     </div>
                     <div class="comparison-item">
@@ -1038,11 +1038,11 @@
             spreadValue.textContent = config.curveSpread.toFixed(1);
 
             // Update performance display
-            fpsDisplay.textContent = `${performanceData.fps.toFixed(1)} FPS`;
-            avgFrameTime.textContent = `${performanceData.avg.toFixed(1)}ms`;
-            minFrameTime.textContent = `${performanceData.min.toFixed(1)}ms`;
-            maxFrameTime.textContent = `${performanceData.max.toFixed(1)}ms`;
-            stdDev.textContent = `${performanceData.stdDev.toFixed(1)}ms`;
+            fpsDisplay.textContent = `${performanceData.fps.toFixed(2)} FPS`;
+            avgFrameTime.textContent = `${performanceData.avg.toFixed(2)}ms`;
+            minFrameTime.textContent = `${performanceData.min.toFixed(2)}ms`;
+            maxFrameTime.textContent = `${performanceData.max.toFixed(2)}ms`;
+            stdDev.textContent = `${performanceData.stdDev.toFixed(2)}ms`;
             
             // Update particle and segment counts
             if (config.numParticles >= 1000000) {
@@ -1126,10 +1126,10 @@
                     const div = document.createElement('div');
                     div.className = `comparison-item ${isBest ? 'best' : ''}`;
                     div.innerHTML = `
-                        <span>${method === 'texture' ? "Seiler's (GPU)" : 
-                                 method === 'seiler-math' ? "Seiler's (Math)" : 
+                        <span>${method === 'texture' ? "Seiler (Texture)" :
+                                 method === 'seiler-math' ? "Seiler" :
                                  "Polynomial"}</span>
-                        <span class="metric-value">${fps.toFixed(1)} FPS (${ms.toFixed(1)}ms)</span>
+                        <span class="metric-value">${fps.toFixed(2)} FPS (${ms.toFixed(2)}ms)</span>
                     `;
                     comparisonResults.appendChild(div);
                 });
@@ -1142,15 +1142,15 @@
 
                     if (textureFps && mathFps) {
                         speedupValue.textContent = `${(textureFps / mathFps).toFixed(2)}x`;
-                        speedupLabel.textContent = "Seiler's (GPU) vs Polynomial";
+                        speedupLabel.textContent = "Seiler (Texture) vs Polynomial";
                         speedupDisplay.style.display = 'block';
                     } else if (seilerMathFps && mathFps) {
                         speedupValue.textContent = `${(seilerMathFps / mathFps).toFixed(2)}x`;
-                        speedupLabel.textContent = "Seiler's (Math) vs Polynomial";
+                        speedupLabel.textContent = "Seiler vs Polynomial";
                         speedupDisplay.style.display = 'block';
                     } else if (textureFps && seilerMathFps) {
                         speedupValue.textContent = `${(textureFps / seilerMathFps).toFixed(2)}x`;
-                        speedupLabel.textContent = "GPU vs Manual Lerp";
+                        speedupLabel.textContent = "Seiler (Texture) vs Seiler";
                         speedupDisplay.style.display = 'block';
                     }
                 }
