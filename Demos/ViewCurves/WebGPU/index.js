@@ -32,8 +32,9 @@ provide imported resources or variable values to the technique:
                     ViewCurves.variable_ShowPolynomial = true; // (Bool)
                     ViewCurves.variable_ShowDeCasteljauTexture = true; // (Bool)
                     ViewCurves.variable_ShowSeilerTexture = true; // (Bool)
-                    ViewCurves.variable_ShowControlPoints = true; // (Bool) In black
                     ViewCurves.variable_ShowHybrid = false; // (Bool) de CastelJau texture, but the last lerp done in shaders at full f32 precision. Quartic and Quintic are already hybrid.
+                    ViewCurves.variable_ShowControlPoints = true; // (Bool) In black
+                    ViewCurves.variable_ComparisonMode = false; // (Bool) Colors the output for a better comparison between two curve types
                     ViewCurves.variable_RenderSize = 512, 512; // (Uint2)
                     ViewCurves.variable_PolynomialColor = 1., 0., 0.; // (Float3)
                     ViewCurves.variable_DeCasteljauColor = 0., 1., 0.; // (Float3)

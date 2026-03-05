@@ -56,8 +56,9 @@ namespace ViewCurves
             bool variable_ShowPolynomial = true;
             bool variable_ShowDeCasteljauTexture = true;
             bool variable_ShowSeilerTexture = true;
-            bool variable_ShowControlPoints = true;  // In black
             bool variable_ShowHybrid = false;  // de CastelJau texture, but the last lerp done in shaders at full f32 precision. Quartic and Quintic are already hybrid.
+            bool variable_ShowControlPoints = true;  // In black
+            bool variable_ComparisonMode = false;  // Colors the output for a better comparison between two curve types
             uint2 variable_RenderSize = {512, 512};
             float3 variable_PolynomialColor = {1.f, 0.f, 0.f};
             float3 variable_DeCasteljauColor = {0.f, 1.f, 0.f};

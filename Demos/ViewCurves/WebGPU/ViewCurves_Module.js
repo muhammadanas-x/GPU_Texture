@@ -48,14 +48,14 @@ struct Struct_DrawCurves_0CB_std140_0
     @align(4) CP4_0 : f32,
     @align(16) CP5_0 : f32,
     @align(4) CP6_0 : f32,
-    @align(8) CurveOrder_0 : i32,
-    @align(4) _padding0_0 : f32,
+    @align(8) ComparisonMode_0 : u32,
+    @align(4) CurveOrder_0 : i32,
     @align(16) DeCasteljauColor_0 : vec3<f32>,
-    @align(4) _padding1_0 : f32,
+    @align(4) _padding0_0 : f32,
     @align(16) HybridColor_0 : vec3<f32>,
-    @align(4) _padding2_0 : f32,
+    @align(4) _padding1_0 : f32,
     @align(16) PolynomialColor_0 : vec3<f32>,
-    @align(4) _padding3_0 : f32,
+    @align(4) _padding2_0 : f32,
     @align(16) SeilerColor_0 : vec3<f32>,
     @align(4) ShowControlPoints_0 : u32,
     @align(16) ShowDeCasteljauTexture_0 : u32,
@@ -63,9 +63,9 @@ struct Struct_DrawCurves_0CB_std140_0
     @align(8) ShowPolynomial_0 : u32,
     @align(4) ShowSeilerTexture_0 : u32,
     @align(16) TextureFormat_0 : i32,
-    @align(4) _padding4_0 : f32,
-    @align(8) _padding5_0 : f32,
-    @align(4) _padding6_0 : f32,
+    @align(4) _padding3_0 : f32,
+    @align(8) _padding4_0 : f32,
+    @align(4) _padding5_0 : f32,
 };
 
 @binding(10) @group(0) var<uniform> _DrawCurves_0CB : Struct_DrawCurves_0CB_std140_0;
@@ -87,22 +87,83 @@ struct Struct_DrawCurves_0CB_std140_0
 
 @binding(8) @group(0) var SeilerTexture3DU8 : texture_3d<f32>;
 
+fn EvaluateBezier_Linear_0( t_0 : f32,  CP1_1 : f32,  CP2_1 : f32) -> f32
+{
+    return CP1_1 * (1.0f - t_0) + CP2_1 * t_0;
+}
+
+fn EvaluateBezier_Quadratic_0( t_1 : f32,  CP1_2 : f32,  CP2_2 : f32,  CP3_1 : f32) -> f32
+{
+    var s_0 : f32 = 1.0f - t_1;
+    return CP1_2 * s_0 * s_0 + 2.0f * CP2_2 * s_0 * t_1 + CP3_1 * t_1 * t_1;
+}
+
+fn EvaluateBezier_Cubic_0( t_2 : f32,  CP1_3 : f32,  CP2_3 : f32,  CP3_2 : f32,  CP4_1 : f32) -> f32
+{
+    var s_1 : f32 = 1.0f - t_2;
+    return CP1_3 * s_1 * s_1 * s_1 + 3.0f * CP2_3 * s_1 * s_1 * t_2 + 3.0f * CP3_2 * s_1 * t_2 * t_2 + CP4_1 * t_2 * t_2 * t_2;
+}
+
+fn EvaluateBezier_Quartic_0( t_3 : f32,  CP1_4 : f32,  CP2_4 : f32,  CP3_3 : f32,  CP4_2 : f32,  CP5_1 : f32) -> f32
+{
+    var s_2 : f32 = 1.0f - t_3;
+    return CP1_4 * s_2 * s_2 * s_2 * s_2 + 4.0f * CP2_4 * s_2 * s_2 * t_3 * s_2 + 6.0f * CP3_3 * s_2 * t_3 * t_3 * s_2 + 4.0f * CP4_2 * s_2 * t_3 * t_3 * t_3 + CP5_1 * t_3 * t_3 * t_3 * t_3;
+}
+
+fn EvaluateBezier_Quintic_0( t_4 : f32,  CP1_5 : f32,  CP2_5 : f32,  CP3_4 : f32,  CP4_3 : f32,  CP5_2 : f32,  CP6_1 : f32) -> f32
+{
+    var s_3 : f32 = 1.0f - t_4;
+    return CP1_5 * s_3 * s_3 * s_3 * s_3 * s_3 + 5.0f * CP2_5 * s_3 * s_3 * s_3 * t_4 * s_3 + 10.0f * CP3_4 * s_3 * s_3 * t_4 * t_4 * s_3 + 10.0f * CP4_3 * s_3 * s_3 * t_4 * t_4 * t_4 + 5.0f * CP5_2 * s_3 * t_4 * t_4 * t_4 * t_4 + CP6_1 * t_4 * t_4 * t_4 * t_4 * t_4;
+}
+
+fn EvaluateBezierPolynomial_0( t_5 : f32) -> f32
+{
+    switch(_DrawCurves_0CB.CurveOrder_0)
+    {
+    case i32(0), :
+        {
+            return EvaluateBezier_Linear_0(t_5, _DrawCurves_0CB.CP1_0, _DrawCurves_0CB.CP2_0);
+        }
+    case i32(1), :
+        {
+            return EvaluateBezier_Quadratic_0(t_5, _DrawCurves_0CB.CP1_0, _DrawCurves_0CB.CP2_0, _DrawCurves_0CB.CP3_0);
+        }
+    case i32(2), :
+        {
+            return EvaluateBezier_Cubic_0(t_5, _DrawCurves_0CB.CP1_0, _DrawCurves_0CB.CP2_0, _DrawCurves_0CB.CP3_0, _DrawCurves_0CB.CP4_0);
+        }
+    case i32(3), :
+        {
+            return EvaluateBezier_Quartic_0(t_5, _DrawCurves_0CB.CP1_0, _DrawCurves_0CB.CP2_0, _DrawCurves_0CB.CP3_0, _DrawCurves_0CB.CP4_0, _DrawCurves_0CB.CP5_0);
+        }
+    case i32(4), :
+        {
+            return EvaluateBezier_Quintic_0(t_5, _DrawCurves_0CB.CP1_0, _DrawCurves_0CB.CP2_0, _DrawCurves_0CB.CP3_0, _DrawCurves_0CB.CP4_0, _DrawCurves_0CB.CP5_0, _DrawCurves_0CB.CP6_0);
+        }
+    case default, :
+        {
+            break;
+        }
+    }
+    return 0.0f;
+}
+
 fn UseF32_0() -> bool
 {
     return (_DrawCurves_0CB.TextureFormat_0) == i32(0);
 }
 
-fn DeCasteljauTexture_Read_Linear_0( tex_0 : texture_2d<f32>,  t_0 : f32,  LinearSampler_0 : sampler) -> f32
+fn DeCasteljauTexture_Read_Linear_0( tex_0 : texture_2d<f32>,  t_6 : f32,  LinearSampler_0 : sampler) -> f32
 {
-    return (textureSampleLevel((tex_0), (LinearSampler_0), (mix(vec2<f32>(0.25f, 0.25f), vec2<f32>(0.75f, 0.25f), vec2<f32>(t_0))), (0.0f)).x);
+    return (textureSampleLevel((tex_0), (LinearSampler_0), (mix(vec2<f32>(0.25f, 0.25f), vec2<f32>(0.75f, 0.25f), vec2<f32>(t_6))), (0.0f)).x);
 }
 
-fn DeCasteljauTexture_Read_Quadratic_0( tex_1 : texture_2d<f32>,  t_1 : f32,  LinearSampler_1 : sampler) -> f32
+fn DeCasteljauTexture_Read_Quadratic_0( tex_1 : texture_2d<f32>,  t_7 : f32,  LinearSampler_1 : sampler) -> f32
 {
-    return (textureSampleLevel((tex_1), (LinearSampler_1), (mix(vec2<f32>(0.25f, 0.25f), vec2<f32>(0.75f, 0.75f), vec2<f32>(t_1))), (0.0f)).x);
+    return (textureSampleLevel((tex_1), (LinearSampler_1), (mix(vec2<f32>(0.25f, 0.25f), vec2<f32>(0.75f, 0.75f), vec2<f32>(t_7))), (0.0f)).x);
 }
 
-fn DeCasteljauTexture_Read_Cubic_0( tex_2 : texture_3d<f32>,  t_2 : f32,  LinearSampler_2 : sampler) -> f32
+fn DeCasteljauTexture_Read_Cubic_0( tex_2 : texture_3d<f32>,  t_8 : f32,  LinearSampler_2 : sampler) -> f32
 {
     var dims_0 : vec3<u32>;
     var _S1 : u32 = dims_0[i32(0)];
@@ -112,10 +173,10 @@ fn DeCasteljauTexture_Read_Cubic_0( tex_2 : texture_3d<f32>,  t_2 : f32,  Linear
     dims_0[i32(0)] = _S1;
     dims_0[i32(1)] = _S2;
     dims_0[i32(2)] = _S3;
-    return (textureSampleLevel((tex_2), (LinearSampler_2), ((mix(vec3<f32>(0.0f, 0.0f, 0.0f), vec3<f32>(1.0f, 1.0f, 1.0f), vec3<f32>(t_2)) + vec3<f32>(0.5f, 0.5f, 0.5f)) / vec3<f32>(dims_0)), (0.0f)).x);
+    return (textureSampleLevel((tex_2), (LinearSampler_2), ((mix(vec3<f32>(0.0f, 0.0f, 0.0f), vec3<f32>(1.0f, 1.0f, 1.0f), vec3<f32>(t_8)) + vec3<f32>(0.5f, 0.5f, 0.5f)) / vec3<f32>(dims_0)), (0.0f)).x);
 }
 
-fn DeCasteljauTexture_Read_Quartic_0( tex_3 : texture_3d<f32>,  t_3 : f32,  LinearSampler_3 : sampler) -> f32
+fn DeCasteljauTexture_Read_Quartic_0( tex_3 : texture_3d<f32>,  t_9 : f32,  LinearSampler_3 : sampler) -> f32
 {
     var dims_1 : vec3<u32>;
     var _S4 : u32 = dims_1[i32(0)];
@@ -125,12 +186,12 @@ fn DeCasteljauTexture_Read_Quartic_0( tex_3 : texture_3d<f32>,  t_3 : f32,  Line
     dims_1[i32(0)] = _S4;
     dims_1[i32(1)] = _S5;
     dims_1[i32(2)] = _S6;
-    var _S7 : vec3<f32> = vec3<f32>(t_3);
+    var _S7 : vec3<f32> = vec3<f32>(t_9);
     const _S8 : vec3<f32> = vec3<f32>(0.5f, 0.5f, 0.5f);
-    return mix((textureSampleLevel((tex_3), (LinearSampler_3), ((mix(vec3<f32>(0.0f, 0.0f, 0.0f), vec3<f32>(1.0f, 1.0f, 1.0f), _S7) + _S8) / vec3<f32>(dims_1)), (0.0f)).x), (textureSampleLevel((tex_3), (LinearSampler_3), ((mix(vec3<f32>(0.0f, 0.0f, 1.0f), vec3<f32>(1.0f, 1.0f, 2.0f), _S7) + _S8) / vec3<f32>(dims_1)), (0.0f)).x), t_3);
+    return mix((textureSampleLevel((tex_3), (LinearSampler_3), ((mix(vec3<f32>(0.0f, 0.0f, 0.0f), vec3<f32>(1.0f, 1.0f, 1.0f), _S7) + _S8) / vec3<f32>(dims_1)), (0.0f)).x), (textureSampleLevel((tex_3), (LinearSampler_3), ((mix(vec3<f32>(0.0f, 0.0f, 1.0f), vec3<f32>(1.0f, 1.0f, 2.0f), _S7) + _S8) / vec3<f32>(dims_1)), (0.0f)).x), t_9);
 }
 
-fn DeCasteljauTexture_Read_Quintic_0( tex_4 : texture_3d<f32>,  t_4 : f32,  LinearSampler_4 : sampler) -> f32
+fn DeCasteljauTexture_Read_Quintic_0( tex_4 : texture_3d<f32>,  t_10 : f32,  LinearSampler_4 : sampler) -> f32
 {
     var dims_2 : vec3<u32>;
     var _S9 : u32 = dims_2[i32(0)];
@@ -140,13 +201,13 @@ fn DeCasteljauTexture_Read_Quintic_0( tex_4 : texture_3d<f32>,  t_4 : f32,  Line
     dims_2[i32(0)] = _S9;
     dims_2[i32(1)] = _S10;
     dims_2[i32(2)] = _S11;
-    var _S12 : vec3<f32> = vec3<f32>(t_4);
+    var _S12 : vec3<f32> = vec3<f32>(t_10);
     const _S13 : vec3<f32> = vec3<f32>(0.5f, 0.5f, 0.5f);
-    var s_0 : f32 = 1.0f - t_4;
-    return (textureSampleLevel((tex_4), (LinearSampler_4), ((mix(vec3<f32>(0.0f, 0.0f, 0.0f), vec3<f32>(1.0f, 1.0f, 1.0f), _S12) + _S13) / vec3<f32>(dims_2)), (0.0f)).x) * s_0 * s_0 + 2.0f * (textureSampleLevel((tex_4), (LinearSampler_4), ((mix(vec3<f32>(0.0f, 0.0f, 1.0f), vec3<f32>(1.0f, 1.0f, 2.0f), _S12) + _S13) / vec3<f32>(dims_2)), (0.0f)).x) * s_0 * t_4 + (textureSampleLevel((tex_4), (LinearSampler_4), ((mix(vec3<f32>(0.0f, 0.0f, 2.0f), vec3<f32>(1.0f, 1.0f, 3.0f), _S12) + _S13) / vec3<f32>(dims_2)), (0.0f)).x) * t_4 * t_4;
+    var s_4 : f32 = 1.0f - t_10;
+    return (textureSampleLevel((tex_4), (LinearSampler_4), ((mix(vec3<f32>(0.0f, 0.0f, 0.0f), vec3<f32>(1.0f, 1.0f, 1.0f), _S12) + _S13) / vec3<f32>(dims_2)), (0.0f)).x) * s_4 * s_4 + 2.0f * (textureSampleLevel((tex_4), (LinearSampler_4), ((mix(vec3<f32>(0.0f, 0.0f, 1.0f), vec3<f32>(1.0f, 1.0f, 2.0f), _S12) + _S13) / vec3<f32>(dims_2)), (0.0f)).x) * s_4 * t_10 + (textureSampleLevel((tex_4), (LinearSampler_4), ((mix(vec3<f32>(0.0f, 0.0f, 2.0f), vec3<f32>(1.0f, 1.0f, 3.0f), _S12) + _S13) / vec3<f32>(dims_2)), (0.0f)).x) * t_10 * t_10;
 }
 
-fn EvaluateDeCasteljauTexture_0( t_5 : f32) -> f32
+fn EvaluateDeCasteljauTexture_0( t_11 : f32) -> f32
 {
     if(UseF32_0())
     {
@@ -154,23 +215,23 @@ fn EvaluateDeCasteljauTexture_0( t_5 : f32) -> f32
         {
         case i32(0), :
             {
-                return DeCasteljauTexture_Read_Linear_0(DCTexture2D, t_5, LinearSampler);
+                return DeCasteljauTexture_Read_Linear_0(DCTexture2D, t_11, LinearSampler);
             }
         case i32(1), :
             {
-                return DeCasteljauTexture_Read_Quadratic_0(DCTexture2D, t_5, LinearSampler);
+                return DeCasteljauTexture_Read_Quadratic_0(DCTexture2D, t_11, LinearSampler);
             }
         case i32(2), :
             {
-                return DeCasteljauTexture_Read_Cubic_0(DCTexture3D, t_5, LinearSampler);
+                return DeCasteljauTexture_Read_Cubic_0(DCTexture3D, t_11, LinearSampler);
             }
         case i32(3), :
             {
-                return DeCasteljauTexture_Read_Quartic_0(DCTexture3D, t_5, LinearSampler);
+                return DeCasteljauTexture_Read_Quartic_0(DCTexture3D, t_11, LinearSampler);
             }
         case i32(4), :
             {
-                return DeCasteljauTexture_Read_Quintic_0(DCTexture3D, t_5, LinearSampler);
+                return DeCasteljauTexture_Read_Quintic_0(DCTexture3D, t_11, LinearSampler);
             }
         case default, :
             {
@@ -184,89 +245,28 @@ fn EvaluateDeCasteljauTexture_0( t_5 : f32) -> f32
         {
         case i32(0), :
             {
-                return DeCasteljauTexture_Read_Linear_0(DCTexture2DU8, t_5, LinearSampler);
+                return DeCasteljauTexture_Read_Linear_0(DCTexture2DU8, t_11, LinearSampler);
             }
         case i32(1), :
             {
-                return DeCasteljauTexture_Read_Quadratic_0(DCTexture2DU8, t_5, LinearSampler);
+                return DeCasteljauTexture_Read_Quadratic_0(DCTexture2DU8, t_11, LinearSampler);
             }
         case i32(2), :
             {
-                return DeCasteljauTexture_Read_Cubic_0(DCTexture3DU8, t_5, LinearSampler);
+                return DeCasteljauTexture_Read_Cubic_0(DCTexture3DU8, t_11, LinearSampler);
             }
         case i32(3), :
             {
-                return DeCasteljauTexture_Read_Quartic_0(DCTexture3DU8, t_5, LinearSampler);
+                return DeCasteljauTexture_Read_Quartic_0(DCTexture3DU8, t_11, LinearSampler);
             }
         case i32(4), :
             {
-                return DeCasteljauTexture_Read_Quintic_0(DCTexture3DU8, t_5, LinearSampler);
+                return DeCasteljauTexture_Read_Quintic_0(DCTexture3DU8, t_11, LinearSampler);
             }
         case default, :
             {
                 break;
             }
-        }
-    }
-    return 0.0f;
-}
-
-fn EvaluateBezier_Linear_0( t_6 : f32,  CP1_1 : f32,  CP2_1 : f32) -> f32
-{
-    return CP1_1 * (1.0f - t_6) + CP2_1 * t_6;
-}
-
-fn EvaluateBezier_Quadratic_0( t_7 : f32,  CP1_2 : f32,  CP2_2 : f32,  CP3_1 : f32) -> f32
-{
-    var s_1 : f32 = 1.0f - t_7;
-    return CP1_2 * s_1 * s_1 + 2.0f * CP2_2 * s_1 * t_7 + CP3_1 * t_7 * t_7;
-}
-
-fn EvaluateBezier_Cubic_0( t_8 : f32,  CP1_3 : f32,  CP2_3 : f32,  CP3_2 : f32,  CP4_1 : f32) -> f32
-{
-    var s_2 : f32 = 1.0f - t_8;
-    return CP1_3 * s_2 * s_2 * s_2 + 3.0f * CP2_3 * s_2 * s_2 * t_8 + 3.0f * CP3_2 * s_2 * t_8 * t_8 + CP4_1 * t_8 * t_8 * t_8;
-}
-
-fn EvaluateBezier_Quartic_0( t_9 : f32,  CP1_4 : f32,  CP2_4 : f32,  CP3_3 : f32,  CP4_2 : f32,  CP5_1 : f32) -> f32
-{
-    var s_3 : f32 = 1.0f - t_9;
-    return CP1_4 * s_3 * s_3 * s_3 * s_3 + 4.0f * CP2_4 * s_3 * s_3 * t_9 * s_3 + 6.0f * CP3_3 * s_3 * t_9 * t_9 * s_3 + 4.0f * CP4_2 * s_3 * t_9 * t_9 * t_9 + CP5_1 * t_9 * t_9 * t_9 * t_9;
-}
-
-fn EvaluateBezier_Quintic_0( t_10 : f32,  CP1_5 : f32,  CP2_5 : f32,  CP3_4 : f32,  CP4_3 : f32,  CP5_2 : f32,  CP6_1 : f32) -> f32
-{
-    var s_4 : f32 = 1.0f - t_10;
-    return CP1_5 * s_4 * s_4 * s_4 * s_4 * s_4 + 5.0f * CP2_5 * s_4 * s_4 * s_4 * t_10 * s_4 + 10.0f * CP3_4 * s_4 * s_4 * t_10 * t_10 * s_4 + 10.0f * CP4_3 * s_4 * s_4 * t_10 * t_10 * t_10 + 5.0f * CP5_2 * s_4 * t_10 * t_10 * t_10 * t_10 + CP6_1 * t_10 * t_10 * t_10 * t_10 * t_10;
-}
-
-fn EvaluateBezierPolynomial_0( t_11 : f32) -> f32
-{
-    switch(_DrawCurves_0CB.CurveOrder_0)
-    {
-    case i32(0), :
-        {
-            return EvaluateBezier_Linear_0(t_11, _DrawCurves_0CB.CP1_0, _DrawCurves_0CB.CP2_0);
-        }
-    case i32(1), :
-        {
-            return EvaluateBezier_Quadratic_0(t_11, _DrawCurves_0CB.CP1_0, _DrawCurves_0CB.CP2_0, _DrawCurves_0CB.CP3_0);
-        }
-    case i32(2), :
-        {
-            return EvaluateBezier_Cubic_0(t_11, _DrawCurves_0CB.CP1_0, _DrawCurves_0CB.CP2_0, _DrawCurves_0CB.CP3_0, _DrawCurves_0CB.CP4_0);
-        }
-    case i32(3), :
-        {
-            return EvaluateBezier_Quartic_0(t_11, _DrawCurves_0CB.CP1_0, _DrawCurves_0CB.CP2_0, _DrawCurves_0CB.CP3_0, _DrawCurves_0CB.CP4_0, _DrawCurves_0CB.CP5_0);
-        }
-    case i32(4), :
-        {
-            return EvaluateBezier_Quintic_0(t_11, _DrawCurves_0CB.CP1_0, _DrawCurves_0CB.CP2_0, _DrawCurves_0CB.CP3_0, _DrawCurves_0CB.CP4_0, _DrawCurves_0CB.CP5_0, _DrawCurves_0CB.CP6_0);
-        }
-    case default, :
-        {
-            break;
         }
     }
     return 0.0f;
@@ -570,53 +570,101 @@ fn main(@builtin(global_invocation_id) DTid_0 : vec3<u32>)
     }
     if(_S36)
     {
-        if(bool(_DrawCurves_0CB.ShowDeCasteljauTexture_0))
+        if(bool(_DrawCurves_0CB.ComparisonMode_0))
         {
-            _S36 = (uv_2.y) < (EvaluateDeCasteljauTexture_0(t_22));
+            var actual_0 : f32 = EvaluateBezierPolynomial_0(t_22);
+            var estimated_0 : f32;
+            if(bool(_DrawCurves_0CB.ShowDeCasteljauTexture_0))
+            {
+                estimated_0 = EvaluateDeCasteljauTexture_0(t_22);
+            }
+            else
+            {
+                if(bool(_DrawCurves_0CB.ShowSeilerTexture_0))
+                {
+                    estimated_0 = EvaluateSeilerTexture_0(t_22);
+                }
+                else
+                {
+                    if(bool(_DrawCurves_0CB.ShowHybrid_0))
+                    {
+                        estimated_0 = EvaluateHybrid_0(t_22);
+                    }
+                    else
+                    {
+                        estimated_0 = actual_0;
+                    }
+                }
+            }
+            if((uv_2.y) > actual_0)
+            {
+                if((uv_2.y) < estimated_0)
+                {
+                    color_1 = vec3<f32>(0.0f, 1.0f, 0.0f);
+                }
+            }
+            else
+            {
+                if((uv_2.y) > estimated_0)
+                {
+                    color_1 = vec3<f32>(1.0f, 0.0f, 0.0f);
+                }
+                else
+                {
+                    color_1 = vec3<f32>(1.0f, 1.0f, 1.0f);
+                }
+            }
         }
         else
         {
-            _S36 = false;
-        }
-        if(_S36)
-        {
-            color_1 = color_1 + _DrawCurves_0CB.DeCasteljauColor_0;
-        }
-        if(bool(_DrawCurves_0CB.ShowPolynomial_0))
-        {
-            _S36 = (uv_2.y) < (EvaluateBezierPolynomial_0(t_22));
-        }
-        else
-        {
-            _S36 = false;
-        }
-        if(_S36)
-        {
-            color_1 = color_1 + _DrawCurves_0CB.PolynomialColor_0;
-        }
-        if(bool(_DrawCurves_0CB.ShowSeilerTexture_0))
-        {
-            _S36 = (uv_2.y) < (EvaluateSeilerTexture_0(t_22));
-        }
-        else
-        {
-            _S36 = false;
-        }
-        if(_S36)
-        {
-            color_1 = color_1 + _DrawCurves_0CB.SeilerColor_0;
-        }
-        if(bool(_DrawCurves_0CB.ShowHybrid_0))
-        {
-            _S36 = (uv_2.y) < (EvaluateHybrid_0(t_22));
-        }
-        else
-        {
-            _S36 = false;
-        }
-        if(_S36)
-        {
-            color_1 = color_1 + _DrawCurves_0CB.HybridColor_0;
+            if(bool(_DrawCurves_0CB.ShowDeCasteljauTexture_0))
+            {
+                _S36 = (uv_2.y) < (EvaluateDeCasteljauTexture_0(t_22));
+            }
+            else
+            {
+                _S36 = false;
+            }
+            if(_S36)
+            {
+                color_1 = color_1 + _DrawCurves_0CB.DeCasteljauColor_0;
+            }
+            if(bool(_DrawCurves_0CB.ShowPolynomial_0))
+            {
+                _S36 = (uv_2.y) < (EvaluateBezierPolynomial_0(t_22));
+            }
+            else
+            {
+                _S36 = false;
+            }
+            if(_S36)
+            {
+                color_1 = color_1 + _DrawCurves_0CB.PolynomialColor_0;
+            }
+            if(bool(_DrawCurves_0CB.ShowSeilerTexture_0))
+            {
+                _S36 = (uv_2.y) < (EvaluateSeilerTexture_0(t_22));
+            }
+            else
+            {
+                _S36 = false;
+            }
+            if(_S36)
+            {
+                color_1 = color_1 + _DrawCurves_0CB.SeilerColor_0;
+            }
+            if(bool(_DrawCurves_0CB.ShowHybrid_0))
+            {
+                _S36 = (uv_2.y) < (EvaluateHybrid_0(t_22));
+            }
+            else
+            {
+                _S36 = false;
+            }
+            if(_S36)
+            {
+                color_1 = color_1 + _DrawCurves_0CB.HybridColor_0;
+            }
         }
     }
     if(bool(_DrawCurves_0CB.ShowControlPoints_0))
@@ -1341,12 +1389,15 @@ variableChanged_ShowDeCasteljauTexture = false;
 variable_ShowSeilerTexture = true;
 variableDefault_ShowSeilerTexture = true;
 variableChanged_ShowSeilerTexture = false;
-variable_ShowControlPoints = true;  // In black
-variableDefault_ShowControlPoints = true;  // In black
-variableChanged_ShowControlPoints = false;
 variable_ShowHybrid = false;  // de CastelJau texture, but the last lerp done in shaders at full f32 precision. Quartic and Quintic are already hybrid.
 variableDefault_ShowHybrid = false;  // de CastelJau texture, but the last lerp done in shaders at full f32 precision. Quartic and Quintic are already hybrid.
 variableChanged_ShowHybrid = false;
+variable_ShowControlPoints = true;  // In black
+variableDefault_ShowControlPoints = true;  // In black
+variableChanged_ShowControlPoints = false;
+variable_ComparisonMode = false;  // Colors the output for a better comparison between two curve types
+variableDefault_ComparisonMode = false;  // Colors the output for a better comparison between two curve types
+variableChanged_ComparisonMode = false;
 variable_RenderSize = [ 512, 512 ];
 variableDefault_RenderSize = [ 512, 512 ];
 variableChanged_RenderSize = [ false, false ];
@@ -1373,20 +1424,20 @@ static StructOffsets__DrawCurves_0CB =
     CP4: 12,
     CP5: 16,
     CP6: 20,
-    CurveOrder: 24,
-    _padding0: 28,
+    ComparisonMode: 24,
+    CurveOrder: 28,
     DeCasteljauColor_0: 32,
     DeCasteljauColor_1: 36,
     DeCasteljauColor_2: 40,
-    _padding1: 44,
+    _padding0: 44,
     HybridColor_0: 48,
     HybridColor_1: 52,
     HybridColor_2: 56,
-    _padding2: 60,
+    _padding1: 60,
     PolynomialColor_0: 64,
     PolynomialColor_1: 68,
     PolynomialColor_2: 72,
-    _padding3: 76,
+    _padding2: 76,
     SeilerColor_0: 80,
     SeilerColor_1: 84,
     SeilerColor_2: 88,
@@ -1396,9 +1447,9 @@ static StructOffsets__DrawCurves_0CB =
     ShowPolynomial: 104,
     ShowSeilerTexture: 108,
     TextureFormat: 112,
-    _padding4: 116,
-    _padding5: 120,
-    _padding6: 124,
+    _padding3: 116,
+    _padding4: 120,
+    _padding5: 124,
     _size: 128,
 }
 
@@ -2782,6 +2833,7 @@ async FillEncoder(device, encoder)
         view.setFloat32(this.constructor.StructOffsets__DrawCurves_0CB.CP4, this.variable_CP4, true);
         view.setFloat32(this.constructor.StructOffsets__DrawCurves_0CB.CP5, this.variable_CP5, true);
         view.setFloat32(this.constructor.StructOffsets__DrawCurves_0CB.CP6, this.variable_CP6, true);
+        view.setUint32(this.constructor.StructOffsets__DrawCurves_0CB.ComparisonMode, (this.variable_ComparisonMode === true ? 1 : 0), true);
         view.setInt32(this.constructor.StructOffsets__DrawCurves_0CB.CurveOrder, this.variable_CurveOrder, true);
         view.setFloat32(this.constructor.StructOffsets__DrawCurves_0CB.DeCasteljauColor_0, this.variable_DeCasteljauColor[0], true);
         view.setFloat32(this.constructor.StructOffsets__DrawCurves_0CB.DeCasteljauColor_1, this.variable_DeCasteljauColor[1], true);

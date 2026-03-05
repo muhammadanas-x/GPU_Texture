@@ -1038,6 +1038,7 @@ namespace ViewCurves
             context->m_internal.constantBuffer__DrawCurves_0CB_cpu.CP4 = context->m_input.variable_CP4;
             context->m_internal.constantBuffer__DrawCurves_0CB_cpu.CP5 = context->m_input.variable_CP5;
             context->m_internal.constantBuffer__DrawCurves_0CB_cpu.CP6 = context->m_input.variable_CP6;
+            context->m_internal.constantBuffer__DrawCurves_0CB_cpu.ComparisonMode = context->m_input.variable_ComparisonMode;
             context->m_internal.constantBuffer__DrawCurves_0CB_cpu.CurveOrder = (int)context->m_input.variable_CurveOrder;
             context->m_internal.constantBuffer__DrawCurves_0CB_cpu.DeCasteljauColor = context->m_input.variable_DeCasteljauColor;
             context->m_internal.constantBuffer__DrawCurves_0CB_cpu.HybridColor = context->m_input.variable_HybridColor;

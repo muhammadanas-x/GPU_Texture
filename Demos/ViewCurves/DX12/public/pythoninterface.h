@@ -233,6 +233,24 @@ namespace ViewCurves
         return Py_None;
     }
 
+    inline PyObject* Set_ShowHybrid(PyObject* self, PyObject* args)
+    {
+        int contextIndex;
+        bool value;
+
+        if (!PyArg_ParseTuple(args, "ib:Set_ShowHybrid", &contextIndex, &value))
+            return PyErr_Format(PyExc_TypeError, "type error");
+
+        Context* context = Context::GetContext(contextIndex);
+        if (!context)
+            return PyErr_Format(PyExc_IndexError, __FUNCTION__, "() : index % i is out of range(count = % i)", contextIndex, Context::GetContextCount());
+
+        context->m_input.variable_ShowHybrid = value;
+
+        Py_INCREF(Py_None);
+        return Py_None;
+    }
+
     inline PyObject* Set_ShowControlPoints(PyObject* self, PyObject* args)
     {
         int contextIndex;
@@ -251,19 +269,19 @@ namespace ViewCurves
         return Py_None;
     }
 
-    inline PyObject* Set_ShowHybrid(PyObject* self, PyObject* args)
+    inline PyObject* Set_ComparisonMode(PyObject* self, PyObject* args)
     {
         int contextIndex;
         bool value;
 
-        if (!PyArg_ParseTuple(args, "ib:Set_ShowHybrid", &contextIndex, &value))
+        if (!PyArg_ParseTuple(args, "ib:Set_ComparisonMode", &contextIndex, &value))
             return PyErr_Format(PyExc_TypeError, "type error");
 
         Context* context = Context::GetContext(contextIndex);
         if (!context)
             return PyErr_Format(PyExc_IndexError, __FUNCTION__, "() : index % i is out of range(count = % i)", contextIndex, Context::GetContextCount());
 
-        context->m_input.variable_ShowHybrid = value;
+        context->m_input.variable_ComparisonMode = value;
 
         Py_INCREF(Py_None);
         return Py_None;
@@ -373,8 +391,9 @@ namespace ViewCurves
         {"Set_ShowPolynomial", Set_ShowPolynomial, METH_VARARGS, ""},
         {"Set_ShowDeCasteljauTexture", Set_ShowDeCasteljauTexture, METH_VARARGS, ""},
         {"Set_ShowSeilerTexture", Set_ShowSeilerTexture, METH_VARARGS, ""},
-        {"Set_ShowControlPoints", Set_ShowControlPoints, METH_VARARGS, "In black"},
         {"Set_ShowHybrid", Set_ShowHybrid, METH_VARARGS, "de CastelJau texture, but the last lerp done in shaders at full f32 precision. Quartic and Quintic are already hybrid."},
+        {"Set_ShowControlPoints", Set_ShowControlPoints, METH_VARARGS, "In black"},
+        {"Set_ComparisonMode", Set_ComparisonMode, METH_VARARGS, "Colors the output for a better comparison between two curve types"},
         {"Set_RenderSize", Set_RenderSize, METH_VARARGS, ""},
         {"Set_PolynomialColor", Set_PolynomialColor, METH_VARARGS, ""},
         {"Set_DeCasteljauColor", Set_DeCasteljauColor, METH_VARARGS, ""},

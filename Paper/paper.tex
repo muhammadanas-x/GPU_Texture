@@ -57,8 +57,6 @@ GPU's fixed-function texture interpolation hardware.}
 \maketitle
 \thispagestyle{firstpagestyle}
 
-\AW{You can add your affiliation (school) under your name like i added my company}
-
 \begin{abstract}
 \small
 We present a texture-based technique for evaluating Bézier curves on the GPU that leverages fixed-function linear texture interpolation hardware. By offloading curve
@@ -446,8 +444,13 @@ would be useful.
 
 \section*{Index of Supplemental Materials}
 
-\AW{fill this out when we are closer to submission}
-When supplemental materials such as video, data sets, and source code are provided with an article, briefly describe them by directory or filename here.
+The Demos folder contains three folders in it.
+
+\begin{itemize}
+    \item \textbf{ColorGrading} - The path tracer used to benchmark the performance of color grading with curves as shown in table \ref{tab:ColorGradePerf}. Written in Gigi (https://github.com/electronicarts/gigi), also contains code generated DX12 and WebGPU versions.
+    \item \textbf{ParticleSim} - The particle simulation used to benchmark the performance of evaluating curves with particles moving along them as shown in table \ref{tab:seiler_comparison}.
+    \item \textbf{ViewCurves} - The curve visualization utility shown in figure \ref{fig_curve_accuracy}. Written in Gigi (https://github.com/electronicarts/gigi), also contains code generated DX12 and WebGPU versions.
+\end{itemize}
 
 \section*{Author Contact Information}
 

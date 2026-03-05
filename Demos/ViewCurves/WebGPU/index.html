@@ -265,8 +265,9 @@
             document.getElementById('inputBox_ShowPolynomial').addEventListener('change',(event) => {ViewCurves.variable_ShowPolynomial=event.target.checked;});
             document.getElementById('inputBox_ShowDeCasteljauTexture').addEventListener('change',(event) => {ViewCurves.variable_ShowDeCasteljauTexture=event.target.checked;});
             document.getElementById('inputBox_ShowSeilerTexture').addEventListener('change',(event) => {ViewCurves.variable_ShowSeilerTexture=event.target.checked;});
-            document.getElementById('inputBox_ShowControlPoints').addEventListener('change',(event) => {ViewCurves.variable_ShowControlPoints=event.target.checked;});
             document.getElementById('inputBox_ShowHybrid').addEventListener('change',(event) => {ViewCurves.variable_ShowHybrid=event.target.checked;});
+            document.getElementById('inputBox_ShowControlPoints').addEventListener('change',(event) => {ViewCurves.variable_ShowControlPoints=event.target.checked;});
+            document.getElementById('inputBox_ComparisonMode').addEventListener('change',(event) => {ViewCurves.variable_ComparisonMode=event.target.checked;});
             document.getElementById('inputBox_RenderSize0').addEventListener('change',(event) => {event.target.value=parseUint(event.target.value); ViewCurves.variable_RenderSize[0]=event.target.value;});
             document.getElementById('inputBox_RenderSize1').addEventListener('change',(event) => {event.target.value=parseUint(event.target.value); ViewCurves.variable_RenderSize[1]=event.target.value;});
             document.getElementById('inputBox_PolynomialColor0').addEventListener('change',(event) => {event.target.value=parseFloat(event.target.value); ViewCurves.variable_PolynomialColor[0]=event.target.value;});
@@ -295,8 +296,9 @@
                     ViewCurves.variable_ShowPolynomial = ViewCurves.variableDefault_ShowPolynomial;
                     ViewCurves.variable_ShowDeCasteljauTexture = ViewCurves.variableDefault_ShowDeCasteljauTexture;
                     ViewCurves.variable_ShowSeilerTexture = ViewCurves.variableDefault_ShowSeilerTexture;
-                    ViewCurves.variable_ShowControlPoints = ViewCurves.variableDefault_ShowControlPoints;
                     ViewCurves.variable_ShowHybrid = ViewCurves.variableDefault_ShowHybrid;
+                    ViewCurves.variable_ShowControlPoints = ViewCurves.variableDefault_ShowControlPoints;
+                    ViewCurves.variable_ComparisonMode = ViewCurves.variableDefault_ComparisonMode;
                     ViewCurves.variable_RenderSize[0] = ViewCurves.variableDefault_RenderSize[0];
                     ViewCurves.variable_RenderSize[1] = ViewCurves.variableDefault_RenderSize[1];
                     ViewCurves.variable_PolynomialColor[0] = ViewCurves.variableDefault_PolynomialColor[0];
@@ -326,8 +328,9 @@
                     document.getElementById('inputBox_ShowPolynomial').checked = Boolean(ViewCurves.variable_ShowPolynomial);
                     document.getElementById('inputBox_ShowDeCasteljauTexture').checked = Boolean(ViewCurves.variable_ShowDeCasteljauTexture);
                     document.getElementById('inputBox_ShowSeilerTexture').checked = Boolean(ViewCurves.variable_ShowSeilerTexture);
-                    document.getElementById('inputBox_ShowControlPoints').checked = Boolean(ViewCurves.variable_ShowControlPoints);
                     document.getElementById('inputBox_ShowHybrid').checked = Boolean(ViewCurves.variable_ShowHybrid);
+                    document.getElementById('inputBox_ShowControlPoints').checked = Boolean(ViewCurves.variable_ShowControlPoints);
+                    document.getElementById('inputBox_ComparisonMode').checked = Boolean(ViewCurves.variable_ComparisonMode);
                     document.getElementById('inputBox_RenderSize0').value = ViewCurves.variable_RenderSize[0];
                     document.getElementById('inputBox_RenderSize1').value = ViewCurves.variable_RenderSize[1];
                     document.getElementById('inputBox_PolynomialColor0').value = ViewCurves.variable_PolynomialColor[0];
@@ -363,8 +366,9 @@
                     ViewCurves.variable_ShowPolynomial = true; // (Bool)
                     ViewCurves.variable_ShowDeCasteljauTexture = true; // (Bool)
                     ViewCurves.variable_ShowSeilerTexture = true; // (Bool)
-                    ViewCurves.variable_ShowControlPoints = true; // (Bool) In black
                     ViewCurves.variable_ShowHybrid = false; // (Bool) de CastelJau texture, but the last lerp done in shaders at full f32 precision. Quartic and Quintic are already hybrid.
+                    ViewCurves.variable_ShowControlPoints = true; // (Bool) In black
+                    ViewCurves.variable_ComparisonMode = false; // (Bool) Colors the output for a better comparison between two curve types
                     ViewCurves.variable_RenderSize = 512, 512; // (Uint2)
                     ViewCurves.variable_PolynomialColor = 1., 0., 0.; // (Float3)
                     ViewCurves.variable_DeCasteljauColor = 0., 1., 0.; // (Float3)
@@ -419,8 +423,9 @@
                     ViewCurves.variable_ShowPolynomial = true; // (Bool)
                     ViewCurves.variable_ShowDeCasteljauTexture = true; // (Bool)
                     ViewCurves.variable_ShowSeilerTexture = true; // (Bool)
-                    ViewCurves.variable_ShowControlPoints = true; // (Bool) In black
                     ViewCurves.variable_ShowHybrid = false; // (Bool) de CastelJau texture, but the last lerp done in shaders at full f32 precision. Quartic and Quintic are already hybrid.
+                    ViewCurves.variable_ShowControlPoints = true; // (Bool) In black
+                    ViewCurves.variable_ComparisonMode = false; // (Bool) Colors the output for a better comparison between two curve types
                     ViewCurves.variable_RenderSize = 512, 512; // (Uint2)
                     ViewCurves.variable_PolynomialColor = 1., 0., 0.; // (Float3)
                     ViewCurves.variable_DeCasteljauColor = 0., 1., 0.; // (Float3)
@@ -537,16 +542,22 @@
                     ViewCurves.variableChanged_ShowSeilerTexture = false;
                 }
 
+                if (ViewCurves.variableChanged_ShowHybrid)
+                {
+                    document.getElementById('inputBox_ShowHybrid').checked=Boolean(ViewCurves.variable_ShowHybrid);
+                    ViewCurves.variableChanged_ShowHybrid = false;
+                }
+
                 if (ViewCurves.variableChanged_ShowControlPoints)
                 {
                     document.getElementById('inputBox_ShowControlPoints').checked=Boolean(ViewCurves.variable_ShowControlPoints);
                     ViewCurves.variableChanged_ShowControlPoints = false;
                 }
 
-                if (ViewCurves.variableChanged_ShowHybrid)
+                if (ViewCurves.variableChanged_ComparisonMode)
                 {
-                    document.getElementById('inputBox_ShowHybrid').checked=Boolean(ViewCurves.variable_ShowHybrid);
-                    ViewCurves.variableChanged_ShowHybrid = false;
+                    document.getElementById('inputBox_ComparisonMode').checked=Boolean(ViewCurves.variable_ComparisonMode);
+                    ViewCurves.variableChanged_ComparisonMode = false;
                 }
 
                 if (ViewCurves.variableChanged_RenderSize[0])
@@ -783,15 +794,21 @@
                             </td>
                         </tr>
                         <tr>
+                            <td valign="top"><div class="tooltip">ShowHybrid&nbsp;<span class="tooltiptext">de CastelJau texture, but the last lerp done in shaders at full f32 precision. Quartic and Quintic are already hybrid.</span></div></td>
+                            <td>
+                                <input type="checkbox" id="inputBox_ShowHybrid">
+                            </td>
+                        </tr>
+                        <tr>
                             <td valign="top"><div class="tooltip">ShowControlPoints&nbsp;<span class="tooltiptext">In black</span></div></td>
                             <td>
                                 <input type="checkbox" id="inputBox_ShowControlPoints">
                             </td>
                         </tr>
                         <tr>
-                            <td valign="top"><div class="tooltip">ShowHybrid&nbsp;<span class="tooltiptext">de CastelJau texture, but the last lerp done in shaders at full f32 precision. Quartic and Quintic are already hybrid.</span></div></td>
+                            <td valign="top"><div class="tooltip">ComparisonMode&nbsp;<span class="tooltiptext">Colors the output for a better comparison between two curve types</span></div></td>
                             <td>
-                                <input type="checkbox" id="inputBox_ShowHybrid">
+                                <input type="checkbox" id="inputBox_ComparisonMode">
                             </td>
                         </tr>
                         <tr>
@@ -882,7 +899,7 @@
                     <span id="FPS"></span>
                     <br />
                     <br />
-                    <b>Created using <a href="https://github.com/electronicarts/gigi/">Gigi v1.01.8 [Internal]</a></b>
+                    <b>Created using <a href="https://github.com/electronicarts/gigi/">Gigi v1.01.9 [Internal]</a></b>
                 </td>
             </tr>
         </table>

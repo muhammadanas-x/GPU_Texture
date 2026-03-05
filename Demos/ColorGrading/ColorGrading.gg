@@ -921,8 +921,8 @@
         }
     },
     "buildSettings": {
-        "outDX12": "ColorGradingDX12",
-        "outWebGPU": "ColorGradingWebGPU"
+        "outDX12": "DX12/",
+        "outWebGPU": "WebGPU/"
     },
     "PrimaryOutput": {
         "name": "Output"

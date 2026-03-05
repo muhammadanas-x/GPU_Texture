@@ -74,14 +74,14 @@ namespace ViewCurves
             float CP4 = 1.f;
             float CP5 = 0.f;
             float CP6 = 1.f;
+            unsigned int ComparisonMode = false;  // Colors the output for a better comparison between two curve types
             int CurveOrder = (int)CurveOrders::Quintic;
-            float _padding0 = 0.f;  // Padding
             float3 DeCasteljauColor = {0.f, 1.f, 0.f};
-            float _padding1 = 0.f;  // Padding
+            float _padding0 = 0.f;  // Padding
             float3 HybridColor = {0.f, 0.f, 1.f};
-            float _padding2 = 0.f;  // Padding
+            float _padding1 = 0.f;  // Padding
             float3 PolynomialColor = {1.f, 0.f, 0.f};
-            float _padding3 = 0.f;  // Padding
+            float _padding2 = 0.f;  // Padding
             float3 SeilerColor = {0.f, 0.f, 1.f};
             unsigned int ShowControlPoints = true;  // In black
             unsigned int ShowDeCasteljauTexture = true;
@@ -89,7 +89,7 @@ namespace ViewCurves
             unsigned int ShowPolynomial = true;
             unsigned int ShowSeilerTexture = true;
             int TextureFormat = (int)TextureFormats::F32;
-            float3 _padding4 = {0.f, 0.f, 0.f};  // Padding
+            float3 _padding3 = {0.f, 0.f, 0.f};  // Padding
         };
 
         struct Struct__MakeCurveTextures_0CB

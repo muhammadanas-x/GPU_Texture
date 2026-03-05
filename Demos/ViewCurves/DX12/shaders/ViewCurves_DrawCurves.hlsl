@@ -24,14 +24,14 @@ struct Struct__DrawCurves_0CB
     float CP4;
     float CP5;
     float CP6;
+    uint ComparisonMode;
     int CurveOrder;
-    float _padding0;
     float3 DeCasteljauColor;
-    float _padding1;
+    float _padding0;
     float3 HybridColor;
-    float _padding2;
+    float _padding1;
     float3 PolynomialColor;
-    float _padding3;
+    float _padding2;
     float3 SeilerColor;
     uint ShowControlPoints;
     uint ShowDeCasteljauTexture;
@@ -39,7 +39,7 @@ struct Struct__DrawCurves_0CB
     uint ShowPolynomial;
     uint ShowSeilerTexture;
     int TextureFormat;
-    float3 _padding4;
+    float3 _padding3;
 };
 
 SamplerState LinearSampler : register(s0);
@@ -208,17 +208,46 @@ void main(uint3 DTid : SV_DispatchThreadID)
 
     if (uv.x >= 0.0f && uv.x <= 1.0f && uv.y >= 0.0f && uv.y <= 1.0f)
     {
-        if ((bool)_DrawCurves_0CB.ShowDeCasteljauTexture && uv.y < EvaluateDeCasteljauTexture(t))
-            color += _DrawCurves_0CB.DeCasteljauColor;
+        if ((bool)_DrawCurves_0CB.ComparisonMode)
+        {
+            float actual = EvaluateBezierPolynomial(t);
 
-        if ((bool)_DrawCurves_0CB.ShowPolynomial && uv.y < EvaluateBezierPolynomial(t))
-            color += _DrawCurves_0CB.PolynomialColor;
+            float estimated = actual;
+            if ((bool)_DrawCurves_0CB.ShowDeCasteljauTexture)
+                estimated = EvaluateDeCasteljauTexture(t);
+            else if ((bool)_DrawCurves_0CB.ShowSeilerTexture)
+                estimated = EvaluateSeilerTexture(t);
+            else if ((bool)_DrawCurves_0CB.ShowHybrid)
+                estimated = EvaluateHybrid(t);
 
-        if ((bool)_DrawCurves_0CB.ShowSeilerTexture && uv.y < EvaluateSeilerTexture(t))
-            color += _DrawCurves_0CB.SeilerColor;
+            if (uv.y > actual)
+            {
+                if (uv.y < estimated)
+                    color = float3(0.0f, 1.0f, 0.0f);
+            }
+            else // if (uv.y <= actual)
+            {
+                if (uv.y > estimated)
+                    color = float3(1.0f, 0.0f, 0.0f);
+                else
+                    color = float3(1.0f, 1.0f, 1.0f);
+            }
 
-        if ((bool)_DrawCurves_0CB.ShowHybrid && uv.y < EvaluateHybrid(t))
-            color += _DrawCurves_0CB.HybridColor;
+        }
+        else
+        {
+            if ((bool)_DrawCurves_0CB.ShowDeCasteljauTexture && uv.y < EvaluateDeCasteljauTexture(t))
+                color += _DrawCurves_0CB.DeCasteljauColor;
+
+            if ((bool)_DrawCurves_0CB.ShowPolynomial && uv.y < EvaluateBezierPolynomial(t))
+                color += _DrawCurves_0CB.PolynomialColor;
+
+            if ((bool)_DrawCurves_0CB.ShowSeilerTexture && uv.y < EvaluateSeilerTexture(t))
+                color += _DrawCurves_0CB.SeilerColor;
+
+            if ((bool)_DrawCurves_0CB.ShowHybrid && uv.y < EvaluateHybrid(t))
+                color += _DrawCurves_0CB.HybridColor;
+        }
     }
 
     if ((bool)_DrawCurves_0CB.ShowControlPoints)

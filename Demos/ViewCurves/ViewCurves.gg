@@ -698,8 +698,8 @@
         }
     },
     "buildSettings": {
-        "outDX12": "ViewCurvesDX12/",
-        "outWebGPU": "ViewCurvesWebGPU/"
+        "outDX12": "DX12/",
+        "outWebGPU": "WebGPU/"
     },
     "PrimaryOutput": {
         "name": "Output"

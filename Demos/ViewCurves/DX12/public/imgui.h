@@ -47,10 +47,12 @@ namespace ViewCurves
         ImGui::Checkbox("ShowPolynomial", &context->m_input.variable_ShowPolynomial);
         ImGui::Checkbox("ShowDeCasteljauTexture", &context->m_input.variable_ShowDeCasteljauTexture);
         ImGui::Checkbox("ShowSeilerTexture", &context->m_input.variable_ShowSeilerTexture);
-        ImGui::Checkbox("ShowControlPoints", &context->m_input.variable_ShowControlPoints);
-        ShowToolTip("In black");
         ImGui::Checkbox("ShowHybrid", &context->m_input.variable_ShowHybrid);
         ShowToolTip("de CastelJau texture, but the last lerp done in shaders at full f32 precision. Quartic and Quintic are already hybrid.");
+        ImGui::Checkbox("ShowControlPoints", &context->m_input.variable_ShowControlPoints);
+        ShowToolTip("In black");
+        ImGui::Checkbox("ComparisonMode", &context->m_input.variable_ComparisonMode);
+        ShowToolTip("Colors the output for a better comparison between two curve types");
         {
             float width = ImGui::GetContentRegionAvail().x / 4.0f;
             ImGui::PushID("RenderSize");
