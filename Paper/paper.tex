@@ -29,19 +29,29 @@
 
 % Authors with brief affiliation and ORCID you have one. 
 % More detailed affiliations can appear in the contact blocks at the end of the paper
-\author
-       {Muhammad Anas~\href{https://orcid.org/0009-0007-7348-9934}{\includegraphics[width=8pt]{ORCIDlogo}}
-        \and Alan Wolfe~\href{https://orcid.org/0000-0001-9100-4928}{\includegraphics[width=8pt]{ORCIDlogo}}\\SEED - Electronic Arts, USA
-       }
+\author{
+\begin{minipage}[t]{0.48\textwidth}
+\centering
+Muhammad Anas~\href{https://orcid.org/0009-0007-7348-9934}{\includegraphics[width=8pt]{ORCIDlogo}}\\
+NUST (National University of Sciences and Technology), Pakistan
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.48\textwidth}
+\centering
+Alan Wolfe~\href{https://orcid.org/0000-0001-9100-4928}{\includegraphics[width=8pt]{ORCIDlogo}}\\
+SEED - Electronic Arts, USA
+\end{minipage}
+}
 
 \teaser{
-  \begin{center}
-    \includegraphics[width=\textwidth]{updated_teaser_image.pdf}
-  \end{center}
-  \caption{A 3d cubic Bézier curve is encoded in the RGB channels of a 2x2 texture and decoded using a single texture lookup using Seiler interpolation. The curve control points are
-  $b_0$, $b_1$, $b_2$, $b_3$, and the Seiler points are $s_1$ and $s_2$. This formulation extends to curves of higher and lower degrees, and  allows computation to be offloaded to the
-  GPU's fixed-function texture interpolation hardware.}
-  \label{fig:teaser}
+\begin{center}
+\makebox[\textwidth][c]{%
+\includegraphics[width=1\textwidth]{Diagrams/Title/title2.png}}
+\end{center}
+\caption{A 3d cubic Bézier curve is encoded in the RGB channels of a 2x2 texture and decoded using a single texture lookup using Seiler interpolation. The curve control points are
+$b_0$, $b_1$, $b_2$, $b_3$, and the Seiler points are $s_1$ and $s_2$. This formulation extends to curves of higher and lower degrees, and allows computation to be offloaded to the
+GPU's fixed-function texture interpolation hardware.}
+\label{fig:teaser}
 }
 
 \maketitle
