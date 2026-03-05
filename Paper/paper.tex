@@ -237,13 +237,13 @@ C(t) = L(b_0, b_3, t) + L(d_1, d_2, t) * st
 Where $L(a,b,t)$ is linear interpolation from $a$ to $b$ at parameter $t$, and $s = 1-t$.  Observing that $A+Bt$ (a multiply add) can be reformulated as a linear interpolation $L(A, A+B, t)$, allows us to rewrite the equation as only lerps.
 
 \begin{equation}
-C(t) = L( L(b_0, b_3, t) + L(d_1 + b_0, d_2 + b_3, t), st)
+C(t) = L( L(b_0, b_3, t), L(d_1 + b_0, d_2 + b_3, t), st)
 \end{equation}
 
 That is equivalent to the "pure lerp" form in Yuksel \cite{10.1145/3641233.3664331} where $d_1 + b_0$ and $d_2 + b_3$ are replaced with $s_1$ and $s_2$ respectively.
 
 \begin{equation}
-C(t) = L( L(b_0, b_3, t) + L(s_1, s_2, t), st)
+C(t) = L( L(b_0, b_3, t), L(s_1, s_2, t), st)
 \end{equation}
 
 This allows us to make a 2x2 texture where the top row of pixels contains $b_0$ and $b_3$, and the bottom row contains $d_1 + b_0$ and $d_2 + b_3$.  Sampling that texture at coordinate $(t, st)$ gives the final point on the curve.  This is shown in figure \ref{fig:teaser}.
@@ -373,7 +373,7 @@ so the overall wall clock time is reduced. These results are shown in table \ref
 \begin{minipage}[t]{0.58\linewidth}
 \vspace{0pt}
 \centering
-\begin{tabular}{lccc}
+\begin{tabular}{lcc}
 \hline
 \textbf{Method} & \textbf{RTX 4090} & \textbf{RTX 3070} \\
 \hline
