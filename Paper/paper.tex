@@ -274,22 +274,18 @@ b_0 & b_5
 \]
 
 When this texture is the first slice of a volume texture, and the previous texture is the second slice, we can sample the volume texture at $(t, st, st)$ to get the point on the quintic curve at time $t$, using a single trilinear texture read.
+See table \ref{tab:SeilerLayout} for a diagram of Seiler textures of various degrees.
 
 Just like with the de Casteljau formulation, When linearly sampling textures, the pixel value is at the center of the pixel. The interpolation time values need to range from the center of one pixel to the next, instead of being in the usual
 $[0,1]$ range. For a 2x2 texture, that means that $t$ is in the range $[0.25, 0.75]$. For the combined term $st$, the conversion happens after the multiplication.
-
-\subsection*{Structured Difference Layout for Degrees 2--5}
 
 \begin{table}[H]
 \centering
 \renewcommand{\arraystretch}{1.5}
 
-% ---------------- 2D CASES ----------------
-\textbf{Quadratic and Cubic (2D Structure)}
-
-\begin{tabular}{|c|c|}
+\begin{tabular}{|c|c|c|}
 \hline
-\textbf{Degree} & \textbf{Structured Layout} \\
+\textbf{Degree} & \textbf{$z=0$ Layer} & \textbf{$z=1$ Layer} \\
 \hline
 
 Quadratic ($d=2$) &
@@ -297,7 +293,8 @@ $\begin{bmatrix}
 B_0 & B_2 \\
 B_0 + d_1 & B_2 + d_1
 \end{bmatrix}$
-\\
+&
+N/A\\
 \hline
 
 Cubic ($d=3$) &
@@ -305,19 +302,11 @@ $\begin{bmatrix}
 B_0 & B_3 \\
 B_0 + d_1 & B_3 + d_2
 \end{bmatrix}$
-\\
+&
+N/A\\
 \hline
-\end{tabular}
-
-\vspace{1em}
 
 % ---------------- 3D CASES ----------------
-\textbf{Quartic and Quintic (3D Structure)}
-
-\begin{tabular}{|c|c|c|}
-\hline
-\textbf{Degree} & \textbf{$z=0$ Layer} & \textbf{$z=1$ Layer} \\
-\hline
 
 Quartic ($d=4$) &
 $\begin{bmatrix}
@@ -349,6 +338,7 @@ B_0 + d_1 + d_2 & B_5 + d_4 + d_3
 \end{tabular}
 
 \caption{Structured arrangement of Seiler difference terms for polynomial degrees 2 through 5. The 2D textures are read using coordinates $(t, st)$, while the 3D textures are read using coordinates $(t, st, st)$. This layout allows for efficient evaluation of the curves using the GPU's texture interpolation hardware.}
+\label{tab:SeilerLayout}
 \end{table}
 
 \section{Performance Analysis}
