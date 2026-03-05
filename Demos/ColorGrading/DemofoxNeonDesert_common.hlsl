@@ -954,7 +954,10 @@ float3 GetColorForRay(in float3 startRayPos, in float3 startRayDir, inout uint r
             hitInfo = TestSceneMarch(rayPos);
 
         // add in emissive lighting
-        ret += hitInfo.material.emissive * colorMultiplier;
+        float3 shadingFromBounce = hitInfo.material.emissive * colorMultiplier;
+        if (/*$(Variable:ColorGrade)*/ == ColorGradeTimings::EveryRay)
+            ColorGrade(shadingFromBounce);
+        ret += shadingFromBounce;
 
         // figure out whether we are going to shoot out a specular or diffuse ray.
         // If neither, exit
@@ -982,9 +985,6 @@ float3 GetColorForRay(in float3 startRayPos, in float3 startRayDir, inout uint r
         // Attenuate diffuse by the dot product of the outgoing ray and the normal (aka multiply diffuse by cosine theta or N dot L)
         float NdotL = dot(hitInfo.normal, rayDir);
         colorMultiplier *= lerp(hitInfo.material.diffuse * NdotL, hitInfo.material.specular, doSpecular);
-
-        if (/*$(Variable:ColorGrade)*/ == ColorGradeTimings::EveryRay)
-            ColorGrade(ret);
     }
 
     return ret;

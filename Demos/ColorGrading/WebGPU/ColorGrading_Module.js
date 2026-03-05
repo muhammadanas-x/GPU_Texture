@@ -594,16 +594,6 @@ fn TestSceneMarch_0( rayPos_6 : vec3<f32>) -> SRayHitInfo_0
     return hitInfo_1;
 }
 
-fn RandomUnitVector_0( state_1 : ptr<function, u32>) -> vec3<f32>
-{
-    var _S57 : f32 = RandomFloat01_0(&((*state_1)));
-    var z_1 : f32 = _S57 * 2.0f - 1.0f;
-    var _S58 : f32 = RandomFloat01_0(&((*state_1)));
-    var a_1 : f32 = _S58 * 6.28318548202514648f;
-    var r_1 : f32 = sqrt(1.0f - z_1 * z_1);
-    return vec3<f32>(r_1 * cos(a_1), r_1 * sin(a_1), z_1);
-}
-
 fn EvaluateBezier_Linear_0( t_1 : vec3<f32>,  CP1_1 : vec3<f32>,  CP2_1 : vec3<f32>) -> vec3<f32>
 {
     return CP1_1 * (vec3<f32>(1.0f) - t_1) + CP2_1 * t_1;
@@ -618,23 +608,23 @@ fn EvaluateBezier_Quadratic_0( t_2 : vec3<f32>,  CP1_2 : vec3<f32>,  CP2_2 : vec
 fn EvaluateBezier_Cubic_0( t_3 : vec3<f32>,  CP1_3 : vec3<f32>,  CP2_3 : vec3<f32>,  CP3_2 : vec3<f32>,  CP4_1 : vec3<f32>) -> vec3<f32>
 {
     var s_1 : vec3<f32> = vec3<f32>(1.0f) - t_3;
-    var _S59 : vec3<f32> = vec3<f32>(3.0f);
-    return CP1_3 * s_1 * s_1 * s_1 + _S59 * CP2_3 * s_1 * s_1 * t_3 + _S59 * CP3_2 * s_1 * t_3 * t_3 + CP4_1 * t_3 * t_3 * t_3;
+    var _S57 : vec3<f32> = vec3<f32>(3.0f);
+    return CP1_3 * s_1 * s_1 * s_1 + _S57 * CP2_3 * s_1 * s_1 * t_3 + _S57 * CP3_2 * s_1 * t_3 * t_3 + CP4_1 * t_3 * t_3 * t_3;
 }
 
 fn EvaluateBezier_Quartic_0( t_4 : vec3<f32>,  CP1_4 : vec3<f32>,  CP2_4 : vec3<f32>,  CP3_3 : vec3<f32>,  CP4_2 : vec3<f32>,  CP5_1 : vec3<f32>) -> vec3<f32>
 {
     var s_2 : vec3<f32> = vec3<f32>(1.0f) - t_4;
-    var _S60 : vec3<f32> = vec3<f32>(4.0f);
-    return CP1_4 * s_2 * s_2 * s_2 * s_2 + _S60 * CP2_4 * s_2 * s_2 * t_4 * s_2 + vec3<f32>(6.0f) * CP3_3 * s_2 * t_4 * t_4 * s_2 + _S60 * CP4_2 * s_2 * t_4 * t_4 * t_4 + CP5_1 * t_4 * t_4 * t_4 * t_4;
+    var _S58 : vec3<f32> = vec3<f32>(4.0f);
+    return CP1_4 * s_2 * s_2 * s_2 * s_2 + _S58 * CP2_4 * s_2 * s_2 * t_4 * s_2 + vec3<f32>(6.0f) * CP3_3 * s_2 * t_4 * t_4 * s_2 + _S58 * CP4_2 * s_2 * t_4 * t_4 * t_4 + CP5_1 * t_4 * t_4 * t_4 * t_4;
 }
 
 fn EvaluateBezier_Quintic_0( t_5 : vec3<f32>,  CP1_5 : vec3<f32>,  CP2_5 : vec3<f32>,  CP3_4 : vec3<f32>,  CP4_3 : vec3<f32>,  CP5_2 : vec3<f32>,  CP6_1 : vec3<f32>) -> vec3<f32>
 {
     var s_3 : vec3<f32> = vec3<f32>(1.0f) - t_5;
-    var _S61 : vec3<f32> = vec3<f32>(5.0f);
-    var _S62 : vec3<f32> = vec3<f32>(10.0f);
-    return CP1_5 * s_3 * s_3 * s_3 * s_3 * s_3 + _S61 * CP2_5 * s_3 * s_3 * s_3 * t_5 * s_3 + _S62 * CP3_4 * s_3 * s_3 * t_5 * t_5 * s_3 + _S62 * CP4_3 * s_3 * s_3 * t_5 * t_5 * t_5 + _S61 * CP5_2 * s_3 * t_5 * t_5 * t_5 * t_5 + CP6_1 * t_5 * t_5 * t_5 * t_5 * t_5;
+    var _S59 : vec3<f32> = vec3<f32>(5.0f);
+    var _S60 : vec3<f32> = vec3<f32>(10.0f);
+    return CP1_5 * s_3 * s_3 * s_3 * s_3 * s_3 + _S59 * CP2_5 * s_3 * s_3 * s_3 * t_5 * s_3 + _S60 * CP3_4 * s_3 * s_3 * t_5 * t_5 * s_3 + _S60 * CP4_3 * s_3 * s_3 * t_5 * t_5 * t_5 + _S59 * CP5_2 * s_3 * t_5 * t_5 * t_5 * t_5 + CP6_1 * t_5 * t_5 * t_5 * t_5 * t_5;
 }
 
 fn EvaluatePolynomial_0( t_6 : vec3<f32>) -> vec3<f32>
@@ -671,95 +661,95 @@ fn EvaluatePolynomial_0( t_6 : vec3<f32>) -> vec3<f32>
 
 fn DeCasteljauTexture_Read_Linear_0( tex_0 : texture_2d<f32>,  t_7 : vec3<f32>,  LinearSampler_0 : sampler) -> vec3<f32>
 {
-    const _S63 : vec2<f32> = vec2<f32>(0.25f, 0.25f);
-    const _S64 : vec2<f32> = vec2<f32>(0.75f, 0.25f);
-    return vec3<f32>((textureSampleLevel((tex_0), (LinearSampler_0), (mix(_S63, _S64, vec2<f32>(t_7.x))), (0.0f))).x, (textureSampleLevel((tex_0), (LinearSampler_0), (mix(_S63, _S64, vec2<f32>(t_7.y))), (0.0f))).y, (textureSampleLevel((tex_0), (LinearSampler_0), (mix(_S63, _S64, vec2<f32>(t_7.z))), (0.0f))).z);
+    const _S61 : vec2<f32> = vec2<f32>(0.25f, 0.25f);
+    const _S62 : vec2<f32> = vec2<f32>(0.75f, 0.25f);
+    return vec3<f32>((textureSampleLevel((tex_0), (LinearSampler_0), (mix(_S61, _S62, vec2<f32>(t_7.x))), (0.0f))).x, (textureSampleLevel((tex_0), (LinearSampler_0), (mix(_S61, _S62, vec2<f32>(t_7.y))), (0.0f))).y, (textureSampleLevel((tex_0), (LinearSampler_0), (mix(_S61, _S62, vec2<f32>(t_7.z))), (0.0f))).z);
 }
 
 fn DeCasteljauTexture_Read_Quadratic_0( tex_1 : texture_2d<f32>,  t_8 : vec3<f32>,  LinearSampler_1 : sampler) -> vec3<f32>
 {
-    const _S65 : vec2<f32> = vec2<f32>(0.25f, 0.25f);
-    const _S66 : vec2<f32> = vec2<f32>(0.75f, 0.75f);
-    return vec3<f32>((textureSampleLevel((tex_1), (LinearSampler_1), (mix(_S65, _S66, vec2<f32>(t_8.x))), (0.0f))).x, (textureSampleLevel((tex_1), (LinearSampler_1), (mix(_S65, _S66, vec2<f32>(t_8.y))), (0.0f))).y, (textureSampleLevel((tex_1), (LinearSampler_1), (mix(_S65, _S66, vec2<f32>(t_8.z))), (0.0f))).z);
+    const _S63 : vec2<f32> = vec2<f32>(0.25f, 0.25f);
+    const _S64 : vec2<f32> = vec2<f32>(0.75f, 0.75f);
+    return vec3<f32>((textureSampleLevel((tex_1), (LinearSampler_1), (mix(_S63, _S64, vec2<f32>(t_8.x))), (0.0f))).x, (textureSampleLevel((tex_1), (LinearSampler_1), (mix(_S63, _S64, vec2<f32>(t_8.y))), (0.0f))).y, (textureSampleLevel((tex_1), (LinearSampler_1), (mix(_S63, _S64, vec2<f32>(t_8.z))), (0.0f))).z);
 }
 
 fn DeCasteljauTexture_Read_Cubic_0( tex_2 : texture_3d<f32>,  t_9 : vec3<f32>,  LinearSampler_2 : sampler) -> vec3<f32>
 {
     var dims_0 : vec3<u32>;
-    var _S67 : u32 = dims_0[i32(0)];
-    var _S68 : u32 = dims_0[i32(1)];
-    var _S69 : u32 = dims_0[i32(2)];
-    {var dim = textureDimensions((tex_2));((_S67)) = dim.x;((_S68)) = dim.y;((_S69)) = dim.z;};
-    dims_0[i32(0)] = _S67;
-    dims_0[i32(1)] = _S68;
-    dims_0[i32(2)] = _S69;
-    const _S70 : vec3<f32> = vec3<f32>(0.0f, 0.0f, 0.0f);
-    const _S71 : vec3<f32> = vec3<f32>(1.0f, 1.0f, 1.0f);
-    const _S72 : vec3<f32> = vec3<f32>(0.5f, 0.5f, 0.5f);
-    return vec3<f32>((textureSampleLevel((tex_2), (LinearSampler_2), ((mix(_S70, _S71, vec3<f32>(t_9.x)) + _S72) / vec3<f32>(dims_0)), (0.0f))).x, (textureSampleLevel((tex_2), (LinearSampler_2), ((mix(_S70, _S71, vec3<f32>(t_9.y)) + _S72) / vec3<f32>(dims_0)), (0.0f))).y, (textureSampleLevel((tex_2), (LinearSampler_2), ((mix(_S70, _S71, vec3<f32>(t_9.z)) + _S72) / vec3<f32>(dims_0)), (0.0f))).z);
+    var _S65 : u32 = dims_0[i32(0)];
+    var _S66 : u32 = dims_0[i32(1)];
+    var _S67 : u32 = dims_0[i32(2)];
+    {var dim = textureDimensions((tex_2));((_S65)) = dim.x;((_S66)) = dim.y;((_S67)) = dim.z;};
+    dims_0[i32(0)] = _S65;
+    dims_0[i32(1)] = _S66;
+    dims_0[i32(2)] = _S67;
+    const _S68 : vec3<f32> = vec3<f32>(0.0f, 0.0f, 0.0f);
+    const _S69 : vec3<f32> = vec3<f32>(1.0f, 1.0f, 1.0f);
+    const _S70 : vec3<f32> = vec3<f32>(0.5f, 0.5f, 0.5f);
+    return vec3<f32>((textureSampleLevel((tex_2), (LinearSampler_2), ((mix(_S68, _S69, vec3<f32>(t_9.x)) + _S70) / vec3<f32>(dims_0)), (0.0f))).x, (textureSampleLevel((tex_2), (LinearSampler_2), ((mix(_S68, _S69, vec3<f32>(t_9.y)) + _S70) / vec3<f32>(dims_0)), (0.0f))).y, (textureSampleLevel((tex_2), (LinearSampler_2), ((mix(_S68, _S69, vec3<f32>(t_9.z)) + _S70) / vec3<f32>(dims_0)), (0.0f))).z);
 }
 
 fn DeCasteljauTexture_Read_Quartic_0( tex_3 : texture_3d<f32>,  t_10 : vec3<f32>,  LinearSampler_3 : sampler) -> vec3<f32>
 {
     var dims_1 : vec3<u32>;
-    var _S73 : u32 = dims_1[i32(0)];
-    var _S74 : u32 = dims_1[i32(1)];
-    var _S75 : u32 = dims_1[i32(2)];
-    {var dim = textureDimensions((tex_3));((_S73)) = dim.x;((_S74)) = dim.y;((_S75)) = dim.z;};
-    dims_1[i32(0)] = _S73;
-    dims_1[i32(1)] = _S74;
-    dims_1[i32(2)] = _S75;
+    var _S71 : u32 = dims_1[i32(0)];
+    var _S72 : u32 = dims_1[i32(1)];
+    var _S73 : u32 = dims_1[i32(2)];
+    {var dim = textureDimensions((tex_3));((_S71)) = dim.x;((_S72)) = dim.y;((_S73)) = dim.z;};
+    dims_1[i32(0)] = _S71;
+    dims_1[i32(1)] = _S72;
+    dims_1[i32(2)] = _S73;
     var A_8 : vec3<f32>;
-    const _S76 : vec3<f32> = vec3<f32>(0.0f, 0.0f, 0.0f);
-    const _S77 : vec3<f32> = vec3<f32>(1.0f, 1.0f, 1.0f);
-    var _S78 : vec3<f32> = vec3<f32>(t_10.x);
-    const _S79 : vec3<f32> = vec3<f32>(0.5f, 0.5f, 0.5f);
-    A_8[i32(0)] = (textureSampleLevel((tex_3), (LinearSampler_3), ((mix(_S76, _S77, _S78) + _S79) / vec3<f32>(dims_1)), (0.0f))).x;
-    var _S80 : vec3<f32> = vec3<f32>(t_10.y);
-    A_8[i32(1)] = (textureSampleLevel((tex_3), (LinearSampler_3), ((mix(_S76, _S77, _S80) + _S79) / vec3<f32>(dims_1)), (0.0f))).y;
-    var _S81 : vec3<f32> = vec3<f32>(t_10.z);
-    A_8[i32(2)] = (textureSampleLevel((tex_3), (LinearSampler_3), ((mix(_S76, _S77, _S81) + _S79) / vec3<f32>(dims_1)), (0.0f))).z;
+    const _S74 : vec3<f32> = vec3<f32>(0.0f, 0.0f, 0.0f);
+    const _S75 : vec3<f32> = vec3<f32>(1.0f, 1.0f, 1.0f);
+    var _S76 : vec3<f32> = vec3<f32>(t_10.x);
+    const _S77 : vec3<f32> = vec3<f32>(0.5f, 0.5f, 0.5f);
+    A_8[i32(0)] = (textureSampleLevel((tex_3), (LinearSampler_3), ((mix(_S74, _S75, _S76) + _S77) / vec3<f32>(dims_1)), (0.0f))).x;
+    var _S78 : vec3<f32> = vec3<f32>(t_10.y);
+    A_8[i32(1)] = (textureSampleLevel((tex_3), (LinearSampler_3), ((mix(_S74, _S75, _S78) + _S77) / vec3<f32>(dims_1)), (0.0f))).y;
+    var _S79 : vec3<f32> = vec3<f32>(t_10.z);
+    A_8[i32(2)] = (textureSampleLevel((tex_3), (LinearSampler_3), ((mix(_S74, _S75, _S79) + _S77) / vec3<f32>(dims_1)), (0.0f))).z;
     var B_9 : vec3<f32>;
-    const _S82 : vec3<f32> = vec3<f32>(0.0f, 0.0f, 1.0f);
-    const _S83 : vec3<f32> = vec3<f32>(1.0f, 1.0f, 2.0f);
-    B_9[i32(0)] = (textureSampleLevel((tex_3), (LinearSampler_3), ((mix(_S82, _S83, _S78) + _S79) / vec3<f32>(dims_1)), (0.0f))).x;
-    B_9[i32(1)] = (textureSampleLevel((tex_3), (LinearSampler_3), ((mix(_S82, _S83, _S80) + _S79) / vec3<f32>(dims_1)), (0.0f))).y;
-    B_9[i32(2)] = (textureSampleLevel((tex_3), (LinearSampler_3), ((mix(_S82, _S83, _S81) + _S79) / vec3<f32>(dims_1)), (0.0f))).z;
+    const _S80 : vec3<f32> = vec3<f32>(0.0f, 0.0f, 1.0f);
+    const _S81 : vec3<f32> = vec3<f32>(1.0f, 1.0f, 2.0f);
+    B_9[i32(0)] = (textureSampleLevel((tex_3), (LinearSampler_3), ((mix(_S80, _S81, _S76) + _S77) / vec3<f32>(dims_1)), (0.0f))).x;
+    B_9[i32(1)] = (textureSampleLevel((tex_3), (LinearSampler_3), ((mix(_S80, _S81, _S78) + _S77) / vec3<f32>(dims_1)), (0.0f))).y;
+    B_9[i32(2)] = (textureSampleLevel((tex_3), (LinearSampler_3), ((mix(_S80, _S81, _S79) + _S77) / vec3<f32>(dims_1)), (0.0f))).z;
     return mix(A_8, B_9, t_10);
 }
 
 fn DeCasteljauTexture_Read_Quintic_0( tex_4 : texture_3d<f32>,  t_11 : vec3<f32>,  LinearSampler_4 : sampler) -> vec3<f32>
 {
     var dims_2 : vec3<u32>;
-    var _S84 : u32 = dims_2[i32(0)];
-    var _S85 : u32 = dims_2[i32(1)];
-    var _S86 : u32 = dims_2[i32(2)];
-    {var dim = textureDimensions((tex_4));((_S84)) = dim.x;((_S85)) = dim.y;((_S86)) = dim.z;};
-    dims_2[i32(0)] = _S84;
-    dims_2[i32(1)] = _S85;
-    dims_2[i32(2)] = _S86;
+    var _S82 : u32 = dims_2[i32(0)];
+    var _S83 : u32 = dims_2[i32(1)];
+    var _S84 : u32 = dims_2[i32(2)];
+    {var dim = textureDimensions((tex_4));((_S82)) = dim.x;((_S83)) = dim.y;((_S84)) = dim.z;};
+    dims_2[i32(0)] = _S82;
+    dims_2[i32(1)] = _S83;
+    dims_2[i32(2)] = _S84;
     var A_9 : vec3<f32>;
-    const _S87 : vec3<f32> = vec3<f32>(0.0f, 0.0f, 0.0f);
-    const _S88 : vec3<f32> = vec3<f32>(1.0f, 1.0f, 1.0f);
-    var _S89 : vec3<f32> = vec3<f32>(t_11.x);
-    const _S90 : vec3<f32> = vec3<f32>(0.5f, 0.5f, 0.5f);
-    A_9[i32(0)] = (textureSampleLevel((tex_4), (LinearSampler_4), ((mix(_S87, _S88, _S89) + _S90) / vec3<f32>(dims_2)), (0.0f))).x;
-    var _S91 : vec3<f32> = vec3<f32>(t_11.y);
-    A_9[i32(1)] = (textureSampleLevel((tex_4), (LinearSampler_4), ((mix(_S87, _S88, _S91) + _S90) / vec3<f32>(dims_2)), (0.0f))).y;
-    var _S92 : vec3<f32> = vec3<f32>(t_11.z);
-    A_9[i32(2)] = (textureSampleLevel((tex_4), (LinearSampler_4), ((mix(_S87, _S88, _S92) + _S90) / vec3<f32>(dims_2)), (0.0f))).z;
+    const _S85 : vec3<f32> = vec3<f32>(0.0f, 0.0f, 0.0f);
+    const _S86 : vec3<f32> = vec3<f32>(1.0f, 1.0f, 1.0f);
+    var _S87 : vec3<f32> = vec3<f32>(t_11.x);
+    const _S88 : vec3<f32> = vec3<f32>(0.5f, 0.5f, 0.5f);
+    A_9[i32(0)] = (textureSampleLevel((tex_4), (LinearSampler_4), ((mix(_S85, _S86, _S87) + _S88) / vec3<f32>(dims_2)), (0.0f))).x;
+    var _S89 : vec3<f32> = vec3<f32>(t_11.y);
+    A_9[i32(1)] = (textureSampleLevel((tex_4), (LinearSampler_4), ((mix(_S85, _S86, _S89) + _S88) / vec3<f32>(dims_2)), (0.0f))).y;
+    var _S90 : vec3<f32> = vec3<f32>(t_11.z);
+    A_9[i32(2)] = (textureSampleLevel((tex_4), (LinearSampler_4), ((mix(_S85, _S86, _S90) + _S88) / vec3<f32>(dims_2)), (0.0f))).z;
     var B_10 : vec3<f32>;
-    const _S93 : vec3<f32> = vec3<f32>(0.0f, 0.0f, 1.0f);
-    const _S94 : vec3<f32> = vec3<f32>(1.0f, 1.0f, 2.0f);
-    B_10[i32(0)] = (textureSampleLevel((tex_4), (LinearSampler_4), ((mix(_S93, _S94, _S89) + _S90) / vec3<f32>(dims_2)), (0.0f))).x;
-    B_10[i32(1)] = (textureSampleLevel((tex_4), (LinearSampler_4), ((mix(_S93, _S94, _S91) + _S90) / vec3<f32>(dims_2)), (0.0f))).y;
-    B_10[i32(2)] = (textureSampleLevel((tex_4), (LinearSampler_4), ((mix(_S93, _S94, _S92) + _S90) / vec3<f32>(dims_2)), (0.0f))).z;
+    const _S91 : vec3<f32> = vec3<f32>(0.0f, 0.0f, 1.0f);
+    const _S92 : vec3<f32> = vec3<f32>(1.0f, 1.0f, 2.0f);
+    B_10[i32(0)] = (textureSampleLevel((tex_4), (LinearSampler_4), ((mix(_S91, _S92, _S87) + _S88) / vec3<f32>(dims_2)), (0.0f))).x;
+    B_10[i32(1)] = (textureSampleLevel((tex_4), (LinearSampler_4), ((mix(_S91, _S92, _S89) + _S88) / vec3<f32>(dims_2)), (0.0f))).y;
+    B_10[i32(2)] = (textureSampleLevel((tex_4), (LinearSampler_4), ((mix(_S91, _S92, _S90) + _S88) / vec3<f32>(dims_2)), (0.0f))).z;
     var C_6 : vec3<f32>;
-    const _S95 : vec3<f32> = vec3<f32>(0.0f, 0.0f, 2.0f);
-    const _S96 : vec3<f32> = vec3<f32>(1.0f, 1.0f, 3.0f);
-    C_6[i32(0)] = (textureSampleLevel((tex_4), (LinearSampler_4), ((mix(_S95, _S96, _S89) + _S90) / vec3<f32>(dims_2)), (0.0f))).x;
-    C_6[i32(1)] = (textureSampleLevel((tex_4), (LinearSampler_4), ((mix(_S95, _S96, _S91) + _S90) / vec3<f32>(dims_2)), (0.0f))).y;
-    C_6[i32(2)] = (textureSampleLevel((tex_4), (LinearSampler_4), ((mix(_S95, _S96, _S92) + _S90) / vec3<f32>(dims_2)), (0.0f))).z;
+    const _S93 : vec3<f32> = vec3<f32>(0.0f, 0.0f, 2.0f);
+    const _S94 : vec3<f32> = vec3<f32>(1.0f, 1.0f, 3.0f);
+    C_6[i32(0)] = (textureSampleLevel((tex_4), (LinearSampler_4), ((mix(_S93, _S94, _S87) + _S88) / vec3<f32>(dims_2)), (0.0f))).x;
+    C_6[i32(1)] = (textureSampleLevel((tex_4), (LinearSampler_4), ((mix(_S93, _S94, _S89) + _S88) / vec3<f32>(dims_2)), (0.0f))).y;
+    C_6[i32(2)] = (textureSampleLevel((tex_4), (LinearSampler_4), ((mix(_S93, _S94, _S90) + _S88) / vec3<f32>(dims_2)), (0.0f))).z;
     var s_4 : vec3<f32> = vec3<f32>(1.0f) - t_11;
     return A_9 * s_4 * s_4 + vec3<f32>(2.0f) * B_10 * s_4 * t_11 + C_6 * t_11 * t_11;
 }
@@ -798,77 +788,77 @@ fn EvaluateTextureDeCasteljau_0( t_12 : vec3<f32>) -> vec3<f32>
 
 fn SeilerTexture_Read_Linear_0( tex_5 : texture_2d<f32>,  t_13 : vec3<f32>,  LinearSampler_5 : sampler) -> vec3<f32>
 {
-    const _S97 : vec2<f32> = vec2<f32>(0.25f, 0.25f);
-    const _S98 : vec2<f32> = vec2<f32>(0.75f, 0.75f);
-    return vec3<f32>((textureSampleLevel((tex_5), (LinearSampler_5), (mix(_S97, _S98, vec2<f32>(t_13.x, 0.0f))), (0.0f))).x, (textureSampleLevel((tex_5), (LinearSampler_5), (mix(_S97, _S98, vec2<f32>(t_13.y, 0.0f))), (0.0f))).y, (textureSampleLevel((tex_5), (LinearSampler_5), (mix(_S97, _S98, vec2<f32>(t_13.z, 0.0f))), (0.0f))).z);
+    const _S95 : vec2<f32> = vec2<f32>(0.25f, 0.25f);
+    const _S96 : vec2<f32> = vec2<f32>(0.75f, 0.75f);
+    return vec3<f32>((textureSampleLevel((tex_5), (LinearSampler_5), (mix(_S95, _S96, vec2<f32>(t_13.x, 0.0f))), (0.0f))).x, (textureSampleLevel((tex_5), (LinearSampler_5), (mix(_S95, _S96, vec2<f32>(t_13.y, 0.0f))), (0.0f))).y, (textureSampleLevel((tex_5), (LinearSampler_5), (mix(_S95, _S96, vec2<f32>(t_13.z, 0.0f))), (0.0f))).z);
 }
 
 fn SeilerTexture_Read_Quadratic_0( tex_6 : texture_2d<f32>,  t_14 : vec3<f32>,  LinearSampler_6 : sampler) -> vec3<f32>
 {
     var s_5 : vec3<f32> = vec3<f32>(1.0f) - t_14;
-    const _S99 : vec2<f32> = vec2<f32>(0.25f, 0.25f);
-    const _S100 : vec2<f32> = vec2<f32>(0.75f, 0.75f);
-    var _S101 : f32 = t_14.x;
-    var _S102 : f32 = t_14.y;
-    var _S103 : f32 = t_14.z;
-    return vec3<f32>((textureSampleLevel((tex_6), (LinearSampler_6), (mix(_S99, _S100, vec2<f32>(_S101, s_5.x * _S101))), (0.0f))).x, (textureSampleLevel((tex_6), (LinearSampler_6), (mix(_S99, _S100, vec2<f32>(_S102, s_5.y * _S102))), (0.0f))).y, (textureSampleLevel((tex_6), (LinearSampler_6), (mix(_S99, _S100, vec2<f32>(_S103, s_5.z * _S103))), (0.0f))).z);
+    const _S97 : vec2<f32> = vec2<f32>(0.25f, 0.25f);
+    const _S98 : vec2<f32> = vec2<f32>(0.75f, 0.75f);
+    var _S99 : f32 = t_14.x;
+    var _S100 : f32 = t_14.y;
+    var _S101 : f32 = t_14.z;
+    return vec3<f32>((textureSampleLevel((tex_6), (LinearSampler_6), (mix(_S97, _S98, vec2<f32>(_S99, s_5.x * _S99))), (0.0f))).x, (textureSampleLevel((tex_6), (LinearSampler_6), (mix(_S97, _S98, vec2<f32>(_S100, s_5.y * _S100))), (0.0f))).y, (textureSampleLevel((tex_6), (LinearSampler_6), (mix(_S97, _S98, vec2<f32>(_S101, s_5.z * _S101))), (0.0f))).z);
 }
 
 fn SeilerTexture_Read_Cubic_0( tex_7 : texture_2d<f32>,  t_15 : vec3<f32>,  LinearSampler_7 : sampler) -> vec3<f32>
 {
     var s_6 : vec3<f32> = vec3<f32>(1.0f) - t_15;
-    const _S104 : vec2<f32> = vec2<f32>(0.25f, 0.25f);
-    const _S105 : vec2<f32> = vec2<f32>(0.75f, 0.75f);
-    var _S106 : f32 = t_15.x;
-    var _S107 : f32 = t_15.y;
-    var _S108 : f32 = t_15.z;
-    return vec3<f32>((textureSampleLevel((tex_7), (LinearSampler_7), (mix(_S104, _S105, vec2<f32>(_S106, s_6.x * _S106))), (0.0f))).x, (textureSampleLevel((tex_7), (LinearSampler_7), (mix(_S104, _S105, vec2<f32>(_S107, s_6.y * _S107))), (0.0f))).y, (textureSampleLevel((tex_7), (LinearSampler_7), (mix(_S104, _S105, vec2<f32>(_S108, s_6.z * _S108))), (0.0f))).z);
+    const _S102 : vec2<f32> = vec2<f32>(0.25f, 0.25f);
+    const _S103 : vec2<f32> = vec2<f32>(0.75f, 0.75f);
+    var _S104 : f32 = t_15.x;
+    var _S105 : f32 = t_15.y;
+    var _S106 : f32 = t_15.z;
+    return vec3<f32>((textureSampleLevel((tex_7), (LinearSampler_7), (mix(_S102, _S103, vec2<f32>(_S104, s_6.x * _S104))), (0.0f))).x, (textureSampleLevel((tex_7), (LinearSampler_7), (mix(_S102, _S103, vec2<f32>(_S105, s_6.y * _S105))), (0.0f))).y, (textureSampleLevel((tex_7), (LinearSampler_7), (mix(_S102, _S103, vec2<f32>(_S106, s_6.z * _S106))), (0.0f))).z);
 }
 
 fn SeilerTexture_Read_Quartic_0( tex_8 : texture_3d<f32>,  t_16 : vec3<f32>,  LinearSampler_8 : sampler) -> vec3<f32>
 {
     var dims_3 : vec3<u32>;
-    var _S109 : u32 = dims_3[i32(0)];
-    var _S110 : u32 = dims_3[i32(1)];
-    var _S111 : u32 = dims_3[i32(2)];
-    {var dim = textureDimensions((tex_8));((_S109)) = dim.x;((_S110)) = dim.y;((_S111)) = dim.z;};
-    dims_3[i32(0)] = _S109;
-    dims_3[i32(1)] = _S110;
-    dims_3[i32(2)] = _S111;
+    var _S107 : u32 = dims_3[i32(0)];
+    var _S108 : u32 = dims_3[i32(1)];
+    var _S109 : u32 = dims_3[i32(2)];
+    {var dim = textureDimensions((tex_8));((_S107)) = dim.x;((_S108)) = dim.y;((_S109)) = dim.z;};
+    dims_3[i32(0)] = _S107;
+    dims_3[i32(1)] = _S108;
+    dims_3[i32(2)] = _S109;
     var s_7 : vec3<f32> = vec3<f32>(1.0f) - t_16;
-    const _S112 : vec3<f32> = vec3<f32>(0.0f, 0.0f, 0.0f);
-    const _S113 : vec3<f32> = vec3<f32>(1.0f, 1.0f, 1.0f);
-    var _S114 : f32 = t_16.x;
-    var _S115 : f32 = s_7.x * _S114;
-    const _S116 : vec3<f32> = vec3<f32>(0.5f, 0.5f, 0.5f);
-    var _S117 : f32 = t_16.y;
-    var _S118 : f32 = s_7.y * _S117;
-    var _S119 : f32 = t_16.z;
-    var _S120 : f32 = s_7.z * _S119;
-    return vec3<f32>((textureSampleLevel((tex_8), (LinearSampler_8), ((mix(_S112, _S113, vec3<f32>(_S114, _S115, _S115)) + _S116) / vec3<f32>(dims_3)), (0.0f))).x, (textureSampleLevel((tex_8), (LinearSampler_8), ((mix(_S112, _S113, vec3<f32>(_S117, _S118, _S118)) + _S116) / vec3<f32>(dims_3)), (0.0f))).y, (textureSampleLevel((tex_8), (LinearSampler_8), ((mix(_S112, _S113, vec3<f32>(_S119, _S120, _S120)) + _S116) / vec3<f32>(dims_3)), (0.0f))).z);
+    const _S110 : vec3<f32> = vec3<f32>(0.0f, 0.0f, 0.0f);
+    const _S111 : vec3<f32> = vec3<f32>(1.0f, 1.0f, 1.0f);
+    var _S112 : f32 = t_16.x;
+    var _S113 : f32 = s_7.x * _S112;
+    const _S114 : vec3<f32> = vec3<f32>(0.5f, 0.5f, 0.5f);
+    var _S115 : f32 = t_16.y;
+    var _S116 : f32 = s_7.y * _S115;
+    var _S117 : f32 = t_16.z;
+    var _S118 : f32 = s_7.z * _S117;
+    return vec3<f32>((textureSampleLevel((tex_8), (LinearSampler_8), ((mix(_S110, _S111, vec3<f32>(_S112, _S113, _S113)) + _S114) / vec3<f32>(dims_3)), (0.0f))).x, (textureSampleLevel((tex_8), (LinearSampler_8), ((mix(_S110, _S111, vec3<f32>(_S115, _S116, _S116)) + _S114) / vec3<f32>(dims_3)), (0.0f))).y, (textureSampleLevel((tex_8), (LinearSampler_8), ((mix(_S110, _S111, vec3<f32>(_S117, _S118, _S118)) + _S114) / vec3<f32>(dims_3)), (0.0f))).z);
 }
 
 fn SeilerTexture_Read_Quintic_0( tex_9 : texture_3d<f32>,  t_17 : vec3<f32>,  LinearSampler_9 : sampler) -> vec3<f32>
 {
     var dims_4 : vec3<u32>;
-    var _S121 : u32 = dims_4[i32(0)];
-    var _S122 : u32 = dims_4[i32(1)];
-    var _S123 : u32 = dims_4[i32(2)];
-    {var dim = textureDimensions((tex_9));((_S121)) = dim.x;((_S122)) = dim.y;((_S123)) = dim.z;};
-    dims_4[i32(0)] = _S121;
-    dims_4[i32(1)] = _S122;
-    dims_4[i32(2)] = _S123;
+    var _S119 : u32 = dims_4[i32(0)];
+    var _S120 : u32 = dims_4[i32(1)];
+    var _S121 : u32 = dims_4[i32(2)];
+    {var dim = textureDimensions((tex_9));((_S119)) = dim.x;((_S120)) = dim.y;((_S121)) = dim.z;};
+    dims_4[i32(0)] = _S119;
+    dims_4[i32(1)] = _S120;
+    dims_4[i32(2)] = _S121;
     var s_8 : vec3<f32> = vec3<f32>(1.0f) - t_17;
-    const _S124 : vec3<f32> = vec3<f32>(0.0f, 0.0f, 0.0f);
-    const _S125 : vec3<f32> = vec3<f32>(1.0f, 1.0f, 1.0f);
-    var _S126 : f32 = t_17.x;
-    var _S127 : f32 = s_8.x * _S126;
-    const _S128 : vec3<f32> = vec3<f32>(0.5f, 0.5f, 0.5f);
-    var _S129 : f32 = t_17.y;
-    var _S130 : f32 = s_8.y * _S129;
-    var _S131 : f32 = t_17.z;
-    var _S132 : f32 = s_8.z * _S131;
-    return vec3<f32>((textureSampleLevel((tex_9), (LinearSampler_9), ((mix(_S124, _S125, vec3<f32>(_S126, _S127, _S127)) + _S128) / vec3<f32>(dims_4)), (0.0f))).x, (textureSampleLevel((tex_9), (LinearSampler_9), ((mix(_S124, _S125, vec3<f32>(_S129, _S130, _S130)) + _S128) / vec3<f32>(dims_4)), (0.0f))).y, (textureSampleLevel((tex_9), (LinearSampler_9), ((mix(_S124, _S125, vec3<f32>(_S131, _S132, _S132)) + _S128) / vec3<f32>(dims_4)), (0.0f))).z);
+    const _S122 : vec3<f32> = vec3<f32>(0.0f, 0.0f, 0.0f);
+    const _S123 : vec3<f32> = vec3<f32>(1.0f, 1.0f, 1.0f);
+    var _S124 : f32 = t_17.x;
+    var _S125 : f32 = s_8.x * _S124;
+    const _S126 : vec3<f32> = vec3<f32>(0.5f, 0.5f, 0.5f);
+    var _S127 : f32 = t_17.y;
+    var _S128 : f32 = s_8.y * _S127;
+    var _S129 : f32 = t_17.z;
+    var _S130 : f32 = s_8.z * _S129;
+    return vec3<f32>((textureSampleLevel((tex_9), (LinearSampler_9), ((mix(_S122, _S123, vec3<f32>(_S124, _S125, _S125)) + _S126) / vec3<f32>(dims_4)), (0.0f))).x, (textureSampleLevel((tex_9), (LinearSampler_9), ((mix(_S122, _S123, vec3<f32>(_S127, _S128, _S128)) + _S126) / vec3<f32>(dims_4)), (0.0f))).y, (textureSampleLevel((tex_9), (LinearSampler_9), ((mix(_S122, _S123, vec3<f32>(_S129, _S130, _S130)) + _S126) / vec3<f32>(dims_4)), (0.0f))).z);
 }
 
 fn EvaluateTextureSeiler_0( t_18 : vec3<f32>) -> vec3<f32>
@@ -931,14 +921,25 @@ fn ColorGrade_1( color_0 : ptr<function, vec3<f32>>)
     return;
 }
 
+fn RandomUnitVector_0( state_1 : ptr<function, u32>) -> vec3<f32>
+{
+    var _S131 : f32 = RandomFloat01_0(&((*state_1)));
+    var z_1 : f32 = _S131 * 2.0f - 1.0f;
+    var _S132 : f32 = RandomFloat01_0(&((*state_1)));
+    var a_1 : f32 = _S132 * 6.28318548202514648f;
+    var r_1 : f32 = sqrt(1.0f - z_1 * z_1);
+    return vec3<f32>(r_1 * cos(a_1), r_1 * sin(a_1), z_1);
+}
+
 fn GetColorForRay_0( startRayPos_0 : vec3<f32>,  startRayDir_0 : vec3<f32>,  rngState_0 : ptr<function, u32>,  numBounces_0 : i32,  rayMarchSteps_0 : u32,  minStepDistance_0 : f32) -> vec3<f32>
 {
-    var ret_0 : vec3<f32> = vec3<f32>(0.0f, 0.0f, 0.0f);
-    const _S133 : vec3<f32> = vec3<f32>(1.0f, 1.0f, 1.0f);
+    const _S133 : vec3<f32> = vec3<f32>(0.0f, 0.0f, 0.0f);
+    const _S134 : vec3<f32> = vec3<f32>(1.0f, 1.0f, 1.0f);
     var i_0 : i32 = i32(0);
     var rayPos_7 : vec3<f32> = startRayPos_0;
     var rayDir_4 : vec3<f32> = startRayDir_0;
-    var colorMultiplier_0 : vec3<f32> = _S133;
+    var colorMultiplier_0 : vec3<f32> = _S134;
+    var ret_0 : vec3<f32> = _S133;
     for(;;)
     {
         if(i_0 <= numBounces_0)
@@ -961,16 +962,22 @@ fn GetColorForRay_0( startRayPos_0 : vec3<f32>,  startRayDir_0 : vec3<f32>,  rng
         {
             hitInfo_2 = TestSceneMarch_0(rayPos_8);
         }
-        ret_0 = ret_0 + hitInfo_2.material_0.emissive_0 * colorMultiplier_0;
-        var specularLength_0 : f32 = length(hitInfo_2.material_0.specular_0);
-        var _S134 : f32 = length(hitInfo_2.material_0.diffuse_0) + specularLength_0;
-        if(_S134 == 0.0f)
+        var shadingFromBounce_0 : vec3<f32> = hitInfo_2.material_0.emissive_0 * colorMultiplier_0;
+        if((_Transform_0CB.ColorGrade_0) == i32(0))
         {
+            ColorGrade_1(&(shadingFromBounce_0));
+        }
+        var ret_1 : vec3<f32> = ret_0 + shadingFromBounce_0;
+        var specularLength_0 : f32 = length(hitInfo_2.material_0.specular_0);
+        var _S135 : f32 = length(hitInfo_2.material_0.diffuse_0) + specularLength_0;
+        if(_S135 == 0.0f)
+        {
+            ret_0 = ret_1;
             break;
         }
-        var specularWeight_0 : f32 = specularLength_0 / _S134;
-        var _S135 : f32 = RandomFloat01_0(&((*rngState_0)));
-        var doSpecular_0 : f32 = f32(_S135 < specularWeight_0);
+        var specularWeight_0 : f32 = specularLength_0 / _S135;
+        var _S136 : f32 = RandomFloat01_0(&((*rngState_0)));
+        var doSpecular_0 : f32 = f32(_S136 < specularWeight_0);
         var roughness_1 : f32 = mix(1.0f, hitInfo_2.material_0.roughness_0, doSpecular_0);
         var reflectDir_0 : vec3<f32> = reflect(rayDir_4, hitInfo_2.normal_0);
         var randomDir_0 : vec3<f32> = RandomUnitVector_0(&((*rngState_0)));
@@ -985,13 +992,10 @@ fn GetColorForRay_0( startRayPos_0 : vec3<f32>,  startRayDir_0 : vec3<f32>,  rng
         }
         var rayPos_9 : vec3<f32> = rayPos_8 + hitInfo_2.normal_0 * vec3<f32>(0.00999999977648258f);
         var colorMultiplier_1 : vec3<f32> = colorMultiplier_0 * mix(hitInfo_2.material_0.diffuse_0 * vec3<f32>(dot(hitInfo_2.normal_0, rayDir_4)), hitInfo_2.material_0.specular_0, vec3<f32>(doSpecular_0));
-        if((_Transform_0CB.ColorGrade_0) == i32(0))
-        {
-            ColorGrade_1(&(ret_0));
-        }
         i_0 = i_0 + i32(1);
         rayPos_7 = rayPos_9;
         colorMultiplier_0 = colorMultiplier_1;
+        ret_0 = ret_1;
     }
     return ret_0;
 }
@@ -1015,36 +1019,36 @@ fn RenderScene_0( px_0 : vec2<u32>) -> vec3<f32>
         {
             break;
         }
-        var _S136 : vec2<f32> = vec2<f32>(px_0);
-        var _S137 : f32 = RandomFloat01_0(&(rngState_1));
+        var _S137 : vec2<f32> = vec2<f32>(px_0);
         var _S138 : f32 = RandomFloat01_0(&(rngState_1));
-        var fragCoordJittered_0 : vec2<f32> = _S136 + (vec2<f32>(_S137, _S138) - vec2<f32>(0.5f));
+        var _S139 : f32 = RandomFloat01_0(&(rngState_1));
+        var fragCoordJittered_0 : vec2<f32> = _S137 + (vec2<f32>(_S138, _S139) - vec2<f32>(0.5f));
         var w_0 : u32;
         var h_2 : u32;
         {var dim = textureDimensions((Accumulation));((w_0)) = dim.x;((h_2)) = dim.y;};
-        var _S139 : vec2<f32> = fragCoordJittered_0 / vec2<f32>(f32(w_0), f32(h_2)) * vec2<f32>(2.0f) - vec2<f32>(1.0f);
-        var screenPos_0 : vec2<f32> = _S139;
-        screenPos_0[i32(1)] = - _S139.y;
-        var _S140 : vec4<f32> = (((mat4x4<f32>(_Transform_0CB.InvViewProjMtx_0.data_0[i32(0)][i32(0)], _Transform_0CB.InvViewProjMtx_0.data_0[i32(0)][i32(1)], _Transform_0CB.InvViewProjMtx_0.data_0[i32(0)][i32(2)], _Transform_0CB.InvViewProjMtx_0.data_0[i32(0)][i32(3)], _Transform_0CB.InvViewProjMtx_0.data_0[i32(1)][i32(0)], _Transform_0CB.InvViewProjMtx_0.data_0[i32(1)][i32(1)], _Transform_0CB.InvViewProjMtx_0.data_0[i32(1)][i32(2)], _Transform_0CB.InvViewProjMtx_0.data_0[i32(1)][i32(3)], _Transform_0CB.InvViewProjMtx_0.data_0[i32(2)][i32(0)], _Transform_0CB.InvViewProjMtx_0.data_0[i32(2)][i32(1)], _Transform_0CB.InvViewProjMtx_0.data_0[i32(2)][i32(2)], _Transform_0CB.InvViewProjMtx_0.data_0[i32(2)][i32(3)], _Transform_0CB.InvViewProjMtx_0.data_0[i32(3)][i32(0)], _Transform_0CB.InvViewProjMtx_0.data_0[i32(3)][i32(1)], _Transform_0CB.InvViewProjMtx_0.data_0[i32(3)][i32(2)], _Transform_0CB.InvViewProjMtx_0.data_0[i32(3)][i32(3)])) * (vec4<f32>(screenPos_0, 0.0f, 1.0f))));
-        var world_0 : vec4<f32> = _S140;
-        var _S141 : vec3<f32> = _S140.xyz / vec3<f32>(_S140.w);
-        world_0.x = _S141.x;
-        world_0.y = _S141.y;
-        world_0.z = _S141.z;
+        var _S140 : vec2<f32> = fragCoordJittered_0 / vec2<f32>(f32(w_0), f32(h_2)) * vec2<f32>(2.0f) - vec2<f32>(1.0f);
+        var screenPos_0 : vec2<f32> = _S140;
+        screenPos_0[i32(1)] = - _S140.y;
+        var _S141 : vec4<f32> = (((mat4x4<f32>(_Transform_0CB.InvViewProjMtx_0.data_0[i32(0)][i32(0)], _Transform_0CB.InvViewProjMtx_0.data_0[i32(0)][i32(1)], _Transform_0CB.InvViewProjMtx_0.data_0[i32(0)][i32(2)], _Transform_0CB.InvViewProjMtx_0.data_0[i32(0)][i32(3)], _Transform_0CB.InvViewProjMtx_0.data_0[i32(1)][i32(0)], _Transform_0CB.InvViewProjMtx_0.data_0[i32(1)][i32(1)], _Transform_0CB.InvViewProjMtx_0.data_0[i32(1)][i32(2)], _Transform_0CB.InvViewProjMtx_0.data_0[i32(1)][i32(3)], _Transform_0CB.InvViewProjMtx_0.data_0[i32(2)][i32(0)], _Transform_0CB.InvViewProjMtx_0.data_0[i32(2)][i32(1)], _Transform_0CB.InvViewProjMtx_0.data_0[i32(2)][i32(2)], _Transform_0CB.InvViewProjMtx_0.data_0[i32(2)][i32(3)], _Transform_0CB.InvViewProjMtx_0.data_0[i32(3)][i32(0)], _Transform_0CB.InvViewProjMtx_0.data_0[i32(3)][i32(1)], _Transform_0CB.InvViewProjMtx_0.data_0[i32(3)][i32(2)], _Transform_0CB.InvViewProjMtx_0.data_0[i32(3)][i32(3)])) * (vec4<f32>(screenPos_0, 0.0f, 1.0f))));
+        var world_0 : vec4<f32> = _S141;
+        var _S142 : vec3<f32> = _S141.xyz / vec3<f32>(_S141.w);
+        world_0.x = _S142.x;
+        world_0.y = _S142.y;
+        world_0.z = _S142.z;
         var rayOrigin_0 : vec3<f32> = _Transform_0CB.CameraPos_0;
         var rayDirection_0 : vec3<f32> = normalize(world_0.xyz - _Transform_0CB.CameraPos_0);
         var cameraRight_0 : vec3<f32> = (((mat4x4<f32>(_Transform_0CB.InvViewMtx_0.data_0[i32(0)][i32(0)], _Transform_0CB.InvViewMtx_0.data_0[i32(0)][i32(1)], _Transform_0CB.InvViewMtx_0.data_0[i32(0)][i32(2)], _Transform_0CB.InvViewMtx_0.data_0[i32(0)][i32(3)], _Transform_0CB.InvViewMtx_0.data_0[i32(1)][i32(0)], _Transform_0CB.InvViewMtx_0.data_0[i32(1)][i32(1)], _Transform_0CB.InvViewMtx_0.data_0[i32(1)][i32(2)], _Transform_0CB.InvViewMtx_0.data_0[i32(1)][i32(3)], _Transform_0CB.InvViewMtx_0.data_0[i32(2)][i32(0)], _Transform_0CB.InvViewMtx_0.data_0[i32(2)][i32(1)], _Transform_0CB.InvViewMtx_0.data_0[i32(2)][i32(2)], _Transform_0CB.InvViewMtx_0.data_0[i32(2)][i32(3)], _Transform_0CB.InvViewMtx_0.data_0[i32(3)][i32(0)], _Transform_0CB.InvViewMtx_0.data_0[i32(3)][i32(1)], _Transform_0CB.InvViewMtx_0.data_0[i32(3)][i32(2)], _Transform_0CB.InvViewMtx_0.data_0[i32(3)][i32(3)])) * (vec4<f32>(1.0f, 0.0f, 0.0f, 0.0f)))).xyz;
         var cameraUp_0 : vec3<f32> = (((mat4x4<f32>(_Transform_0CB.InvViewMtx_0.data_0[i32(0)][i32(0)], _Transform_0CB.InvViewMtx_0.data_0[i32(0)][i32(1)], _Transform_0CB.InvViewMtx_0.data_0[i32(0)][i32(2)], _Transform_0CB.InvViewMtx_0.data_0[i32(0)][i32(3)], _Transform_0CB.InvViewMtx_0.data_0[i32(1)][i32(0)], _Transform_0CB.InvViewMtx_0.data_0[i32(1)][i32(1)], _Transform_0CB.InvViewMtx_0.data_0[i32(1)][i32(2)], _Transform_0CB.InvViewMtx_0.data_0[i32(1)][i32(3)], _Transform_0CB.InvViewMtx_0.data_0[i32(2)][i32(0)], _Transform_0CB.InvViewMtx_0.data_0[i32(2)][i32(1)], _Transform_0CB.InvViewMtx_0.data_0[i32(2)][i32(2)], _Transform_0CB.InvViewMtx_0.data_0[i32(2)][i32(3)], _Transform_0CB.InvViewMtx_0.data_0[i32(3)][i32(0)], _Transform_0CB.InvViewMtx_0.data_0[i32(3)][i32(1)], _Transform_0CB.InvViewMtx_0.data_0[i32(3)][i32(2)], _Transform_0CB.InvViewMtx_0.data_0[i32(3)][i32(3)])) * (vec4<f32>(0.0f, 1.0f, 0.0f, 0.0f)))).xyz;
         var focalPlanePoint_0 : vec3<f32> = rayOrigin_0 + rayDirection_0 * vec3<f32>(80.0f);
-        var _S142 : f32 = RandomFloat01_0(&(rngState_1));
-        var angle_0 : f32 = _S142 * 2.0f * 3.14159274101257324f;
         var _S143 : f32 = RandomFloat01_0(&(rngState_1));
-        var offset_0 : vec2<f32> = vec2<f32>(cos(angle_0), sin(angle_0)) * vec2<f32>((sqrt(_S143) * 0.40000000596046448f));
+        var angle_0 : f32 = _S143 * 2.0f * 3.14159274101257324f;
+        var _S144 : f32 = RandomFloat01_0(&(rngState_1));
+        var offset_0 : vec2<f32> = vec2<f32>(cos(angle_0), sin(angle_0)) * vec2<f32>((sqrt(_S144) * 0.40000000596046448f));
         var rayOrigin_1 : vec3<f32> = rayOrigin_0 + (vec3<f32>(offset_0.x) * cameraRight_0 + vec3<f32>(offset_0.y) * cameraUp_0);
-        var _S144 : vec3<f32> = GetColorForRay_0(rayOrigin_1, normalize(focalPlanePoint_0 - rayOrigin_1), &(rngState_1), i32(4), u32(256), 0.10000000149011612f);
-        var _S145 : i32 = rayIndex_0 + i32(1);
-        color_1 = mix(color_1, _S144, vec3<f32>((1.0f / f32(_S145))));
-        rayIndex_0 = _S145;
+        var _S145 : vec3<f32> = GetColorForRay_0(rayOrigin_1, normalize(focalPlanePoint_0 - rayOrigin_1), &(rngState_1), i32(4), u32(256), 0.10000000149011612f);
+        var _S146 : i32 = rayIndex_0 + i32(1);
+        color_1 = mix(color_1, _S145, vec3<f32>((1.0f / f32(_S146))));
+        rayIndex_0 = _S146;
     }
     if((_Transform_0CB.ColorGrade_0) == i32(1))
     {
@@ -1053,41 +1057,41 @@ fn RenderScene_0( px_0 : vec2<u32>) -> vec3<f32>
     var blend_0 : f32;
     if((_Transform_0CB.RaysPerPixelPerFrame_0) > i32(0))
     {
-        var _S146 : vec4<f32> = (textureLoad((AccumulationReadOnly), (vec2<i32>(px_0))));
-        var _S147 : bool;
+        var _S147 : vec4<f32> = (textureLoad((AccumulationReadOnly), (vec2<i32>(px_0))));
+        var _S148 : bool;
         if((_Transform_0CB.iFrame_0) < i32(2))
         {
-            _S147 = true;
+            _S148 = true;
         }
         else
         {
-            _S147 = (_S146.w) == 0.0f;
+            _S148 = (_S147.w) == 0.0f;
         }
-        if(_S147)
+        if(_S148)
         {
-            _S147 = true;
+            _S148 = true;
         }
         else
         {
-            _S147 = bool(_Transform_0CB.CameraChanged_0);
+            _S148 = bool(_Transform_0CB.CameraChanged_0);
         }
-        if(_S147)
+        if(_S148)
         {
             blend_0 = 1.0f;
         }
         else
         {
-            blend_0 = 1.0f / (1.0f + 1.0f / _S146.w);
+            blend_0 = 1.0f / (1.0f + 1.0f / _S147.w);
         }
-        color_1 = mix(_S146.xyz, color_1, vec3<f32>(blend_0));
+        color_1 = mix(_S147.xyz, color_1, vec3<f32>(blend_0));
     }
     else
     {
-        var _S148 : vec2<i32> = vec2<i32>(px_0);
-        var _S149 : vec4<f32> = (textureLoad((AccumulationReadOnly), (_S148)));
-        var _S150 : vec4<f32> = (textureLoad((AccumulationReadOnly), (_S148)));
-        color_1 = _S150.xyz;
-        blend_0 = _S149.w;
+        var _S149 : vec2<i32> = vec2<i32>(px_0);
+        var _S150 : vec4<f32> = (textureLoad((AccumulationReadOnly), (_S149)));
+        var _S151 : vec4<f32> = (textureLoad((AccumulationReadOnly), (_S149)));
+        color_1 = _S151.xyz;
+        blend_0 = _S150.w;
     }
     if(bool(_Transform_0CB.ResetAccumulation_0))
     {
@@ -1102,34 +1106,34 @@ fn LinearToSRGB_0( linearCol_0 : vec3<f32>) -> vec3<f32>
     var sRGBLo_0 : vec3<f32> = linearCol_0 * vec3<f32>(12.92000007629394531f);
     var sRGBHi_0 : vec3<f32> = pow(abs(linearCol_0), vec3<f32>(0.4166666567325592f, 0.4166666567325592f, 0.4166666567325592f)) * vec3<f32>(1.0549999475479126f) - vec3<f32>(0.05499999970197678f);
     var sRGB_0 : vec3<f32>;
-    var _S151 : f32;
+    var _S152 : f32;
     if((linearCol_0.x) <= 0.00313080009073019f)
     {
-        _S151 = sRGBLo_0.x;
+        _S152 = sRGBLo_0.x;
     }
     else
     {
-        _S151 = sRGBHi_0.x;
+        _S152 = sRGBHi_0.x;
     }
-    sRGB_0[i32(0)] = _S151;
+    sRGB_0[i32(0)] = _S152;
     if((linearCol_0.y) <= 0.00313080009073019f)
     {
-        _S151 = sRGBLo_0.y;
+        _S152 = sRGBLo_0.y;
     }
     else
     {
-        _S151 = sRGBHi_0.y;
+        _S152 = sRGBHi_0.y;
     }
-    sRGB_0[i32(1)] = _S151;
+    sRGB_0[i32(1)] = _S152;
     if((linearCol_0.z) <= 0.00313080009073019f)
     {
-        _S151 = sRGBLo_0.z;
+        _S152 = sRGBLo_0.z;
     }
     else
     {
-        _S151 = sRGBHi_0.z;
+        _S152 = sRGBHi_0.z;
     }
-    sRGB_0[i32(2)] = _S151;
+    sRGB_0[i32(2)] = _S152;
     return sRGB_0;
 }
 
