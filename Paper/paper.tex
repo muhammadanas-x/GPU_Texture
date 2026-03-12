@@ -101,7 +101,7 @@ $[0,1]$ range. For a 2x2 texture, that means that $t$ is in the range $[0.25, 0.
 
 \input{Diagrams/ZigZag/figure.tex}
 
-To store multiple quadratic curves in a single texture, we would naively need a 2x2 group of pixels for each curve. However, it can be observed that the diagonal texels
+To store multiple quadratic curves in a single de Casteljau texture, we would naively need a 2x2 group of pixels for each curve. However, it can be observed that the diagonal texels
 only need to average to $B$. If we have a 2x2 texture with rows $A, B$ and $C, D$, and we define $s = 1 - t$, bilinear interpolation can be written and expanded as:
 
 \begin{equation}
