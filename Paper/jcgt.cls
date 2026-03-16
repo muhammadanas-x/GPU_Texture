@@ -1,6 +1,11 @@
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{jcgt}[2012/06/21 Journal of Computer Graphics Techniques]
 
+\newif\ifjcgt@preprint
+\jcgt@preprintfalse
+\DeclareOption{preprint}{\jcgt@preprinttrue}
+\ProcessOptions\relax
+
 \LoadClass[11pt]{article}
 
 \RequirePackage{graphicx}
@@ -42,7 +47,11 @@
 
 \newcommand{\submitted}[1]{
   \renewcommand{\jcgt@submitted}{#1}
-  \lhead{\small Submitted to the \textit{Journal of Computer Graphics Techniques}}\chead{}\rhead{\small #1}
+  \ifjcgt@preprint
+    \lhead{}\chead{}\rhead{}
+  \else
+    \lhead{\small Submitted to the \textit{Journal of Computer Graphics Techniques}}\chead{}\rhead{\small #1}
+  \fi
 }
 
 \newcommand{\accepted}[9]{%
@@ -57,15 +66,25 @@
 \renewcommand{\jcgt@endpage}{#8}
 \renewcommand{\jcgt@year}{#9}
 
-% 
-\lhead{\small \textit{Journal of Computer Graphics Techniques} \\ \jcgt@headtitle }\chead{}\rhead{\small Vol. \jcgt@volume, No. \jcgt@number, \jcgt@year \\\href{http://jcgt.org}{http://jcgt.org}}
+\ifjcgt@preprint
+  \lhead{}\chead{}\rhead{}
+  \fancypagestyle{firstpagestyle}
+  {
+     \fancyhead{}\chead{}\rhead{}
+     \fancyfoot[C]{\thepage}
+     \fancyfoot[R]{}
+  }
+\else
+  % 
+  \lhead{\small \textit{Journal of Computer Graphics Techniques} \\ \jcgt@headtitle }\chead{}\rhead{\small Vol. \jcgt@volume, No. \jcgt@number, \jcgt@year \\\href{http://jcgt.org}{http://jcgt.org}}
 
-\fancypagestyle{firstpagestyle}
-{
-   \fancyhead{\small \textit{Journal of Computer Graphics Techniques} Vol. \jcgt@volume, No. \jcgt@number, \jcgt@year}\chead{}\rhead{\small  \href{http://jcgt.org}{http://jcgt.org}}
-   \fancyfoot[C]{\thepage }
-   \fancyfoot[R]{ISSN~2331-7418}
-}
+  \fancypagestyle{firstpagestyle}
+  {
+     \fancyhead{\small \textit{Journal of Computer Graphics Techniques} Vol. \jcgt@volume, No. \jcgt@number, \jcgt@year}\chead{}\rhead{\small  \href{http://jcgt.org}{http://jcgt.org}}
+     \fancyfoot[C]{\thepage }
+     \fancyfoot[R]{ISSN~2331-7418}
+  }
+\fi
 }
 
 
@@ -73,6 +92,7 @@
 
 \newcommand{\afterdoc}
 {
+\ifjcgt@preprint\else
 \vspace{3mm}
 \hrule
 \vspace{3mm}
@@ -93,6 +113,7 @@ Published: &\jcgt@published & Editor-in-Chief: &Alexander Wilkie
 
 \vspace{2mm}
 \noindent\includegraphics[width=2.5cm]{CC-BY-ND.png}
+\fi
 }
 
 
@@ -131,7 +152,7 @@ frame=single,
 %    pdftitle={\jcgt@title},
 %    pdfauthor={\jcgt@author},
 %    pdfsubject={\pdf@Subject},
-    pdfkeywords={Journal of Computer Graphics Techniques}]{hyperref}
+    pdfkeywords={}]{hyperref}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Figures
 \setlength{\fboxsep}{0mm}
