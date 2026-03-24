@@ -152,27 +152,32 @@ format, leading to unavoidable quantization errors \cite{CUDA_PG}. If this is a 
 32-bit floating-point precision. The quantization errors are shown in Figure \ref{fig_curve_accuracy}.
 
 \section{Seiler Interpolation}
+Seiler interpolation provides an optimized method for evaluating cubic Bézier curves using a minimal number of linear interpolations. 
+Instead of the six lerps required by the classical de Casteljau algorithm, it achieves the same result with only three by introducing carefully constructed difference terms.
 
-Seiler interpolation provides an efficient method for evaluating polynomial curves using a reduced number of linear interpolations. 
-For cubic Bézier curves, it requires only three linear interpolations, compared to the six required by the classical de Casteljau algorithm. 
-This efficiency is achieved through the introduction of carefully constructed difference terms.
+For a cubic curve defined by control points \(b_0, b_1, b_2, b_3\), we first compute
+\[
+d_1 = 3(b_1 - b_0) - (b_3 - b_0), \qquad
+d_2 = 3(b_2 - b_3) - (b_0 - b_3).
+\]
 
-A purely interpolation-based formulation can be obtained by defining the Seiler points
+We then define the Seiler points as
 \[
 s_1 = b_0 + d_1, \qquad s_2 = b_3 + d_2.
 \]
 
-We then compute
+Next, the interpolated endpoints and difference points are computed:
 \[
 b_{03} = L(b_0, b_3, t), \qquad
 s_{12} = L(s_1, s_2, t),
 \]
-and evaluate
+
+and the final curve position is evaluated by
 \[
-C(t) = L\!\left(b_{03}, s_{12}, (1-t)t\right).
+C(t) = L(b_{03}, s_{12}, (1-t)t).
 \]
 
-This form uses only three lerps.
+This form provides an exact cubic Bézier evaluation using only three linear interpolations.
 
 \subsection{Arbitrary Degree Curves}
 
