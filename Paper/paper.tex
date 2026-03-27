@@ -137,7 +137,7 @@ the shader to get the final point on the surface.
 With some preprocessing, it is also possible to evaluate NURBS. Rational splines can be achieved by dividing one integral spline point by another in the shader, and B-splines can be converted
 to piecewise Bézier curves using Boehm's algorithm.
 
-Lastly, as power basis polynomials can be converted to and from Bernstein basis (Bézier) polynomials, this technique can be used to evaluate general polynomials as well.
+Lastly, as power basis polynomials can be converted to and from Bernstein basis (Bézier) polynomials, this technique can also be used to evaluate general polynomials.
 
 \subsection{Limitations}
 
@@ -152,7 +152,7 @@ format, leading to unavoidable quantization errors \cite{CUDA_PG}. If this is a 
 32-bit floating-point precision. The quantization errors are shown in Figure \ref{fig_curve_accuracy}.
 
 \section{Seiler Interpolation}
-Seiler interpolation was introduced by Seiler et al. \cite{lin2021hardware} as an efficient method for evaluating cubic Bézier curves using a minimal number of linear interpolations. 
+Seiler interpolation was introduced by Lin et al. \cite{lin2021hardware} as an efficient method for evaluating cubic Bézier curves using a minimal number of linear interpolations. 
 Instead of the six lerps required by the classical de Casteljau algorithm, it achieves the same result with only three by introducing carefully constructed difference terms.
 
 For a cubic curve defined by control points \(b_0, b_1, b_2, b_3\), we first compute
