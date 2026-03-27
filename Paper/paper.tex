@@ -152,7 +152,7 @@ format, leading to unavoidable quantization errors \cite{CUDA_PG}. If this is a 
 32-bit floating-point precision. The quantization errors are shown in Figure \ref{fig_curve_accuracy}.
 
 \section{Seiler Interpolation}
-Seiler interpolation provides an optimized method for evaluating cubic Bézier curves using a minimal number of linear interpolations. 
+Seiler interpolation was introduced by Seiler et al. \cite{lin2021hardware} as an efficient method for evaluating cubic Bézier curves using a minimal number of linear interpolations. 
 Instead of the six lerps required by the classical de Casteljau algorithm, it achieves the same result with only three by introducing carefully constructed difference terms.
 
 For a cubic curve defined by control points \(b_0, b_1, b_2, b_3\), we first compute
