@@ -7,6 +7,7 @@
 \usepackage{booktabs}
 \usepackage{caption}
 \usepackage{float}
+\usepackage[section]{placeins}  % Added: \FloatBarrier before each \section automatically
 \setciteauthor{Anas, Wolfe}
 \setcitetitle{A Texture Lookup Approach to Bézier Curve Evaluation on the GPU}
 %\setheadtitle{Abbreviated title, only if full title won't fit in page headers}
@@ -67,6 +68,7 @@ this framework to improve efficiency. We also compare performance and accuracy a
 \end{abstract}
 
 %-------------------------------------------------------------------------
+\FloatBarrier
 \section{Introduction}
 \label{sec:introduction}
 
@@ -80,6 +82,7 @@ interpolation could be used for the initial linear interpolation steps, with the
 In this paper, we present the details of evaluating Bézier curves using hardware-accelerated linear texture interpolation and show how to perform all interpolations on the hardware,
 using both the de Casteljau algorithm and Seiler interpolation. We also compare performance and accuracy against curves evaluated as polynomials in shader code.
 
+\FloatBarrier
 \section{De Casteljau Using Linear Texture Interpolation}
 
 \input{Diagrams/BezDecasteljau/figure.tex}
@@ -98,11 +101,16 @@ interpolation levels can be done in the shader after the texture reads, since 4D
 When linearly sampling textures, the pixel value is at the center of the pixel, so the $t$ values need to range from the center of one pixel to the next, instead of being in the usual
 $[0,1]$ range. For a 2x2 texture, that means that $t$ is in the range $[0.25, 0.75]$.
 
+\FloatBarrier
 \subsection{$C^0$-Continuous Piecewise Curves}
+
+
+To store multiple quadratic curves in a single de Casteljau texture, we would naively need a 2x2 group of pixels for each curve.
 
 \input{Diagrams/ZigZag/figure.tex}
 
-To store multiple quadratic curves in a single de Casteljau texture, we would naively need a 2x2 group of pixels for each curve. However, it can be observed that the diagonal texels
+
+However, it can be observed that the diagonal texels
 only need to average to $B$. If we have a 2x2 texture with rows $A, B$ and $C, D$, and we define $s = 1 - t$, bilinear interpolation can be written and expanded as:
 
 \begin{equation}
@@ -123,6 +131,7 @@ while also reading in a zig-zag pattern, we can add two pixels for each addition
 Since a 2D texture can store arbitrary $C^0$-continuous quadratic Bézier curves, we can place two of them front-to-back into a 3D texture and interpolate to make a cubic curve. The pattern would
 continue for higher order curves if higher dimensional textures were supported.
 
+\FloatBarrier
 \subsection{Surfaces, Volumes, and NURBS}
 
 Bézier tensor-product surfaces and volumes can be evaluated using this technique as well. If you are using the texture interpolator and the shader to evaluate an order-$O$ curve, you can split
@@ -139,9 +148,9 @@ to piecewise Bézier curves using Boehm's algorithm.
 
 Lastly, as power basis polynomials can be converted to and from Bernstein basis (Bézier) polynomials, this technique can be used to evaluate general polynomials as well.
 
+\FloatBarrier
 \subsection{Limitations}
 
-\input{Diagrams/CurveAccuracy/figure.tex}
 
 When using a low-bit-depth texture format, the values that control points can take are limited; for example, 8-bit textures are limited to 255 values, and to $[0,1]$ when using
 a unorm format. Furthermore, the values read from the curves are also limited to the same range and discretization as the texture format! To deal with this limitation, it is possible to
@@ -151,6 +160,10 @@ Another source of discretization error is the texture sampling itself. When perf
 format, leading to unavoidable quantization errors \cite{CUDA_PG}. If this is a problem, doing some interpolation levels in the shader can help reduce the error, since shaders run at full
 32-bit floating-point precision. The quantization errors are shown in Figure \ref{fig_curve_accuracy}.
 
+
+\input{Diagrams/CurveAccuracy/figure.tex}
+
+\FloatBarrier
 \section{Seiler Interpolation}
 Seiler interpolation was introduced by Seiler et al. \cite{lin2021hardware} as an efficient method for evaluating cubic Bézier curves using a minimal number of linear interpolations. 
 Instead of the six lerps required by the classical de Casteljau algorithm, it achieves the same result with only three by introducing carefully constructed difference terms.
@@ -232,6 +245,8 @@ interpolations, $\lceil d/2 \rceil$ of which can be computed in parallel,
 since they operate on disjoint pairs of difference terms.
 
 Explicit closed-form difference rules are currently known up to degree $5$.
+
+\FloatBarrier
 \section{Seiler Interpolation Using Linear Texture Interpolation}
 
 Using Seiler interpolation, a cubic Bézier curve can be written as follows:
@@ -355,6 +370,7 @@ B_0 + d_1 + d_2 & B_5 + d_4 + d_3
 \label{tab:SeilerLayout}
 \end{table}
 
+\FloatBarrier
 \section{Performance Analysis}
 
 Modern GPUs hide memory latency by suspending the active thread and switching to another thread while waiting on memory reads. This allows memory and computation to happen in parallel, but GPU workloads are often unbalanced and end up either compute-bound or memory-bound. Our technique offloads
@@ -425,6 +441,7 @@ evaluates the curve as shader instructions, Seiler Texture uses the GPU texture 
 \label{tab:seiler_comparison}
 \end{table}
 
+\FloatBarrier
 \section{Conclusions and Future Work}
 
 We have shown that certain types of operations can be offloaded to the GPU's fixed-function texture interpolation hardware to improve performance in compute-bound GPU workloads.
