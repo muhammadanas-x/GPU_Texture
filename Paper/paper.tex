@@ -179,17 +179,13 @@ We then define the Seiler points as
 s_1 = b_0 + d_1, \qquad s_2 = b_3 + d_2.
 \]
 
-Let
-\[
-L(a,b,t) = (1-t)a + tb
-\]
-denote linear interpolation between \(a\) and \(b\) at parameter \(t\).
-
-Next, the interpolated endpoints and difference points are computed:
+Next, the interpolated endpoints and difference points are computed,
+where $L(a, b, t) = (1-t)a + tb$ denotes linear interpolation:
 \[
 b_{03} = L(b_0, b_3, t), \qquad
 s_{12} = L(s_1, s_2, t),
 \]
+
 
 and the final curve position is evaluated by
 \[
@@ -263,8 +259,6 @@ C(t) = L(b_0, b_3, t) + L(d_1, d_2, t)\,st
 
 Here, $s = 1-t$.
 
-Observing that $A+Bt$ (a multiply-add) can be reformulated as a linear interpolation $L(A, A+B, t)$ allows us to rewrite the equation using only lerps.
-
 \begin{equation}
 C(t) = L( L(b_0, b_3, t), L(d_1 + b_0, d_2 + b_3, t), st)
 \end{equation}
@@ -313,7 +307,8 @@ b_0 & b_5
 When this texture is the first slice of a volume texture, and the previous texture is the second slice, we can sample the volume texture at $(t, st, st)$ to get the point on the quintic curve at time $t$, using a single trilinear texture read.
 See Table \ref{tab:SeilerLayout} for a diagram of Seiler textures of various degrees.
 
-Just like in the de Casteljau formulation, when linearly sampling textures, the pixel value is at the center of the pixel. The interpolation-time values need to range from the center of one pixel to the next, instead of being in the usual $[0,1]$ range. For a 2x2 texture, that means that $t$ is in the range $[0.25, 0.75]$. For the combined term $st$, the conversion happens after the multiplication.
+Just like in the de Casteljau formulation, when linearly sampling textures, the pixel value is at the center of the pixel. The interpolation-time values need to range from the center of one pixel to the next, instead of being in the usual
+$[0,1]$ range. For a 2x2 texture, that means that $t$ is in the range $[0.25, 0.75]$. For the combined term $st$, the conversion happens after the multiplication.
 
 \begin{table}[H]
 \centering
@@ -342,214 +337,7 @@ B_0 + d_1 & B_3 + d_2
 N/A\\
 \hline
 
-Quartic ($d=4$) &
-$\begin{bmatrix}
-B_0 & B_4 \\
-B_0 & B_4
-\end{bmatrix}$
-&
-$\begin{bmatrix}
-B_0 + d_1 & B_4 + d_3 \\
-B_0 + d_1 + d_2 & B_4 + d_3 + d_2
-\end{bmatrix}$
-
-\\
-\hline
-
-Quintic ($d=5$) &
-$\begin{bmatrix}
-B_0 & B_5 \\
-B_0 & B_5
-\end{bmatrix}$
-&
-$\begin{bmatrix}
-B_0 + d_1 & B_5 + d_4 \\
-B_0 + d_1 + d_2 & B_5 + d_4 + d_3
-\end{bmatrix}$
-\\
-\hline
-
-\end{tabular}
-
-\caption{Structured arrangement of Seiler difference terms for polynomial degrees 2 through 5. The 2D textures are read using coordinates $(t, st)$, while the 3D textures are read using coordinates $(t, st, st)$. This layout allows efficient evaluation of curves using the GPU's texture interpolation hardware.}
-\label{tab:SeilerLayout}
-\end{table}\section{Seiler Interpolation}
-Seiler interpolation was introduced by Seiler et al. \cite{lin2021hardware} as an efficient method for evaluating cubic Bézier curves using a minimal number of linear interpolations. 
-Instead of the six lerps required by the classical de Casteljau algorithm, it achieves the same result with only three by introducing carefully constructed difference terms.
-
-For a cubic curve defined by control points \(b_0, b_1, b_2, b_3\), we first compute
-\[
-d_1 = 3(b_1 - b_0) - (b_3 - b_0), \qquad
-d_2 = 3(b_2 - b_3) - (b_0 - b_3).
-\]
-
-We then define the Seiler points as
-\[
-s_1 = b_0 + d_1, \qquad s_2 = b_3 + d_2.
-\]
-
-Let
-\[
-L(a,b,t) = (1-t)a + tb
-\]
-denote linear interpolation between \(a\) and \(b\) at parameter \(t\).
-
-Next, the interpolated endpoints and difference points are computed:
-\[
-b_{03} = L(b_0, b_3, t), \qquad
-s_{12} = L(s_1, s_2, t),
-\]
-
-and the final curve position is evaluated by
-\[
-C(t) = L(b_{03}, s_{12}, (1-t)t).
-\]
-
-This form provides an exact cubic Bézier evaluation using only three linear interpolations.
-
-\subsection{Arbitrary Degree Curves}
-
-For a polynomial curve of degree $d$ with control points 
-$b_0, b_1, \dots, b_d$, Seiler interpolation can be written recursively as
-
-\[
-C(t) = L(b_0, b_d, t) + (1 - t)t \, D_1(t),
-\]
-
-where the recursive term is defined as
-
-\[
-D_i(t) =
-\begin{cases}
-0, & \text{if } 2i = d + 1, \\[6pt]
-d_i, & \text{if } 2i = d, \\[6pt]
-L(d_i, d_{d-i}, t) + (1 - t)t \, D_{i+1}(t), & \text{otherwise}.
-\end{cases}
-\]
-
-The difference terms are computed from the Bézier control points. 
-For general degree $d$:
-
-\[
-d_1 = d(b_1 - b_0) - (b_d - b_0),
-\]
-\[
-d_{d-1} = d(b_{d-1} - b_d) - (b_0 - b_d).
-\]
-
-For degrees up to $5$, additional terms can be computed as:
-
-\[
-d_2 =
-\binom{d}{2}(b_2 - b_1)
-- \binom{d-2}{2}(b_1 - b_0)
-- (d-3)(b_{d-1} - b_d)
-- 3(b_{d-1} - b_1),
-\]
-
-\[
-d_{d-2} =
-\binom{d}{2}(b_{d-2} - b_{d-1})
-- \binom{d-2}{2}(b_{d-1} - b_d)
-- (d-3)(b_1 - b_0)
-- 3(b_1 - b_{d-1}).
-\]
-
-For a degree-$d$ polynomial, Seiler interpolation requires $d$ linear 
-interpolations, $\lceil d/2 \rceil$ of which can be computed in parallel, 
-since they operate on disjoint pairs of difference terms.
-
-Explicit closed-form difference rules are currently known up to degree $5$.
-
-\FloatBarrier
-\section{Seiler Interpolation Using Linear Texture Interpolation}
-
-Using Seiler interpolation, a cubic Bézier curve can be written as follows:
-
-\begin{equation}
-C(t) = L(b_0, b_3, t) + L(d_1, d_2, t)\,st
-\end{equation}
-
-Here, $s = 1-t$.
-
-Observing that $A+Bt$ (a multiply-add) can be reformulated as a linear interpolation $L(A, A+B, t)$ allows us to rewrite the equation using only lerps.
-
-\begin{equation}
-C(t) = L( L(b_0, b_3, t), L(d_1 + b_0, d_2 + b_3, t), st)
-\end{equation}
-
-This is equivalent to the "pure lerp" form in Yuksel \cite{10.1145/3641233.3664331}, where $d_1 + b_0$ and $d_2 + b_3$ are replaced with $s_1$ and $s_2$, respectively.
-
-\begin{equation}
-C(t) = L( L(b_0, b_3, t), L(s_1, s_2, t), st)
-\end{equation}
-
-This allows us to make a 2x2 texture where the top row of pixels contains $b_0$ and $b_3$, and the bottom row contains $s_1$ and $s_2$. Sampling that texture at coordinate $(t, st)$ gives the final point on the curve. This is shown in Figure \ref{fig:teaser}.
-
-Using Seiler interpolation in this way allows us to store a cubic curve in a 2x2 texture, whereas the de Casteljau texture formulation would require a 2x2x2 texture. A cubic curve has 4 control points, and a 2x2 texture has the same number of degrees of freedom with 4 pixels, so
-there is no redundant storage, unlike the de Casteljau formulation which requires 8 pixels.
-
-The highest-order curve currently known in Seiler interpolation is a quintic curve, which has 6 control points. The pure-lerp form can be written as:
-
-\begin{equation}
-    \begin{split}
-    C(t) = L(b_{05}, L(b_{05} + d_{14}, b_{05} + d_{14} + d_{23}, st), st) \\
-    \text{where } \\
-    b_{05} = L(b_0, b_5, t) \\
-    d_{14} = L(d_1, d_4, t) \\
-    d_{23} = L(d_2, d_3, t)
-    \end{split}
-\end{equation}
-
-The second parameter of the outermost linear interpolation can be realized with a 2D texture that is read at location $(t, st)$:
-
-\[
-\begin{bmatrix}
-b_0 + d_1 & b_5 + d_4 \\
-b_0 + d_1 + d_2 & b_5 + d_4 + d_3
-\end{bmatrix}
-\]
-
-Knowing that we must interpolate from $b_{05}$ to this value in the outermost lerp, we need a 2D texture that, when read at $(t, st)$, gives us $b_{05}$. We can do that with this texture:
-
-\[
-\begin{bmatrix}
-b_0 & b_5\\
-b_0 & b_5
-\end{bmatrix}
-\]
-
-When this texture is the first slice of a volume texture, and the previous texture is the second slice, we can sample the volume texture at $(t, st, st)$ to get the point on the quintic curve at time $t$, using a single trilinear texture read.
-See Table \ref{tab:SeilerLayout} for a diagram of Seiler textures of various degrees.
-
-Just like in the de Casteljau formulation, when linearly sampling textures, the pixel value is at the center of the pixel. The interpolation-time values need to range from the center of one pixel to the next, instead of being in the usual $[0,1]$ range. For a 2x2 texture, that means that $t$ is in the range $[0.25, 0.75]$. For the combined term $st$, the conversion happens after the multiplication.
-
-\begin{table}[H]
-\centering
-\renewcommand{\arraystretch}{1.5}
-
-\begin{tabular}{|c|c|c|}
-\hline
-\textbf{Degree} & \textbf{$z=0$ Layer} & \textbf{$z=1$ Layer} \\
-\hline
-
-Quadratic ($d=2$) &
-$\begin{bmatrix}
-B_0 & B_2 \\
-B_0 + d_1 & B_2 + d_1
-\end{bmatrix}$
-&
-N/A\\
-\hline
-
-Cubic ($d=3$) &
-$\begin{bmatrix}
-B_0 & B_3 \\
-B_0 + d_1 & B_3 + d_2
-\end{bmatrix}$
-&
-N/A\\
-\hline
+% ---------------- 3D CASES ----------------
 
 Quartic ($d=4$) &
 $\begin{bmatrix}
