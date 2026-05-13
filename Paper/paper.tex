@@ -163,6 +163,7 @@ format, leading to unavoidable quantization errors \cite{CUDA_PG}. If this is a 
 
 \input{Diagrams/CurveAccuracy/figure.tex}
 
+Note that DirectX spec allows UNorm8 to have 0.6 ULP error so the error can be even higher.
 \FloatBarrier
 \section{Seiler Interpolation}
 Seiler interpolation was introduced by Seiler et al. \cite{lin2021hardware} as an efficient method for evaluating cubic Bézier curves using a minimal number of linear interpolations. 
