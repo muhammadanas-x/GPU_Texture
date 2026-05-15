@@ -87,7 +87,6 @@ using both the de Casteljau algorithm and Seiler interpolation. We also compare 
 \FloatBarrier
 \section{De Casteljau Using Linear Texture Interpolation}
 
-\input{Diagrams/BezDecasteljau/figure.tex}
 
 The link between Bézier curves and linear texture interpolation lies in the de Casteljau algorithm, which is based on recursive linear interpolation. For a quadratic curve with control points
 $A$, $B$, and $C$, the de Casteljau algorithm linearly interpolates between $A$ and $B$ to get point $AB$, between $B$ and $C$ to get point $BC$, and between $AB$ and $BC$ to get the final
@@ -95,6 +94,8 @@ point $ABC$, all with the same interpolation time $t$.
 
 Similarly, we can make a 2x2 texture that has a row of pixels with values $A$, $B$, and a row with values $B$, $C$. When this texture is linearly sampled at $(t, t)$, there
 are effectively two horizontal interpolations that produce $AB$ and $BC$, followed by a vertical interpolation between them that produces $ABC$. This equivalence is shown in Figure \ref{fig_tex_decasteljau}.
+
+\input{Diagrams/BezDecasteljau/figure.tex}
 
 For a cubic curve, the de Casteljau algorithm linearly interpolates between two quadratic curve points $ABC$ and $BCD$ to make cubic curve point $ABCD$. If we make a 2x2x2 volume
 texture that has a front slice encoding the quadratic Bézier curve $ABC$ and a back slice encoding $BCD$, sampling at $(t,t,t)$ gives point $ABCD$. For higher-order curves, further
@@ -109,7 +110,6 @@ $[0,1]$ range. For a 2x2 texture, that means that $t$ is in the range $[0.25, 0.
 
 To store multiple quadratic curves in a single de Casteljau texture, we would naively need a 2x2 group of pixels for each curve.
 
-\input{Diagrams/ZigZag/figure.tex}
 
 
 However, it can be observed that the diagonal texels
@@ -129,6 +129,8 @@ As^2 + 2Est + Dt^2
 
 These are equal when $2E = B+C$ or equivalently when $E = (B+C)/2$.  Thus, when the diagonal values mismatch, the control point is defined as their average. If we use this fact
 while also reading in a zig-zag pattern, we can add two pixels for each additional quadratic Bézier segment, instead of four, which reduces redundant memory storage. This is shown in Figure \ref{fig_ZigZag}.
+
+\input{Diagrams/ZigZag/figure.tex}
 
 Since a 2D texture can store arbitrary $C^0$-continuous quadratic Bézier curves, we can place two of them front-to-back into a 3D texture and interpolate to make a cubic curve. The pattern would
 continue for higher order curves if higher dimensional textures were supported.
