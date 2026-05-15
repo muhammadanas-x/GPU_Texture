@@ -79,7 +79,9 @@ parameters. Bézier curves have also been extended to increase their expressiven
 Yuksel explained how Seiler interpolation can be used to evaluate polynomial curves \cite{10.1145/3641233.3664331}, including Bézier curves, and noted that GPU linear
 interpolation could be used for the initial linear interpolation steps, with the remaining interpolations done in shader code.
 
-In this paper, we present the details of evaluating Bézier curves using hardware-accelerated linear texture interpolation and show how to perform all interpolations on the hardware,
+Wolfe previously showed how to evaluate Bézier curves using the GPU texture interpolator \cite{wolfe2016}, but only with the de Casteljau algorithm, which requires more texture reads and storage than Seiler interpolation.
+
+In this paper, we combine the two, to present the details of evaluating Bézier curves using hardware-accelerated linear texture interpolation and show how to perform all interpolations on the hardware,
 using both the de Casteljau algorithm and Seiler interpolation. We also compare performance and accuracy against curves evaluated as polynomials in shader code.
 
 \FloatBarrier
@@ -166,7 +168,7 @@ format, leading to unavoidable quantization errors \cite{CUDA_PG}. If this is a 
 Note that DirectX spec \cite{D3D11_3_FunctionalSpec} allows UNorm8 to have 0.6 ULP error so the error can be even higher.
 \FloatBarrier
 \section{Seiler Interpolation}
-Seiler interpolation was introduced by Seiler et al. \cite{lin2021hardware} as an efficient method for evaluating cubic Bézier curves using a minimal number of linear interpolations. 
+Seiler interpolation was introduced by Lin et al. \cite{lin2021hardware} as an efficient method for evaluating cubic Bézier curves using a minimal number of linear interpolations. 
 Instead of the six lerps required by the classical de Casteljau algorithm, it achieves the same result with only three by introducing carefully constructed difference terms.
 
 For a cubic curve defined by control points \(b_0, b_1, b_2, b_3\), we first compute
