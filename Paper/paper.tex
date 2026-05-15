@@ -407,8 +407,7 @@ Polynomial         & 1.952\,ms & 12.662\,ms \\
 \hline
 \end{tabular}
 \end{minipage}
-\caption{Frame times when path tracing a textureless scene of hardcoded geometry with 16 rays per pixel at 1920x1080 and using quintic curves for color grading each ray result. Averaged over 1000 frames. The RTX 3070 used stable power state to get consistent results.
-Polynomial evaluates the curve as shader instructions, while Seiler Texture uses the GPU texture interpolator to evaluate the curve. Total wall-clock time is reduced when parallelizable work can be offloaded to the texture interpolator in compute-bound workloads.}
+\caption{Frame times when path tracing a textureless scene of hardcoded geometry with 16 rays per pixel at 1920×1080 and using quintic curves for color grading each ray result. Averaged over 1000 frames. The RTX 3070 used a stable power state to ensure consistent results. Polynomial evaluates the curve directly as shader instructions, while Seiler Texture uses the GPU texture interpolator to evaluate the curve. Curve lookup textures use 32-bit floating-point RGBA textures, while the displayed framebuffer input/output uses 8-bit normalized RGBA textures. The accumulation buffer also uses 32-bit floating-point RGBA textures. There is no 8-bit curve atlas in this demo. Total wall-clock time is reduced when parallelizable work can be offloaded to the texture interpolator in compute-bound workloads.}
 \label{tab:ColorGradePerf}
 \end{table}
 
@@ -438,8 +437,7 @@ Polynomial         & 6.9\,ms & 13.9\,ms & 23.2\,ms \\
 \hline
 \end{tabular}
 \end{minipage}
-\caption{Frame time for a particle simulation with particles moving along cubic Bézier curves, measured on an RTX 4050. Polynomial
-evaluates the curve as shader instructions, Seiler Texture uses the GPU texture interpolator to evaluate the curve.}
+\caption{Frame time for a particle simulation with particles moving along cubic Bézier curves, measured on an RTX 4050. Polynomial evaluates the curve as shader instructions, while Seiler Texture uses the GPU texture interpolator to evaluate the curve. Curve lookup textures use 32-bit floating-point RGBA textures (RGBA32F).}
 %\caption{Average frame time (milliseconds between consecutive frames) for different methods at varying particle counts, measured on an RTX 4050.}
 \label{tab:seiler_comparison}
 \end{table}
