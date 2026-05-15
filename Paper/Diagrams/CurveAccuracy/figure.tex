@@ -3,8 +3,8 @@
     \centering
     \includegraphics[width=\textwidth]{Diagrams/CurveAccuracy/diagram.png}
     \caption{Quantization error when evaluating Bézier curves using texture interpolation. Three approaches are compared for cubic and quintic
-    curves: \textit{Seiler} (single texture sample, lowest storage, highest error), \textit{de Casteljau} (single texture sample, moderate storage, moderate error,
-    cubic or less only), and \textit{Hybrid} (Multiple texture samples combined in shaders, moderate storage, lowest error). All methods produce identical results
+    curves: \textit{Seiler} (single texture sample, lowest storage, highest error), \textit{de Casteljau} (single texture sample, highest storage, moderate error,
+    cubic or less only), and \textit{Hybrid} (Multiple texture samples combined in shaders, highest storage, lowest error). All methods produce identical results
     with 32-bit float and 8-bit unorm textures, except Seiler which requires values outside $[0,1]$, so cannot use 8-bit unorm textures.}
     \label{fig_curve_accuracy}
 \end{figure}
