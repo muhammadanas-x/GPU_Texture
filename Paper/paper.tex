@@ -73,7 +73,7 @@ this framework to improve efficiency. We also compare performance and accuracy a
 \label{sec:introduction}
 
 Bézier curves were invented in the late 1950s and early 1960s by Pierre Bézier and Paul de Casteljau to produce curves that were easily controlled and reproduced in computer-aided design
-of automobile bodies. Since then, Bézier curves have been widely adopted in computer graphics for describing geometry and for modeling how data animates over time or in response to other
+of automobile bodies. Since then, Bézier curves have been widely adopted in computer graphics for describing geometry and modeling how data animates over time or in response to other
 parameters. Bézier curves have also been extended to increase their expressiveness and flexibility, such as with B-splines and NURBS. 
 
 Yuksel explained how Seiler interpolation can be used to evaluate polynomial curves \cite{10.1145/3641233.3664331}, including Bézier curves, and noted that GPU linear
@@ -90,7 +90,7 @@ using both the de Casteljau algorithm and Seiler interpolation. We also compare 
 
 The link between Bézier curves and linear texture interpolation lies in the de Casteljau algorithm, which is based on recursive linear interpolation. For a quadratic curve with control points
 $A$, $B$, and $C$, the de Casteljau algorithm linearly interpolates between $A$ and $B$ to get point $AB$, between $B$ and $C$ to get point $BC$, and between $AB$ and $BC$ to get the final
-point $ABC$, all with the same interpolation time $t$.
+point $ABC$, all with the same interpolation parameter $t$.
 
 Similarly, we can make a 2x2 texture that has a row of pixels with values $A$, $B$, and a row with values $B$, $C$. When this texture is linearly sampled at $(t, t)$, there
 are effectively two horizontal interpolations that produce $AB$ and $BC$, followed by a vertical interpolation between them that produces $ABC$. This equivalence is shown in Figure \ref{fig_tex_decasteljau}.
@@ -157,7 +157,7 @@ Lastly, as power basis polynomials can be converted to and from Bernstein basis 
 
 
 When using a low-bit-depth texture format, the values that control points can take are limited; for example, 8-bit textures are limited to 255 values, and to $[0,1]$ when using
-a unorm format. Furthermore, the values read from the curves are also limited to the same range and discretization as the texture format! To deal with this limitation, it is possible to
+a unorm format. Furthermore, the values read from the curves are also limited to the same range and discretization as the texture format. To deal with this limitation, it is possible to
 rescale the curves to fit within the range. Alternatively, higher-bit-depth textures can be used, which can also help if 8-bit discretization of control points is too coarse.
 
 Another source of discretization error is the texture sampling itself. When performing interpolation, the $(u,v)$ coordinates are commonly converted to a fixed-point X.8-bit
@@ -167,7 +167,7 @@ format, leading to unavoidable quantization errors \cite{CUDA_PG}. If this is a 
 
 \input{Diagrams/CurveAccuracy/figure.tex}
 
-Note that DirectX spec \cite{D3D11_3_FunctionalSpec} allows UNorm8 to have 0.6 ULP error so the error can be even higher.
+Note that the DirectX spec \cite{D3D11_3_FunctionalSpec} allows UNorm8 to have 0.6 ULP error so the error can be even higher.
 \FloatBarrier
 \section{Seiler Interpolation}
 Seiler interpolation was introduced by Lin et al. \cite{lin2021hardware} as an efficient method for evaluating cubic Bézier curves using a minimal number of linear interpolations. 
@@ -384,7 +384,7 @@ Modern GPUs hide memory latency by suspending the active thread and switching to
 computational work from the shader program to the texture sampling unit, effectively trading compute for cache-friendly memory access of small textures. A necessary condition for our technique to provide a performance boost is that the workload must be compute-bound.
 That condition isn't sufficient, though, because not all memory reads can be parallelized with all compute.
 
-As a benchmark, we wrote a simple path tracer that traces $N$ rays per pixel per frame, has no textures, and uses hardcoded geometry to remove memory reads and force a compute-bound workload. After rendering, we use curves to color-grade the result. The first part of the work is fully compute, and the second part is entirely memory
+As a benchmark, we wrote a simple path tracer that traces $N$ rays per pixel per frame, has no textures, and uses hardcoded geometry to remove memory reads and force a compute-bound workload. After rendering, we use curves to color-grade the result. The first part of the work is fully computation, and the second part is entirely memory
 reads when using our texture interpolation method. When profiling that workload, we found that performance decreased when using our texture interpolation method instead of compute, because this work was inherently serial and was difficult for the GPU to parallelize.
 
 After modifying the path tracer to color-grade the result of each ray before accumulation, we saw a performance improvement because the next ray can start calculations while the previous ray is color grading. This work has more opportunity to parallelize memory and compute,
