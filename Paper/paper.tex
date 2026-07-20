@@ -7,16 +7,16 @@
 \usepackage{booktabs}
 \usepackage{caption}
 \usepackage{float}
-\setciteauthor{Anas, Wolfe}
+\setciteauthor{Muhammad Anas and Alan Wolfe}
 \setcitetitle{A Texture Lookup Approach to Bézier Curve Evaluation on the GPU}
 %\setheadtitle{Abbreviated title, only if full title won't fit in page headers}
 
 % Mark submissions with the date of submission using the following line:
-\submitted{\today}
+%\submitted{\today}
 
 % Once an article is accepted accepted, switch to the following line and comment the preceding one. The editor will supply the argument values.
-\accepted{yyyy-mm-dd}{yyyy-mm-dd}{yyyy-mm-dd}{Editor Name}{volume}{issue}{1}{6}{yyyy}
-\seturl{http://jcgt.org/published/vol/issue/num/}
+\accepted{2026-03-29}{2026-05-10}{2026-07-??}{Angelo Pesce}{15}{2}{38}{49}{2026}
+\seturl{http://jcgt.org/published/0015/02/02/}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -45,15 +45,15 @@ SEED - Electronic Arts, USA
 }
 
 \teaser{
-\begin{center}
+\centering
 \makebox[\textwidth][c]{%
 \includegraphics[width=1\textwidth]{Diagrams/Title/title2.png}}
-\end{center}
-\caption{A 3D cubic Bézier curve is encoded in the RGB channels of a 2x2 texture and decoded using a single texture lookup with Seiler interpolation. The curve control points are
-$b_0$, $b_1$, $b_2$, $b_3$, and the Seiler points are $s_1$ and $s_2$. This formulation extends to curves of higher and lower degrees, and allows computation to be offloaded to the
+\caption{A 3D cubic Bézier curve is encoded in the RGB channels of a $2 \times 2$ texture and decoded using a single texture lookup with Seiler interpolation. The curve control points are
+$b_0$, $b_1$, $b_2$, and $b_3$, and the Seiler points are $s_1$ and $s_2$. This formulation extends to curves of higher and lower degrees, and allows computation to be offloaded to the
 GPU's fixed-function texture interpolation hardware.}
 \label{fig:teaser}
 }
+%TODO: AQ: If possible, please edit the mathematical variables in the figure so that they match the main text: change x to times symbol, set numbers as subscripts, and set b, s, C, t, and L in italics.
 
 \maketitle
 \thispagestyle{firstpagestyle}
@@ -72,9 +72,9 @@ this framework to improve efficiency. We also compare performance and accuracy a
 
 Bézier curves were invented in the late 1950s and early 1960s by Pierre Bézier and Paul de Casteljau to produce curves that were easily controlled and reproduced in computer-aided design
 of automobile bodies. Since then, Bézier curves have been widely adopted in computer graphics for describing geometry and for modeling how data animates over time or in response to other
-parameters. Bézier curves have also been extended to increase their expressiveness and flexibility, such as with B-splines and NURBS. 
+parameters. Bézier curves have also been extended to increase their expressiveness and flexibility, such as with B-splines and NURBS (non-uniform rational B-splines). 
 
-Yuksel explained how Seiler interpolation can be used to evaluate polynomial curves \cite{10.1145/3641233.3664331}, including Bézier curves, and noted that GPU linear
+\citet{10.1145/3641233.3664331} explained how Seiler interpolation can be used to evaluate polynomial curves, including Bézier curves, and noted that GPU linear
 interpolation could be used for the initial linear interpolation steps, with the remaining interpolations done in shader code.
 
 In this paper, we present the details of evaluating Bézier curves using hardware-accelerated linear texture interpolation and show how to perform all interpolations on the hardware,
@@ -82,55 +82,56 @@ using both the de Casteljau algorithm and Seiler interpolation. We also compare 
 
 \section{De Casteljau Using Linear Texture Interpolation}
 
-\input{Diagrams/BezDecasteljau/figure.tex}
 
 The link between Bézier curves and linear texture interpolation lies in the de Casteljau algorithm, which is based on recursive linear interpolation. For a quadratic curve with control points
 $A$, $B$, and $C$, the de Casteljau algorithm linearly interpolates between $A$ and $B$ to get point $AB$, between $B$ and $C$ to get point $BC$, and between $AB$ and $BC$ to get the final
 point $ABC$, all with the same interpolation time $t$.
 
-Similarly, we can make a 2x2 texture that has a row of pixels with values $A$, $B$, and a row with values $B$, $C$. When this texture is linearly sampled at $(t, t)$, there
-are effectively two horizontal interpolations that produce $AB$ and $BC$, followed by a vertical interpolation between them that produces $ABC$. This equivalence is shown in Figure \ref{fig_tex_decasteljau}.
+Similarly, we can make a $2 \times 2$ texture that has a row of pixels with values $A$ and $B$, and a row with values $B$ and $C$. When this texture is linearly sampled at $(t, t)$, there
+are effectively two horizontal interpolations that produce $AB$ and $BC$, followed by a vertical interpolation between them that produces $ABC$. This equivalence is shown in Figure~\ref{fig_tex_decasteljau}.
 
-For a cubic curve, the de Casteljau algorithm linearly interpolates between two quadratic curve points $ABC$ and $BCD$ to make cubic curve point $ABCD$. If we make a 2x2x2 volume
+\input{Diagrams/BezDecasteljau/figure.tex}
+%TODO: AQ: In the image, please insert a space before and after each equal sign, and set t and uv in italics (as well as bold).
+%TODO: AQ: Should "uv" be "(u, v)" instead?
+
+For a cubic curve, the de Casteljau algorithm linearly interpolates between two quadratic curve points $ABC$ and $BCD$ to make cubic curve point $ABCD$. If we make a $2 \times 2 \times 2$ volume
 texture that has a front slice encoding the quadratic Bézier curve $ABC$ and a back slice encoding $BCD$, sampling at $(t,t,t)$ gives point $ABCD$. For higher-order curves, further
 interpolation levels can be done in the shader after the texture reads, since 4D and higher-dimensional textures are not supported on modern GPUs.
 
 When linearly sampling textures, the pixel value is at the center of the pixel, so the $t$ values need to range from the center of one pixel to the next, instead of being in the usual
-$[0,1]$ range. For a 2x2 texture, that means that $t$ is in the range $[0.25, 0.75]$.
+$[0,1]$ range. For a $2 \times 2$ texture, that means that $t$ is in the range $[0.25, 0.75]$.
 
-\subsection{$C^0$-Continuous Piecewise Curves}
+\subsection{\textit{C}$^\text{0}$-Continuous Piecewise Curves}
 
-\input{Diagrams/ZigZag/figure.tex}
 
-To store multiple quadratic curves in a single de Casteljau texture, we would naively need a 2x2 group of pixels for each curve. However, it can be observed that the diagonal texels
-only need to average to $B$. If we have a 2x2 texture with rows $A, B$ and $C, D$, and we define $s = 1 - t$, bilinear interpolation can be written and expanded as:
-
+To store multiple quadratic curves in a single de Casteljau texture, we would naively need a $2 \times 2$ group of pixels for each curve. However, it can be observed that the diagonal texels
+only need to average to $B$. If we have a $2 \times 2$ texture with rows $A, B$ and $C, D$, and we define $s = 1 - t$, the bilinear interpolation can be written and expanded~as
 \begin{equation}
 \begin{split}
-(As + Bt)s + (Cs + Dt)t \Rightarrow \\ As^2 + (B+C)st + Dt^2
+(As + Bt)s + (Cs + Dt)t \quad \Rightarrow \quad As^2 + (B+C)st + Dt^2 .
 \end{split}
 \end{equation}
-
-Doing the same for a texture with rows $A, E$ and $E, D$, we get:
-
+Doing the same for a texture with rows $A, E$ and $E, D$, we get
 \begin{equation}
-As^2 + 2Est + Dt^2
+As^2 + 2Est + Dt^2 .
 \end{equation}
 
 These are equal when $2E = B+C$ or equivalently when $E = (B+C)/2$.  Thus, when the diagonal values mismatch, the control point is defined as their average. If we use this fact
-while also reading in a zig-zag pattern, we can add two pixels for each additional quadratic Bézier segment, instead of four, which reduces redundant memory storage. This is shown in Figure \ref{fig_ZigZag}.
+while also reading in a zigzag pattern, we can add two pixels for each additional quadratic Bézier segment, instead of four, which reduces redundant memory storage. This is shown in Figure~\ref{fig_ZigZag}.
+
+\input{Diagrams/ZigZag/figure.tex}
 
 Since a 2D texture can store arbitrary $C^0$-continuous quadratic Bézier curves, we can place two of them front-to-back into a 3D texture and interpolate to make a cubic curve. The pattern would
-continue for higher order curves if higher dimensional textures were supported.
+continue for higher-order curves if higher-dimensional textures were supported.
 
 \subsection{Surfaces, Volumes, and NURBS}
 
 Bézier tensor-product surfaces and volumes can be evaluated using this technique as well. If you are using the texture interpolator and the shader to evaluate an order-$O$ curve, you can split
 that into order $M$ and $N$ such that $M+N=O$, to evaluate order $M$ with coordinate $t$ and order $N$ with coordinate $u$ to get the point on a surface.  The simplest incarnation of this
-is sampling a 2D texture at coordinate $(t, u)$ to evaluate a bilinear Bézier surface. Similarly, for volumes, you can break the order $O$ into $M$, $N$ and $P$ such that $M+N+P=O$, to make
+is sampling a 2D texture at coordinate $(t, u)$ to evaluate a bilinear Bézier surface. Similarly, for volumes, you can break the order $O$ into $M$, $N$, and $P$ such that $M+N+P=O$, to make
 a Bézier volume. The pattern extends to hypervolumes as well.
 
-If needing to evaluate multiple curves at once, you can use multiple color channels. A nice coincidence is that a bicubic surface parameterized by $(u,v)$ can fit into a 2x2x2 RGBA 3D texture.
+If needing to evaluate multiple curves at once, you can use multiple color channels. A nice coincidence is that a bicubic surface parameterized by $(u,v)$ can fit into a $2 \times 2 \times 2$ RGBA 3D texture.
 Reading the 3D texture at $(u,u,u)$ evaluates a cubic Bézier curve in each color channel. The four resulting points are the control points of the cubic-curve isoline to be evaluated with $v$ in
 the shader to get the final point on the surface.
 
@@ -143,163 +144,144 @@ Lastly, as power basis polynomials can be converted to and from Bernstein basis 
 
 \input{Diagrams/CurveAccuracy/figure.tex}
 
-When using a low-bit-depth texture format, the values that control points can take are limited; for example, 8-bit textures are limited to 255 values, and to $[0,1]$ when using
-a unorm format. Furthermore, the values read from the curves are also limited to the same range and discretization as the texture format! To deal with this limitation, it is possible to
-rescale the curves to fit within the range. Alternatively, higher-bit-depth textures can be used, which can also help if 8-bit discretization of control points is too coarse.
+When using a low-bit-depth texture format, the values that control points can take are limited; for example, $8$-bit textures are limited to $255$ values, and to $[0,1]$ when using
+a unsigned normalized integer (UNORM) format. Furthermore, the values read from the curves are also limited to the same range and discretization as the texture format! To deal with this limitation, it is possible to
+rescale the curves to fit within the range. Alternatively, higher-bit-depth textures can be used, which can also help if $8$-bit discretization of control points is too coarse.
 
-Another source of discretization error is the texture sampling itself. When performing interpolation, the $(u,v)$ coordinates are commonly converted to a fixed-point X.8-bit
+Another source of discretization error is the texture sampling itself. When performing interpolation, the $(u,v)$ coordinates are commonly converted to a fixed-point X.$8$-bit
 format, leading to unavoidable quantization errors \cite{CUDA_PG}. If this is a problem, doing some interpolation levels in the shader can help reduce the error, since shaders run at full
-32-bit floating-point precision. The quantization errors are shown in Figure \ref{fig_curve_accuracy}.
+$32$-bit floating-point precision. The quantization errors are shown in Figure~\ref{fig_curve_accuracy}.
 
 \section{Seiler Interpolation}
-Seiler interpolation was introduced by Lin et al. \cite{lin2021hardware} as an efficient method for evaluating cubic Bézier curves using a minimal number of linear interpolations. 
-Instead of the six lerps required by the classical de Casteljau algorithm, it achieves the same result with only three by introducing carefully constructed difference terms.
+Seiler interpolation was introduced by \citet{lin2021hardware} as an efficient method for evaluating cubic Bézier curves using a minimal number of linear interpolations. 
+Instead of the six linear interpolations (lerps) required by the classical de Casteljau algorithm, it achieves the same result with only three by introducing carefully constructed difference terms.
 
 For a cubic curve defined by control points \(b_0, b_1, b_2, b_3\), we first compute
 \[
 d_1 = 3(b_1 - b_0) - (b_3 - b_0), \qquad
 d_2 = 3(b_2 - b_3) - (b_0 - b_3).
 \]
-
 We then define the Seiler points as
 \[
 s_1 = b_0 + d_1, \qquad s_2 = b_3 + d_2.
 \]
-
-Next, the interpolated endpoints and difference points are computed:
+Next, the interpolated endpoints and difference points are computed as
 \[
 b_{03} = L(b_0, b_3, t), \qquad
 s_{12} = L(s_1, s_2, t),
 \]
-
 and the final curve position is evaluated by
 \[
 C(t) = L(b_{03}, s_{12}, (1-t)t).
 \]
-
 This form provides an exact cubic Bézier evaluation using only three linear interpolations.
 
-\subsection{Arbitrary Degree Curves}
+\subsection{Arbitrary-Degree Curves}
+%TODO: AQ: Note that the use of a lone subsection is discouraged; ideally there should be at least two subsections. Please consider solutions like adding a subsection in the previous discussion, changing the heading to a section, or removing the subsection heading.
 
 For a polynomial curve of degree $d$ with control points 
 $b_0, b_1, \dots, b_d$, Seiler interpolation can be written recursively as
-
 \[
 C(t) = L(b_0, b_d, t) + (1 - t)t \, D_1(t),
 \]
-
 where the recursive term is defined as
-
 \[
 D_i(t) =
 \begin{cases}
-0, & \text{if } 2i = d + 1, \\[6pt]
-d_i, & \text{if } 2i = d, \\[6pt]
+0, & \text{if } 2i = d + 1, \\[2pt]
+d_i, & \text{if } 2i = d, \\[2pt]
 L(d_i, d_{d-i}, t) + (1 - t)t \, D_{i+1}(t), & \text{otherwise}.
 \end{cases}
 \]
 
 The difference terms are computed from the Bézier control points. 
-For general degree $d$:
-
-\[
-d_1 = d(b_1 - b_0) - (b_d - b_0),
-\]
-\[
-d_{d-1} = d(b_{d-1} - b_d) - (b_0 - b_d).
-\]
-
-For degrees up to $5$, additional terms can be computed as:
-
-\[
-d_2 =
-\binom{d}{2}(b_2 - b_1)
-- \binom{d-2}{2}(b_1 - b_0)
+For general degree $d$,
+\begin{align*}
+d_1 &= d(b_1 - b_0) - (b_d - b_0),\\
+d_{d-1} &= d(b_{d-1} - b_d) - (b_0 - b_d).
+\end{align*}
+For degrees up to $5$, additional terms can be computed as
+\begin{align*}
+d_2 &=
+\!\binom{d}{2}\!(b_2 - b_1)
+- \binom{d-2}{2}\!(b_1 - b_0)
 - (d-3)(b_{d-1} - b_d)
 - 3(b_{d-1} - b_1),
-\]
-
-\[
-d_{d-2} =
-\binom{d}{2}(b_{d-2} - b_{d-1})
-- \binom{d-2}{2}(b_{d-1} - b_d)
-- (d-3)(b_1 - b_0)
-- 3(b_1 - b_{d-1}).
-\]
+\\[3pt]
+d_{d-2} &=
+\!\binom{d}{2}\!(b_{d-2} - b_{d-1})\!
+- \!\binom{d-2}{2}\!(b_{d-1} - b_d)\!
+-\! (d-3)(b_1 - b_0)
+\!-\! 3(b_1 - b_{d-1}).
+\end{align*}
 
 For a degree-$d$ polynomial, Seiler interpolation requires $d$ linear 
 interpolations, $\lceil d/2 \rceil$ of which can be computed in parallel, 
 since they operate on disjoint pairs of difference terms.
 
 Explicit closed-form difference rules are currently known up to degree $5$.
+
 \section{Seiler Interpolation Using Linear Texture Interpolation}
 
-Using Seiler interpolation, a cubic Bézier curve can be written as follows:
-
+Using Seiler interpolation, a cubic Bézier curve can be written as 
 \begin{equation}
-C(t) = L(b_0, b_3, t) + L(d_1, d_2, t)\,st
+C(t) = L(b_0, b_3, t) + L(d_1, d_2, t)\,st .
+\end{equation}
+Here, $L(a,b,t)$ denotes linear interpolation from $a$ to $b$ at parameter $t$, and $s = 1-t$. Observing that $A+Bt$ (a multiply-add) can be reformulated as a linear interpolation $L(A, A+B, t)$ allows us to rewrite the equation using only lerps:
+\begin{equation}
+C(t) = L( L(b_0, b_3, t), L(d_1 + b_0, d_2 + b_3, t), st).
 \end{equation}
 
-Here, $L(a,b,t)$ denotes linear interpolation from $a$ to $b$ at parameter $t$, and $s = 1-t$. Observing that $A+Bt$ (a multiply-add) can be reformulated as a linear interpolation $L(A, A+B, t)$ allows us to rewrite the equation using only lerps.
-
+This is equivalent to the ``pure lerp'' form by \citet{10.1145/3641233.3664331}, where $d_1 + b_0$ and $d_2 + b_3$ are replaced with $s_1$ and $s_2$, respectively:
 \begin{equation}
-C(t) = L( L(b_0, b_3, t), L(d_1 + b_0, d_2 + b_3, t), st)
+C(t) = L( L(b_0, b_3, t), L(s_1, s_2, t), st).
 \end{equation}
+This allows us to make a $2 \times 2$ texture where the top row of pixels contains $b_0$ and $b_3$, and the bottom row contains $s_1$ and $s_2$. Sampling that texture at coordinate $(t, st)$ gives the final point on the curve. This is shown in Figure~\ref{fig:teaser}.
 
-This is equivalent to the "pure lerp" form in Yuksel \cite{10.1145/3641233.3664331}, where $d_1 + b_0$ and $d_2 + b_3$ are replaced with $s_1$ and $s_2$, respectively.
+Using Seiler interpolation in this way allows us to store a cubic curve in a $2 \times 2$ texture, whereas the de Casteljau texture formulation would require a $2 \times 2 \times 2$ texture. A cubic curve has four control points, and a $2 \times 2$ texture has the same number of degrees of freedom with four pixels, so
+there is no redundant storage, unlike the de Casteljau formulation, which requires eight pixels.
 
-\begin{equation}
-C(t) = L( L(b_0, b_3, t), L(s_1, s_2, t), st)
-\end{equation}
-
-This allows us to make a 2x2 texture where the top row of pixels contains $b_0$ and $b_3$, and the bottom row contains $s_1$ and $s_2$. Sampling that texture at coordinate $(t, st)$ gives the final point on the curve. This is shown in Figure \ref{fig:teaser}.
-
-Using Seiler interpolation in this way allows us to store a cubic curve in a 2x2 texture, whereas the de Casteljau texture formulation would require a 2x2x2 texture. A cubic curve has 4 control points, and a 2x2 texture has the same number of degrees of freedom with 4 pixels, so
-there is no redundant storage, unlike the de Casteljau formulation which requires 8 pixels.
-
-The highest-order curve currently known in Seiler interpolation is a quintic curve, which has 6 control points. The pure-lerp form can be written as:
-
+The highest-order curve currently known in Seiler interpolation is a quintic curve, which has six control points. The pure lerp form can be written as
 \begin{equation}
     \begin{split}
-    C(t) = L(b_{05}, L(b_{05} + d_{14}, b_{05} + d_{14} + d_{23}, st), st) \\
-    \text{where } \\
-    b_{05} = L(b_0, b_5, t) \\
-    d_{14} = L(d_1, d_4, t) \\
-    d_{23} = L(d_2, d_3, t)
+    C(t) = L(b_{05}, L(b_{05} + d_{14}, b_{05} + d_{14} + d_{23}, st), st), \\
+    \text{where } \quad
+    \begin{array}{l}
+    b_{05} = L(b_0, b_5, t), \\
+    d_{14} = L(d_1, d_4, t), \\
+    d_{23} = L(d_2, d_3, t).
+    \end{array}
     \end{split}
 \end{equation}
 
 The second parameter of the outermost linear interpolation can be realized with a 2D texture that is read at location $(t, st)$:
-
 \[
 \begin{bmatrix}
 b_0 + d_1 & b_5 + d_4 \\
 b_0 + d_1 + d_2 & b_5 + d_4 + d_3
-\end{bmatrix}
+\end{bmatrix} .
 \]
-
 Knowing that we must interpolate from $b_{05}$ to this value in the outermost lerp, we need a 2D texture that, when read at $(t, st)$, gives us $b_{05}$. We can do that with this texture:
-
 \[
 \begin{bmatrix}
 b_0 & b_5\\
-b_0 & b_5
-\end{bmatrix}
+b_0 & b_5 
+\end{bmatrix} .
 \]
 
-When this texture is the first slice of a volume texture, and the previous texture is the second slice, we can sample the volume texture at $(t, st, st)$ to get the point on the quintic curve at time $t$, using a single trilinear texture read.
-See Table \ref{tab:SeilerLayout} for a diagram of Seiler textures of various degrees.
+When that texture is the first slice of a volume texture, and the previous texture is the second slice, we can sample the volume texture at $(t, st, st)$ to get the point on the quintic curve at time $t$, using a single trilinear texture read.
+See Table~\ref{tab:SeilerLayout} for a diagram of Seiler textures of various degrees.
 
 Just like in the de Casteljau formulation, when linearly sampling textures, the pixel value is at the center of the pixel. The interpolation-time values need to range from the center of one pixel to the next, instead of being in the usual
-$[0,1]$ range. For a 2x2 texture, that means that $t$ is in the range $[0.25, 0.75]$. For the combined term $st$, the conversion happens after the multiplication.
+$[0,1]$ range. For a $2 \times 2$ texture, that means that $t$ is in the range $[0.25, 0.75]$. For the combined term $st$, the conversion happens after the multiplication.
 
-\begin{table}[H]
-\centering
+\begin{table}[t]
+\centering\small
 \renewcommand{\arraystretch}{1.5}
 
 \begin{tabular}{|c|c|c|}
 \hline
-\textbf{Degree} & \textbf{$z=0$ Layer} & \textbf{$z=1$ Layer} \\
+\textbf{Degree} & \textbf{\textit{z} = 0 Layer} & \textbf{\textit{z} = 1 Layer} \\
 \hline
 
 Quadratic ($d=2$) &
@@ -351,7 +333,7 @@ B_0 + d_1 + d_2 & B_5 + d_4 + d_3
 
 \end{tabular}
 
-\caption{Structured arrangement of Seiler difference terms for polynomial degrees 2 through 5. The 2D textures are read using coordinates $(t, st)$, while the 3D textures are read using coordinates $(t, st, st)$. This layout allows efficient evaluation of curves using the GPU's texture interpolation hardware.}
+\caption{Structured arrangement of Seiler difference terms for polynomial degrees~$2$ through~$5$. The 2D textures are read using coordinates $(t, st)$, while the 3D textures are read using coordinates $(t, st, st)$. This layout allows efficient evaluation of curves using the GPU's texture interpolation hardware.}
 \label{tab:SeilerLayout}
 \end{table}
 
@@ -365,10 +347,10 @@ As a benchmark, we wrote a simple path tracer that traces $N$ rays per pixel per
 reads when using our texture interpolation method. When profiling that workload, we found that performance decreased when using our texture interpolation method instead of compute, because this work was inherently serial and was difficult for the GPU to parallelize.
 
 After modifying the path tracer to color-grade the result of each ray before accumulation, we saw a performance improvement because the next ray can start calculations while the previous ray is color grading. This work has more opportunity to parallelize memory and compute,
-so the overall wall-clock time is reduced. These results are shown in Table \ref{tab:ColorGradePerf}.
+so the overall wall-clock time is reduced. These results are shown in Table~\ref{tab:ColorGradePerf}.
 
-\begin{table}[h]
-\centering
+\begin{table}[t]
+\centering\small
 \renewcommand{\arraystretch}{1.3}
 \begin{minipage}[t]{0.38\linewidth}
 \vspace{0pt}
@@ -379,7 +361,7 @@ so the overall wall-clock time is reduced. These results are shown in Table \ref
 \begin{minipage}[t]{0.58\linewidth}
 \vspace{0pt}
 \centering
-\begin{tabular}{lcc}
+\begin{tabular}{@{}lcc@{}}
 \hline
 \textbf{Method} & \textbf{RTX 4090} & \textbf{RTX 3070} \\
 \hline
@@ -388,17 +370,17 @@ Polynomial         & 1.952\,ms & 12.662\,ms \\
 \hline
 \end{tabular}
 \end{minipage}
-\caption{Frame times when path tracing a textureless scene of hardcoded geometry with 16 rays per pixel at 1920x1080 and using quintic curves for color grading each ray result. Averaged over 1000 frames. The RTX 3070 used stable power state to get consistent results.
-Polynomial evaluates the curve as shader instructions, while Seiler Texture uses the GPU texture interpolator to evaluate the curve. Total wall-clock time is reduced when parallelizable work can be offloaded to the texture interpolator in compute-bound workloads.}
+\caption{Frame times when path tracing a textureless scene of hardcoded geometry with $16$ rays per pixel at $1920 \times 1080$ and using quintic curves for color grading each ray result, averaged over $1000$ frames. The RTX 3070 used a stable power state to get consistent results.
+The polynomial method evaluates the curve as shader instructions, while the Seiler texture method uses the GPU texture interpolator to evaluate the curve. Total wall-clock time is reduced when parallelizable work can be offloaded to the texture interpolator in compute-bound workloads.}
 \label{tab:ColorGradePerf}
 \end{table}
 
 As another performance test, we implemented a particle simulation where several cubic Bézier curves are chained together to form a ring shape. Particles are spawned on the curves and move along them over their lifetime in a vertex shader.
-We tested the performance using both our Seiler texture method, which stores each cubic curve in a 2x2 texture and evaluates the curve with a single bilinear read, and the Bernstein polynomial method, which evaluates
-the curve as shader instructions. The results are shown in Table \ref{tab:seiler_comparison}.
+We tested the performance using both our Seiler texture method, which stores each cubic curve in a $2 \times 2$ texture and evaluates the curve with a single bilinear read, and the Bernstein polynomial method, which evaluates
+the curve as shader instructions. The results are shown in Table~\ref{tab:seiler_comparison}.
 
-\begin{table}[h]
-\centering
+\begin{table}[b]
+\centering\small
 \renewcommand{\arraystretch}{1.3}
 \begin{minipage}[t]{0.38\linewidth}
 \vspace{0pt}
@@ -409,9 +391,9 @@ the curve as shader instructions. The results are shown in Table \ref{tab:seiler
 \begin{minipage}[t]{0.58\linewidth}
 \vspace{0pt}
 \centering
-\begin{tabular}{lccc}
+\begin{tabular}{@{}lccc@{}}
 \hline
-\textbf{Method} & \textbf{1m} & \textbf{5m} & \textbf{10m} \\
+\textbf{Method} & \textbf{1\,m} & \textbf{5\,m} & \textbf{10\,m} \\
 \hline
 Polynomial         & 6.9\,ms & 13.9\,ms & 23.2\,ms \\
 \textbf{Seiler Texture (Ours)} & 6.9\,ms &  \textbf{10.3}\,ms & \textbf{18.6}\,ms \\
@@ -419,8 +401,8 @@ Polynomial         & 6.9\,ms & 13.9\,ms & 23.2\,ms \\
 \hline
 \end{tabular}
 \end{minipage}
-\caption{Frame time for a particle simulation with particles moving along cubic Bézier curves, measured on an RTX 4050. Polynomial
-evaluates the curve as shader instructions, Seiler Texture uses the GPU texture interpolator to evaluate the curve.}
+\caption{Frame time for a particle simulation with particles moving along cubic Bézier curves, measured on an RTX 4050. The polynomial method
+evaluates the curve as shader instructions; the Seiler texture method uses the GPU texture interpolator to evaluate the curve.}
 %\caption{Average frame time (milliseconds between consecutive frames) for different methods at varying particle counts, measured on an RTX 4050.}
 \label{tab:seiler_comparison}
 \end{table}
@@ -428,35 +410,35 @@ evaluates the curve as shader instructions, Seiler Texture uses the GPU texture 
 \section{Conclusions and Future Work}
 
 We have shown that certain types of operations can be offloaded to the GPU's fixed-function texture interpolation hardware to improve performance in compute-bound GPU workloads.
-While the quality of those calculations can degrade by being done at a low bit count quantized precision, the option to offload only some of the work allows a sliding scale of
+While the quality of those calculations can degrade by being done at a low-bit-count quantized precision, the option to offload only some of the work allows a sliding scale of
 performance benefits versus quality.
 
 We show how to evaluate curves, surfaces, and volumes using the GPU texture interpolator to perform the de Casteljau algorithm, but we only show curves for Seiler interpolation.
 Exploring surfaces and volumes with Seiler interpolation in the GPU texture interpolator could be fruitful.
 
-Yuksel's paper provides formulas for Seiler interpolation up to degree 5, which has 6 control points. We believe that for a 3D volume texture with 8 pixels arranged as 2x2x2, degree
-7 with 8 control points should be possible, much like cubic Bézier curves with 4 control points can be evaluated with a 2D texture with 4 pixels as 2x2. It may also be possible
+\citet{10.1145/3641233.3664331} provides formulas for Seiler interpolation up to degree $5$, which has six control points. We believe that for a 3D volume texture with eight pixels arranged as $2 \times 2 \times 2$, degree
+$7$ with eight control points should be possible, much like how cubic Bézier curves with four control points can be evaluated with a 2D texture with four pixels as $2 \times 2$. It may also be possible
 to make higher-order curves in the same texture sizes by putting constraints on the control points and removing degrees of freedom, such as is done for piecewise curves that require
 continuity at the endpoints. Exploring these avenues may lead to more use cases.
 
-\subsection*{Acknowledgements}
+\section*{Acknowledgements}
 
 We would like to thank the Rendering Engineering Special Interest Group (\#rendering-engineering-sig) chat room at Electronic Arts for helping us understand when these methods
 would be useful.
+
+\section*{Index of Supplemental Materials}
+
+The Demos folder contains three subfolders.
+\begin{itemize}
+    \item \textbf{ColorGrading:} The path tracer used to benchmark the performance of color grading with curves, as shown in Table~\ref{tab:ColorGradePerf}. Written in Gigi (\url{https://github.com/electronicarts/gigi}), it also contains code-generated DX12 and WebGPU versions.
+    \item \textbf{ParticleSim:} The particle simulation used to benchmark the performance of evaluating curves with particles moving along them, as shown in Table~\ref{tab:seiler_comparison}.
+    \item \textbf{ViewCurves:} The curve visualization utility shown in Figure~\ref{fig_curve_accuracy}. Written in Gigi (\url{https://github.com/electronicarts/gigi}), it also contains code-generated DX12 and WebGPU versions.
+\end{itemize}
 
 \small
 \bibliographystyle{jcgt}
 \bibliography{paper}
 
-\section*{Index of Supplemental Materials}
-
-The Demos folder contains three subfolders.
-
-\begin{itemize}
-    \item \textbf{ColorGrading} - The path tracer used to benchmark the performance of color grading with curves, as shown in Table \ref{tab:ColorGradePerf}. Written in Gigi (https://github.com/electronicarts/gigi); also contains code-generated DX12 and WebGPU versions.
-    \item \textbf{ParticleSim} - The particle simulation used to benchmark the performance of evaluating curves with particles moving along them, as shown in Table \ref{tab:seiler_comparison}.
-    \item \textbf{ViewCurves} - The curve visualization utility shown in Figure \ref{fig_curve_accuracy}. Written in Gigi (https://github.com/electronicarts/gigi); also contains code-generated DX12 and WebGPU versions.
-\end{itemize}
 
 \section*{Author Contact Information}
 
