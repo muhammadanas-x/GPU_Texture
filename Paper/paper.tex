@@ -47,7 +47,7 @@ SEED - Electronic Arts, USA
 \teaser{
 \centering
 \makebox[\textwidth][c]{%
-\includegraphics[width=1\textwidth]{Diagrams/Title/title2.png}}
+\includegraphics[width=1\textwidth]{Diagrams/Title/title2_cropped.png}}
 \caption{A 3D cubic Bézier curve is encoded in the RGB channels of a $2 \times 2$ texture and decoded using a single texture lookup with Seiler interpolation. The curve control points are
 $b_0$, $b_1$, $b_2$, and $b_3$, and the Seiler points are $s_1$ and $s_2$. This formulation extends to curves of higher and lower degrees, and allows computation to be offloaded to the
 GPU's fixed-function texture interpolation hardware.}
@@ -176,8 +176,8 @@ C(t) = L(b_{03}, s_{12}, (1-t)t).
 \]
 This form provides an exact cubic Bézier evaluation using only three linear interpolations.
 
-\subsection{Arbitrary-Degree Curves}
 %TODO: AQ: Note that the use of a lone subsection is discouraged; ideally there should be at least two subsections. Please consider solutions like adding a subsection in the previous discussion, changing the heading to a section, or removing the subsection heading.
+\vspace{0.5em}
 
 For a polynomial curve of degree $d$ with control points 
 $b_0, b_1, \dots, b_d$, Seiler interpolation can be written recursively as
